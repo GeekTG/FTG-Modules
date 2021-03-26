@@ -1,4 +1,7 @@
-ping
 notes
 notexec
 noterminal
+terminal
+info
+afk
+speedtest

@@ -2,3 +2,11 @@ ping
 notes
 notexec
 noterminal
+afk
+dice
+info
+lydia
+lyrics
+purge
+speedtest
+terminal
