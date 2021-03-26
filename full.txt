@@ -10,3 +10,4 @@ lyrics
 purge
 speedtest
 terminal
+image_manager

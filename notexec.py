@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+
+# Module author: @DneZyeK
+
 import logging
 import traceback
 import sys

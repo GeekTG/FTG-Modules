@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+
+# Module author: @DneZyeK
+
 from .. import loader, utils
 import logging
 import asyncio

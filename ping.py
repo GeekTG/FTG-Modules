@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+
+# Module author: @xadjIlut
+
 from telethon import events
 from telethon.errors.rpcerrorlist import YouBlockedUserError
 from telethon.tl.types import MessageEntityMention as mem
