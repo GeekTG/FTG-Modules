@@ -5,3 +5,4 @@ terminal
 info
 afk
 speedtest
+stickers
