@@ -6,3 +6,4 @@ info
 afk
 speedtest
 stickers
+information

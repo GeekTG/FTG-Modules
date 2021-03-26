@@ -13,3 +13,4 @@ terminal
 image_manager
 admin_tools
 stickers
+information
