@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+
+# Module author: @Fl1yd
+
 import os
 from .. import loader, utils
 from telethon.tl.functions.photos import GetUserPhotosRequest
