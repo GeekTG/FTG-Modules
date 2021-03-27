@@ -4,7 +4,6 @@ noterminal
 terminal
 info
 afk
-speedtest
 stickers
 information
 quotes
