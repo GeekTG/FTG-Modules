@@ -121,7 +121,7 @@ class mQuotesMod(loader.Module):
 
     @loader.unrestricted
     @loader.ratelimit
-    async def mquotecmd(self, message):
+    async def quotecmd(self, message):
         """.mquote <reply> - quote a message"""
         message.from_id = message.sender_id
         await quote_handler(self, message)
