@@ -50,10 +50,10 @@ class PurgeMod(loader.Module):
                     entity=message.to_id,
                     min_id=message.reply_to_msg_id - 1,
                     reverse=True):
-                if from_users and msg.from_id not in from_users:
+                if from_users and msg.sender_id not in from_users:
                     continue
                 msgs.append(msg.id)
-                from_ids.add(msg.from_id)
+                from_ids.add(msg.sender_id)
                 if len(msgs) >= 99:
                     logger.debug(msgs)
                     await message.client.delete_messages(message.to_id, msgs)
@@ -78,4 +78,4 @@ class PurgeMod(loader.Module):
         msgs.append(msg.id)
         logger.debug(msgs)
         await message.client.delete_messages(message.to_id, msgs)
-        await self.allmodules.log("delete", group=message.to_id, affected_uids=[msg.from_id])
+        await self.allmodules.log("delete", group=message.to_id, affected_uids=[msg.sender_id])
