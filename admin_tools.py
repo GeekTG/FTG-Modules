@@ -69,7 +69,6 @@ def register(cb):
 class AdminToolsMod(loader.Module):
     """Chat administration."""
     strings = {'name': 'AdminTools',
-               'no_reply': '<b>No reply to the pic/sticker.</b>',
                'not_pic': '<b>This isn`t an pic/sticker.</b>',
                'wait': '<b>Waiting...</b>',
                'pic_so_small': '<b>The image is too small, try another one.</b>',
