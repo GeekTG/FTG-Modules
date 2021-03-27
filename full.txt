@@ -19,7 +19,6 @@ autoprofile
 google
 lmgtfy
 nopm
-typer
 recent_actions
 spam
 translate
@@ -31,3 +30,5 @@ file_uploader
 urldl
 callcontrol
 text_editor
+weather
+demot
