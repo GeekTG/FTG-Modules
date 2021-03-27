@@ -12,6 +12,7 @@ from meval import meval
 import telethon
 
 from .. import loader, utils
+
 logger = logging.getLogger(__name__)
 
 
@@ -23,13 +24,14 @@ class ExecutorMod(loader.Module):
                "no_note": "<b>Notexec not found</b>",
                "execute_fail": ("<b>Failed to execute expression:</b>\n<code>{}</code>")
                }
+
     async def notexeccmd(self, message):
         """Gets the note specified"""
         args = utils.get_args(message)
         if not args:
             await utils.answer(message, self.strings("what_note", message))
             return
-        
+
         asset_id = self._db.get("friendly-telegram.modules.notes", "notes", {}).get(args[0], None)
         logger.debug(asset_id)
         if asset_id is not None:
@@ -45,7 +47,7 @@ class ExecutorMod(loader.Module):
             return
 
         cmd = await self._db.fetch_asset(asset_id)
-        
+
         try:
             await meval(cmd.raw_text, globals(), **await self.getattrs(message))
         except Exception:
@@ -55,7 +57,6 @@ class ExecutorMod(loader.Module):
                                .format(utils.escape_html(exc)))
             return
 
-
     async def client_ready(self, client, db):
         self.client = client
         self.db = db
@@ -63,7 +64,8 @@ class ExecutorMod(loader.Module):
 
     async def getattrs(self, message):
         return {"message": message, "client": self.client, "self": self, "db": self.db,
-                "reply": await message.get_reply_message(), "event": message,"chat": message.to_id , **self.get_types(), **self.get_functions()}
+                "reply": await message.get_reply_message(), "event": message, "chat": message.to_id, **self.get_types(),
+                **self.get_functions()}
 
     def get_types(self):
         return self.get_sub(telethon.tl.types)
@@ -77,8 +79,8 @@ class ExecutorMod(loader.Module):
                               it.__dict__.items())),
                 **dict(itertools.chain.from_iterable([self.get_sub(y[1], _depth + 1).items() for y in
                                                       filter(lambda x: x[0][0] != "_"
-                                                             and isinstance(x[1], types.ModuleType)
-                                                             and x[1] != it
-                                                             and x[1].__package__.rsplit(".", _depth)[0]
-                                                             == "telethon.tl",
+                                                                       and isinstance(x[1], types.ModuleType)
+                                                                       and x[1] != it
+                                                                       and x[1].__package__.rsplit(".", _depth)[0]
+                                                                       == "telethon.tl",
                                                              it.__dict__.items())]))}

@@ -41,12 +41,11 @@ class noTerminalMod(loader.Module):
         self.config = loader.ModuleConfig("FLOOD_WAIT_PROTECT", 2,
                                           lambda m: self.strings("flood_wait_protect_cfg_doc", m))
         self.activecmds = {}
-    
+
     async def client_ready(self, client, db):
         self.client = client
         self.db = db
         self._db = db
-    
 
     async def noterminalcmd(self, message):
         """Gets the note specified"""
@@ -54,7 +53,7 @@ class noTerminalMod(loader.Module):
         if not args:
             await utils.answer(message, self.strings("what_note", message))
             return
-        
+
         asset_id = self.db.get("friendly-telegram.modules.notes", "notes", {}).get(args[0], None)
         logger.debug(asset_id)
         if asset_id is not None:
@@ -71,7 +70,6 @@ class noTerminalMod(loader.Module):
 
         cmd = await self.db.fetch_asset(asset_id)
         await self.run_command(message, cmd.raw_text)
-
 
     async def run_command(self, message, cmd, editor=None):
         if len(cmd.split(" ")) > 1 and cmd.split(" ")[0] == "sudo":
@@ -129,6 +127,7 @@ class noTerminalMod(loader.Module):
                 await utils.answer(message, self.strings("killed", message))
         else:
             await utils.answer(message, self.strings("no_cmd", message))
+
 
 def hash_msg(message):
     return str(utils.get_chat_id(message)) + "/" + str(message.id)
