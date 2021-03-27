@@ -25,7 +25,6 @@ filter
 tags
 audio_editor
 file_uploader
-urldl
 callcontrol
 text_editor
 weather
@@ -37,3 +36,4 @@ searcher
 url
 user
 distort
+downloader
