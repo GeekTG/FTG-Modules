@@ -45,7 +45,7 @@ class ImageManagerMod(loader.Module):
         await m.delete()
 
     async def delbg2cmd(self, m):
-        """Удалить черный фон(всё что <30)
+        """Deletes black color
         Return sticker webp"""
         s = "[ImageManager -> DelBg]\n"
         reply = await m.get_reply_message()
