@@ -58,6 +58,7 @@ class TranslatorMod(loader.Module):
     @loader.unrestricted
     @loader.ratelimit
     async def translatecmd(self, message):
+        """Translate text via Yandex Translate"""
         chat = '@YTranslateBot'
         reply = await message.get_reply_message()
         async with message.client.conversation(chat) as conv:
