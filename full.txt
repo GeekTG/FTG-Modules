@@ -16,8 +16,6 @@ stickers
 information
 quotes
 autoprofile
-google
-lmgtfy
 nopm
 recent_actions
 spam
@@ -34,3 +32,6 @@ weather
 demot
 fake_actions
 avatar
+screenshot
+searcher
+url
