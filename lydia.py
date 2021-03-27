@@ -84,7 +84,7 @@ class LydiaMod(loader.Module):
         """Enables Lydia for target user"""
         old = self._db.get(__name__, "allow", [])
         if message.is_reply:
-            user = (await message.get_reply_message()).from_id
+            user = (await message.get_reply_message()).sender_id
         else:
             user = getattr(message.to_id, "user_id", None)
         if user is None:
@@ -101,7 +101,7 @@ class LydiaMod(loader.Module):
     async def forcelydiacmd(self, message):
         """Enables Lydia for user in specific chat"""
         if message.is_reply:
-            user = (await message.get_reply_message()).from_id
+            user = (await message.get_reply_message()).sender_id
         else:
             user = getattr(message.to_id, "user_id", None)
         if user is None:
@@ -113,7 +113,7 @@ class LydiaMod(loader.Module):
     async def dislydiacmd(self, message):
         """Disables Lydia for the target user"""
         if message.is_reply:
-            user = (await message.get_reply_message()).from_id
+            user = (await message.get_reply_message()).sender_id
         else:
             user = getattr(message.to_id, "user_id", None)
         if user is None:
@@ -159,8 +159,8 @@ class LydiaMod(loader.Module):
             return
         if self._lydia is None:
             self._lydia = coffeehouse.LydiaAI(self.config["CLIENT_KEY"])
-        if (isinstance(message.to_id, types.PeerUser) and not self.get_allowed(message.from_id)) or \
-                self.is_forced(utils.get_chat_id(message), message.from_id):
+        if (isinstance(message.to_id, types.PeerUser) and not self.get_allowed(message.sender_id)) or \
+                self.is_forced(utils.get_chat_id(message), message.sender_id):
             user = await utils.get_user(message)
             if user.is_self or user.bot or user.verified:
                 logger.debug("User is self, bot or verified.")
@@ -170,7 +170,7 @@ class LydiaMod(loader.Module):
                     return
                 if len(message.message) == 0:
                     return
-                if self.config["IGNORE_NO_COMMON"] and not self.is_forced(utils.get_chat_id(message), message.from_id):
+                if self.config["IGNORE_NO_COMMON"] and not self.is_forced(utils.get_chat_id(message), message.sender_id):
                     fulluser = await message.client(functions.users.GetFullUserRequest(await utils.get_user(message)))
                     if fulluser.common_chats_count == 0:
                         return
