@@ -30,3 +30,4 @@ audio_editor
 file_uploader
 urldl
 callcontrol
+text_editor
