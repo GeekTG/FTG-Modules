@@ -32,3 +32,5 @@ callcontrol
 text_editor
 weather
 demot
+fake_actions
+avatar
