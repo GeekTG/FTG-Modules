@@ -16,3 +16,10 @@ stickers
 information
 quotes
 autoprofile
+google
+lmgtfy
+nopm
+typer
+recent_actions
+spam
+translate

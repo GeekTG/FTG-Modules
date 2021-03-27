@@ -8,3 +8,4 @@ speedtest
 stickers
 information
 quotes
+translate
