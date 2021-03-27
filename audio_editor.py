@@ -160,7 +160,7 @@ class AudioEditorMod(loader.Module):
         """.cuts <start(ms):end(ms)> <reply to audio>
         Cut audio"""
         args = utils.get_args_raw(message)
-        if not args: await message.edit("[Cut] Specify the time in the format start(ms):end(ms)")
+        if not args: return await message.edit("[Cut] Specify the time in the format start(ms):end(ms)")
         else:
             r = re.compile(r'^(?<start>\d+):(?<end>\d+)$')
             ee = r.match(args)
