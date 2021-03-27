@@ -29,6 +29,7 @@ class FileUploaderMod(loader.Module):
 
     @loader.sudo
     async def x0cmd(self, message):
+        """Upload to x0"""
         await message.edit("<b>Uploading...</b>")
         reply = await message.get_reply_message()
         if not reply:
@@ -71,6 +72,7 @@ class FileUploaderMod(loader.Module):
         await message.edit("<b>" + link + "</b>")
 
     async def imgurcmd(self, message):
+        """Upload to imgur"""
         chat = '@ImgUploadBot'
         reply = await message.get_reply_message()
         async with message.client.conversation(chat) as conv:
