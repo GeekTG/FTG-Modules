@@ -14,15 +14,15 @@ from datetime import datetime
 
 @loader.tds
 class WhoIsMod(loader.Module):
-    """Получает информацию о пользователе или чате"""
+    """Get info about user/chat"""
     strings = {'name': 'Information'}
 
     async def userinfocmd(self, message):
-        """Используй .whois <@ или реплай>; ничего"""
+        """.whois <@ or reply or id>; Northing"""
         args = utils.get_args_raw(message)
         reply = await message.get_reply_message()
 
-        await message.edit("<b>Получаю информацию о пользователе...</b>")
+        await message.edit("<b>Getting info...</b>")
 
         try:
             if args:
@@ -41,7 +41,7 @@ class WhoIsMod(loader.Module):
         await message.delete()
 
     async def chatinfocmd(self, message):
-        """Используй .message <айди чата>; ничего"""
+        """.message <@ or id>; Northing"""
         args = utils.get_args_raw(message)
 
         try:
@@ -50,11 +50,11 @@ class WhoIsMod(loader.Module):
             if not message.is_private:
                 chat = await message.client.get_entity(message.chat_id)
             else:
-                return await message.edit("<b>Это не чат!</b>")
+                return await message.edit("<b>It is not a chat!</b>")
 
         chat = await message.client(GetFullChannelRequest(chat.id))
 
-        await message.edit("<b>Загрузка информации...</b>")
+        await message.edit("<b>Loading info...</b>")
 
         caption = await get_chat_info(chat, message)
 
@@ -66,40 +66,40 @@ class WhoIsMod(loader.Module):
 
 
 async def get_user_info(user, message):
-    """Подробная информация о пользователе."""
+    """Detailed information about the user."""
     uuser = user.user
 
     user_photos = await message.client(GetUserPhotosRequest(user_id=uuser.id,
                                                             offset=42, max_id=0, limit=100))
-    user_photos_count = "У пользователя нет аватарки."
+    user_photos_count = "The user does not have an avatar."
     try:
         user_photos_count = user_photos.count
     except:
         pass
 
     user_id = uuser.id
-    first_name = uuser.first_name or "Пользователь не указал имя."
-    last_name = uuser.last_name or "Пользователь не указал фамилию."
-    username = uuser.username or "У пользователя нет юзернейма."
-    user_bio = user.about or "У пользователя нет информации о себе."
+    first_name = uuser.first_name or "null"
+    last_name = uuser.last_name or "null"
+    username = uuser.username or "null"
+    user_bio = user.about or "null"
     common_chat = user.common_chats_count
-    is_bot = "Да" if uuser.bot else "Нет"
-    restricted = "Да" if uuser.restricted else "Нет"
-    verified = "Да" if uuser.verified else "Нет"
+    is_bot = "Yes" if uuser.bot else "No"
+    restricted = "Yes" if uuser.restricted else "No"
+    verified = "Yes" if uuser.verified else "No"
 
     photo = await message.client.download_profile_photo(user_id, str(user_id) + ".jpg", download_big=True)
-    caption = (f"<b>ИНФОРМАЦИЯ О ПОЛЬЗОВАТЕЛЕ:</b>\n\n"
-               f"<b>Имя:</b> {first_name}\n"
-               f"<b>Фамилия:</b> {last_name}\n"
-               f"<b>Юзернейм:</b> @{username}\n"
+    caption = (f"<b>USER INFORMATION:</b>\n\n"
+               f"<b>First name:</b> {first_name}\n"
+               f"<b>Last name:</b> {last_name}\n"
+               f"<b>Username:</b> @{username}\n"
                f"<b>ID:</b> <code>{user_id}</code>\n"
-               f"<b>Бот:</b> {is_bot}\n"
-               f"<b>Ограничен:</b> {restricted}\n"
-               f"<b>Верифицирован:</b> {verified}\n\n"
-               f"<b>О себе:</b> \n<code>{user_bio}</code>\n\n"
-               f"<b>Кол-во аватарок в профиле:</b> {user_photos_count}\n"
-               f"<b>Общие чаты:</b> {common_chat}\n"
-               f"<b>Пермалинк:</b> <a href=\"tg://user?id={user_id}\">клик</a>")
+               f"<b>Bot:</b> {is_bot}\n"
+               f"<b>Restricted:</b> {restricted}\n"
+               f"<b>Verified:</b> {verified}\n\n"
+               f"<b>About:</b> \n<code>{user_bio}</code>\n\n"
+               f"<b>Number of avatars in the profile:</b> {user_photos_count}\n"
+               f"<b>Shared Chats:</b> {common_chat}\n"
+               f"<b>Permalink:</b> <a href=\"tg://user?id={user_id}\">клик</a>")
 
     return photo, caption
 
@@ -118,7 +118,7 @@ async def get_chat_info(chat, message):
     creator_valid = True if first_msg_valid and msg_info.users else False
     creator_id = msg_info.users[0].id if creator_valid else None
     creator_firstname = msg_info.users[0].first_name if creator_valid and msg_info.users[
-        0].first_name is not None else "Удалённый аккаунт"
+        0].first_name is not None else "УYesлённый аккаунт"
     creator_username = msg_info.users[0].username if creator_valid and msg_info.users[0].username is not None else None
     created = msg_info.messages[0].date if first_msg_valid else None
     former_title = msg_info.messages[0].action.title if first_msg_valid and type(
@@ -142,11 +142,11 @@ async def get_chat_info(chat, message):
     username = chat_obj_info.username if hasattr(chat_obj_info, "username") else None
     bots_list = chat.full_chat.bot_info
     bots = 0
-    slowmode = "Да" if hasattr(chat_obj_info, "slowmode_enabled") and chat_obj_info.slowmode_enabled else "Нет"
+    slowmode = "Yes" if hasattr(chat_obj_info, "slowmode_enabled") and chat_obj_info.slowmode_enabled else "No"
     slowmode_time = chat.full_chat.slowmode_seconds if hasattr(chat_obj_info,
                                                                "slowmode_enabled") and chat_obj_info.slowmode_enabled else None
-    restricted = "Да" if hasattr(chat_obj_info, "restricted") and chat_obj_info.restricted else "Нет"
-    verified = "Да" if hasattr(chat_obj_info, "verified") and chat_obj_info.verified else "Нет"
+    restricted = "Yes" if hasattr(chat_obj_info, "restricted") and chat_obj_info.restricted else "No"
+    verified = "Yes" if hasattr(chat_obj_info, "verified") and chat_obj_info.verified else "No"
     username = "@{}".format(username) if username else None
     creator_username = "@{}".format(creator_username) if creator_username else None
 
@@ -162,62 +162,62 @@ async def get_chat_info(chat, message):
         for bot in bots_list:
             bots += 1
 
-    caption = "<b>ИНФОРМАЦИЯ О ЧАТЕ:</b>\n\n"
+    caption = "<b>CHAT INFORMATION:</b>\n\n"
     caption += f"<b>ID:</b> {chat_obj_info.id}\n"
     if chat_title is not None:
-        caption += f"<b>Название группы:</b> {chat_title}\n"
+        caption += f"<b>Group name:</b> {chat_title}\n"
     if former_title is not None:
-        caption += f"<b>Предыдущее название:</b> {former_title}\n"
+        caption += f"<b>Previous name:</b> {former_title}\n"
     if username is not None:
-        caption += f"<b>Тип группы:</b> Публичный\n"
-        caption += f"<b>Линк:</b> {username}\n"
+        caption += f"<b>Group Type:</b> Public\n"
+        caption += f"<b>Link:</b> {username}\n"
     else:
-        caption += f"<b>Тип группы:</b> Приватный\n"
+        caption += f"<b>Group Type:</b> Private\n"
     if creator_username is not None:
-        caption += f"<b>Создатель:</b> <code>{creator_username}</code>\n"
+        caption += f"<b>The Creator:</b> <code>{creator_username}</code>\n"
     elif creator_valid:
-        caption += f"<b>Создатель:</b> <code><a href=\"tg://user?id={creator_id}\">{creator_firstname}</a></code>\n"
+        caption += f"<b>The Creator:</b> <code><a href=\"tg://user?id={creator_id}\">{creator_firstname}</a></code>\n"
     if created is not None:
-        caption += f"<b>Создан:</b> {created.date().strftime('%b %d, %Y')} - {created.time()}\n"
+        caption += f"<b>Created:</b> {created.date().strftime('%b %d, %Y')} - {created.time()}\n"
     else:
-        caption += f"<b>Создан:</b> {chat_obj_info.date.date().strftime('%b %d, %Y')} - {chat_obj_info.date.time()}\n"
+        caption += f"<b>Created:</b> {chat_obj_info.date.date().strftime('%b %d, %Y')} - {chat_obj_info.date.time()}\n"
     if messages_viewable is not None:
-        caption += f"<b>Видимые сообщения:</b> {messages_viewable}\n"
+        caption += f"<b>Visible messages:</b> {messages_viewable}\n"
     if messages_sent:
-        caption += f"<b>Всего сообщений:</b> {messages_sent}\n"
+        caption += f"<b>Total messages:</b> {messages_sent}\n"
     elif messages_sent_alt:
-        caption += f"<b>Всего сообщений:</b> {messages_sent_alt}\n"
+        caption += f"<b>Total messages:</b> {messages_sent_alt}\n"
     if members is not None:
-        caption += f"<b>Участников:</b> {members}\n"
+        caption += f"<b>Participants:</b> {members}\n"
     if admins is not None:
-        caption += f"<b>Админов:</b> {admins}\n"
+        caption += f"<b>Admins:</b> {admins}\n"
     if bots_list:
-        caption += f"<b>Ботов:</b> {bots}\n"
+        caption += f"<b>Bots:</b> {bots}\n"
     if users_online:
-        caption += f"<b>Сейчас онлайн:</b> {users_online}\n"
+        caption += f"<b>Now Online:</b> {users_online}\n"
     if restrcited_users is not None:
-        caption += f"<b>Ограниченных пользователей:</b> {restrcited_users}\n"
+        caption += f"<b>Restricted Users:</b> {restrcited_users}\n"
     if banned_users is not None:
-        caption += f"<b>Забаненных пользователей:</b> {banned_users}\n"
+        caption += f"<b>Banned users:</b> {banned_users}\n"
     if group_stickers is not None:
-        caption += f"<b>Стикеры группы:</b> <a href=\"t.me/addstickers/{chat.full_chat.stickerset.short_name}\">{group_stickers}</a>\n"
+        caption += f"<b>Group stickers:</b> <a href=\"t.me/addstickers/{chat.full_chat.stickerset.short_name}\">{group_stickers}</a>\n"
     caption += "\n"
-    caption += f"<b>Слоумод:</b> {slowmode}"
+    caption += f"<b>Slowmode:</b> {slowmode}"
     if hasattr(chat_obj_info, "slowmode_enabled") and chat_obj_info.slowmode_enabled:
-        caption += f", {slowmode_time} секунд\n"
+        caption += f", {slowmode_time} seconds\n"
     else:
         caption += "\n"
-    caption += f"<b>Ограничен:</b> {restricted}\n"
+    caption += f"<b>Restricted:</b> {restricted}\n"
     if chat_obj_info.restricted:
-        caption += f"> Платформа: {chat_obj_info.restriction_reason[0].platform}\n"
-        caption += f"> Причина: {chat_obj_info.restriction_reason[0].reason}\n"
-        caption += f"> Текст: {chat_obj_info.restriction_reason[0].text}\n\n"
+        caption += f"> Platform: {chat_obj_info.restriction_reason[0].platform}\n"
+        caption += f"> Reason: {chat_obj_info.restriction_reason[0].reason}\n"
+        caption += f"> Text: {chat_obj_info.restriction_reason[0].text}\n\n"
     else:
         caption += ""
     if hasattr(chat_obj_info, "scam") and chat_obj_info.scam:
-        caption += "<b>Скам</b>: да\n\n"
+        caption += "<b>Scam</b>: Yes\n\n"
     if hasattr(chat_obj_info, "verified"):
-        caption += f"<b>Верифицирован:</b> {verified}\n\n"
+        caption += f"<b>Verified:</b> {verified}\n\n"
     if description:
-        caption += f"<b>Описание:</b> \n\n<code>{description}</code>\n"
+        caption += f"<b>Description:</b> \n\n<code>{description}</code>\n"
     return caption

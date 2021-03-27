@@ -13,21 +13,20 @@ import re
 
 @loader.tds
 class ImageManagerMod(loader.Module):
-    """ImageManager - простая работа с фото через Pillow"""
+    """ImageManager - Simple work with imgaes"""
     strings = {"name": "ImageManager"}
 
     @loader.owner
     async def delbgcmd(self, m):
-        """Удалить белый фон(всё что >230)
-        Возвращает стикер webp
-        Если после команды что-либо указать, отправится как файл png"""
+        """Remove wite background(всё что >230)
+        Return sticker webp"""
         s = "[ImageManager -> DelBg]\n"
         reply = await m.get_reply_message()
         im = await get_img_from_msg(reply)
         if not im:
-            await m.edit(s + "Реплай на изображение")
+            await m.edit(s + "Reply to image")
             return
-        await m.edit(s + "Работаю...")
+        await m.edit(s + "Working...")
         im2 = Image.open(im).convert("RGBA")
         w, h = im2.size
         for x in range(w):
@@ -47,15 +46,14 @@ class ImageManagerMod(loader.Module):
 
     async def delbg2cmd(self, m):
         """Удалить черный фон(всё что <30)
-        Возвращает стикер webp
-        Если после команды что-либо указать, отправится как файл png"""
+        Return sticker webp"""
         s = "[ImageManager -> DelBg]\n"
         reply = await m.get_reply_message()
         im = await get_img_from_msg(reply)
         if not im:
-            await m.edit(s + "Реплай на изображение")
+            await m.edit(s + "Reply to image")
             return
-        await m.edit(s + "Работаю...")
+        await m.edit(s + "Working...")
         im2 = Image.open(im).convert("RGBA")
         w, h = im2.size
         for x in range(w):
@@ -75,24 +73,24 @@ class ImageManagerMod(loader.Module):
 
     async def resizecmd(self, m):
         """<x:int> <y:int>
-        Изменить размер фото"""
+        Resize image"""
         s = "[ImageManager -> Resize]\n"
         reply = await m.get_reply_message()
         im = await get_img_from_msg(reply)
         if not im:
-            await m.edit(s + "Реплай на изображение")
+            await m.edit(s + "Reply to image")
             return
         args = utils.get_args_raw(m)
         if not args:
-            await m.edit(s + "Укажите <x:int> <y:int>")
+            await m.edit(s + "Specify x:int y:int")
             return
         rr = re.compile(r"^(\d+)\s+(\d+)$")
         if not rr.match(args):
-            await m.edit(s + "Укажите <x:int> <y:int>")
+            await m.edit(s + "Specify x:int y:int")
             return
         x = int(rr.findall(args)[0][0])
         y = int(rr.findall(args)[0][1])
-        await m.edit(s + "Работаю...")
+        await m.edit(s + "Working...")
         im2 = Image.open(im)
         im2 = im2.resize((x, y))
         out = io.BytesIO()
@@ -107,20 +105,20 @@ class ImageManagerMod(loader.Module):
 
     async def rotatecmd(self, m):
         """<rotate:int>
-        Повернуть изображение"""
+        Rotate image"""
         s = "[ImageManager -> Rotate]\n"
         reply = await m.get_reply_message()
         im = await get_img_from_msg(reply)
         if not im:
-            await m.edit(s + "Реплай на изображение")
+            await m.edit(s + "Reply to image")
             return
         args = utils.get_args_raw(m)
         if not args:
-            await m.edit(s + "Укажите <rotate:int>")
+            await m.edit(s + "Specify <rotate:int>")
             return
         rr = re.compile(r"^(-*\d+)$")
         if not rr.match(args):
-            await m.edit(s + "Укажите <rotate:int>")
+            await m.edit(s + "Specify <rotate:int>")
             return
         c = int(rr.findall(args)[0])
         im2 = Image.open(im)
@@ -136,49 +134,49 @@ class ImageManagerMod(loader.Module):
         await m.delete()
 
     async def invertcmd(self, m):
-        """Инвертировать цвета фото"""
+        """Invert image's colors"""
         s = "[ImageManager -> Invert]\n"
         reply = await m.get_reply_message()
         im = await get_img_from_msg(reply)
         if not im:
-            await m.edit(s + "Реплай на изображение")
+            await m.edit(s + "Reply to image")
             return
-        await m.edit(s + "Работаю...")
+        await m.edit(s + "Working...")
         await m.client.send_file(m.to_id, await invert_image(im, reply.file.ext), reply_to=reply.id)
         await m.delete()
 
     async def contrstcmd(self, m):
         """<level:float or int>
-        Изменить контрастность изображения"""
+        Change the image contrast"""
         s = "[ImageManager -> Contrast]\n"
         reply = await m.get_reply_message()
         im = await get_img_from_msg(reply)
         if not im:
-            await m.edit(s + "Реплай на изображение")
+            await m.edit(s + "Reply to image")
             return
-        await m.edit(s + "Работаю...")
+        await m.edit(s + "Working...")
         args = utils.get_args_raw(m)
         if not args:
-            await m.edit(s + "Укажите <level:float or int>")
+            await m.edit(s + "Specify level:float or int")
             return
         rr = re.compile(r"^(\d+|\d+\.\d+)$")
         if not rr.match(args):
-            await m.edit(s + "Укажите <level:float or int>")
+            await m.edit(s + "Specify level:float or int")
             return
         c = float(rr.findall(args)[0])
         await m.client.send_file(m.to_id, await contrast(im, c, reply.file.ext), reply_to=reply.id)
         await m.delete()
 
     async def convpcmd(self, m):
-        """Стикер в фото
-        Фото в стикер"""
+        """Sticker to image
+        Image to sticker"""
         s = "[ImageManager -> Converter]\n"
         reply = await m.get_reply_message()
         im = await get_img_from_msg(reply)
         if not im:
-            await m.edit(s + "Реплай на изображение")
+            await m.edit(s + "Reply to image")
             return
-        await m.edit(s + "Работаю...")
+        await m.edit(s + "Working...")
         im2 = Image.open(im)
         iswebp = True if reply.file.ext == ".webp" else False
         out = io.BytesIO()
@@ -194,21 +192,21 @@ class ImageManagerMod(loader.Module):
 
     async def brightcmd(self, m):
         """<level:float or int>
-        Изменить яркость фото"""
+        Change the brightness of the image"""
         s = "[ImageManager -> Bright]\n"
         reply = await m.get_reply_message()
         im = await get_img_from_msg(reply)
         if not im:
-            await m.edit(s + "Реплай на изображение")
+            await m.edit(s + "Reply to image")
             return
-        await m.edit(s + "Работаю...")
+        await m.edit(s + "Working...")
         args = utils.get_args_raw(m)
         if not args:
-            await m.edit(s + "Укажите <level:float or int>")
+            await m.edit(s + "Specify level:float or int")
             return
         rr = re.compile(r"^(\d+|\d+\.\d+)$")
         if not rr.match(args):
-            await m.edit(s + "Укажите <level:float or int>")
+            await m.edit(s + "Specify level:float or int")
             return
         c = float(rr.findall(args)[0])
         await m.client.send_file(m.to_id, setbright(im, c, reply.file.ext), reply_to=reply.id)
@@ -216,21 +214,21 @@ class ImageManagerMod(loader.Module):
 
     async def sharpnesscmd(self, m):
         """<level:float or int>
-        Изменить чёткость фото(если указать много, будет deepfry)"""
+        Change the sharpness of the image"""
         s = "[ImageManager -> Sharpness]\n"
         reply = await m.get_reply_message()
         im = await get_img_from_msg(reply)
         if not im:
-            await m.edit(s + "Реплай на изображение")
+            await m.edit(s + "Reply to image")
             return
-        await m.edit(s + "Работаю...")
+        await m.edit(s + "Working...")
         args = utils.get_args_raw(m)
         if not args:
-            await m.edit(s + "Укажите <level:float or int>")
+            await m.edit(s + "Specify <level:float or int>")
             return
         rr = re.compile(r"^(\d+|\d+\.\d+)$")
         if not rr.match(args):
-            await m.edit(s + "Укажите <level:float or int>")
+            await m.edit(s + "Specify <level:float or int>")
             return
         c = float(rr.findall(args)[0])
         await m.client.send_file(m.to_id, setsharpness(im, c, reply.file.ext), reply_to=reply.id)

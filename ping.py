@@ -11,11 +11,11 @@ from statistics import mean, median, stdev
 
 
 @loader.tds
-class PingerMod(loader.Module):
-    """AdvancedPinger"""
+class PPingerMod(loader.Module):
+    """PPinger"""
 
     strings = {
-        'name': 'Advanced Ping',
+        'name': 'PPinger',
         'samples': 5,
         'timeout': 1
     }
@@ -34,7 +34,7 @@ class PingerMod(loader.Module):
         if not self.db.get(self.strings['name'], 'timeout'):
             self.db.set(self.strings['name'], 'timeout', self.strings['timeout'])
 
-    async def advpingcmd(self, message):
+    async def ppingcmd(self, message):
         """Pings itself or the bot, if you specify its username with the argument"""
         a = self.db.get(self.strings["name"], "samples")
         if not isinstance(a, int):
@@ -71,7 +71,7 @@ class PingerMod(loader.Module):
         for i in ping_ans:
             await i.delete()
 
-    async def pingsetcmd(self, message):
+    async def ppingsetcmd(self, message):
         """.samples <int> - number of ping attempts
         .timeout <int> - response waiting time in seconds
         Setting parameters for ping"""
