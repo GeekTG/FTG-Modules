@@ -10,11 +10,11 @@ from asyncio import sleep, gather
 
 @loader.tds
 class SpamMod(loader.Module):
-    """Спам модуль"""
+    """Spam Module"""
     strings = {'name': 'Spam'}
 
     async def spamcmd(self, message):
-        """Обычный спам. Используй .spam <кол-во:int> <текст или реплай>."""
+        """Simple spam. Use .spam <count:int> <args or reply>."""
         try:
             await message.delete()
             args = utils.get_args(message)
@@ -33,10 +33,10 @@ class SpamMod(loader.Module):
                 for _ in range(count):
                     await gather(*[message.respond(message)])
         except:
-            return await message.client.send_message(message.to_id, '.spam <кол-во:int> <текст или реплай>.')
+            return await message.client.send_message(message.to_id, '.spam <count:int> <args or reply>.')
 
     async def cspamcmd(self, message):
-        """Спам символами. Используй .cspam <текст или реплай>."""
+        """Character spam. Use .cspam <args or reply>."""
         await message.delete()
         reply = await message.get_reply_message()
         if reply:
@@ -48,7 +48,7 @@ class SpamMod(loader.Module):
             await message.respond(m)
 
     async def wspamcmd(self, message):
-        """Спам словами. Используй .wspam <текст или реплай>."""
+        """Word spam. Use .wspam <args or reply>."""
         await message.delete()
         reply = await message.get_reply_message()
         if reply:
@@ -60,7 +60,7 @@ class SpamMod(loader.Module):
             await message.respond(m)
 
     async def delayspamcmd(self, message):
-        """Спам с задержкой. Используй .delayspam <время:int> <кол-во:int> <текст или реплай>."""
+        """Delay spam. Use .delayspam <time(sec):int> <count:int> <args or reply>."""
         try:
             await message.delete()
             args = utils.get_args_raw(message)
@@ -82,14 +82,10 @@ class SpamMod(loader.Module):
                     await message.respond(spammsg)
                     await sleep(time)
         except:
-            return await message.client.send_message(message.to_id,
-                                                     '.delayspam <время:int> '
-                                                     '<кол-во:int> <текст или '
-                                                     'реплай>')
+            return await message.client.send_message(message.to_id, '.delayspam <time(sec):int> <count:int> <args or reply>.')
 
     async def replayspamcmd(self, message):
-        """Спам в ответ на сообщение. Используй ответом на сообщение
-        .replayspam <кол-во:int> <текст>. """
+        """Reply spam. Use a reply to a message: .replayspam <count:int> <args>."""
         try:
             await message.delete()
             args = utils.get_args_raw(message)
@@ -99,4 +95,4 @@ class SpamMod(loader.Module):
                 await reply.reply(args.split(' ', 2)[1])
             return
         except:
-            return await message.client.send_message(message.to_id, '.replayspam <кол-во:int> <текст>.')
+            return await message.client.send_message(message.to_id, '.replayspam <count:int> <args>.')

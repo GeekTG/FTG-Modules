@@ -21,30 +21,30 @@ class FiltersMod(loader.Module):
         chatid = str(message.chat_id)
 
         if not key and not reply:
-            return await message.edit("<b>Нет аргументов и реплая.</b>")
+            return await message.edit("<b>No args or reply.</b>")
 
         if chatid not in filters:
             filters.setdefault(chatid, {})
 
         if key in filters[chatid]:
-            return await message.edit("<b>Такой фильтр уже есть.</b>")
+            return await message.edit("<b>Such a filter already exists.</b>")
 
         if reply:
             if key:
                 msgid = await self.db.store_asset(reply)
             else:
-                return await message.edit("<b>Нужны аргументы, чтобы сохранить фильтр!</b>")
+                return await message.edit("<b>You need arguments to save the filter!</b>")
         else:
             try:
                 msgid = (await message.client.send_message(f'friendly-{(await message.client.get_me()).id}-assets',
                                                            key.split('/')[1])).id
                 key = key.split('/')[0]
             except IndexError:
-                return await message.edit("<b>Нужен второй аргумент (через / )или реплай.</b>")
+                return await message.edit("<b>Need a second argument (through / ) or a reply.</b>")
 
         filters[chatid].setdefault(key, msgid)
         self.db.set("Filters", "filters", filters)
-        await message.edit(f"<b>Фильтр \"{key}\" сохранён!</b>")
+        await message.edit(f"<b>Filter \"{key}\" saved!</b>")
 
     async def stopcmd(self, message):
         """Removes a filter from the list."""
@@ -53,20 +53,20 @@ class FiltersMod(loader.Module):
         chatid = str(message.chat_id)
 
         if chatid not in filters:
-            return await message.edit("<b>В этом чате нет фильтров.</b>")
+            return await message.edit("<b>There are no filters in this chat.</b>")
 
         if not args:
-            return await message.edit("<b>Нет аргументов.</b>")
+            return await message.edit("<b>No args.</b>")
 
         if args:
             try:
                 filters[chatid].pop(args)
                 self.db.set("Filters", "filters", filters)
-                await message.edit(f"<b>Фильтр \"{args}\" удалён из чата!</b>")
+                await message.edit(f"<b>Filter \"{args}\" removed from chat list!</b>")
             except KeyError:
-                return await message.edit(f"<b>Фильтра \"{args}\" нет.</b>")
+                return await message.edit(f"<b>No \"{args}\" filter.</b>")
         else:
-            return await message.edit("<b>Нет аргументов.</b>")
+            return await message.edit("<b>No args.</b>")
 
     async def stopallcmd(self, message):
         """Clears out the filter list."""
@@ -74,11 +74,11 @@ class FiltersMod(loader.Module):
         chatid = str(message.chat_id)
 
         if chatid not in filters:
-            return await message.edit("<b>В этом чате нет фильтров.</b>")
+            return await message.edit("<b>There are no filters in this chat.</b>")
 
         filters.pop(chatid)
         self.db.set("Filters", "filters", filters)
-        await message.edit("<b>Всё фильтры были удалены из списка чата!</b>")
+        await message.edit("<b>All filters have been removed from the chat list!</b>")
 
     async def filterscmd(self, message):
         """Shows saved filters."""
@@ -86,12 +86,12 @@ class FiltersMod(loader.Module):
         chatid = str(message.chat_id)
 
         if chatid not in filters:
-            return await message.edit("<b>В этом чате нет фильтров.</b>")
+            return await message.edit("<b>There are no filters in this chat.</b>")
 
         msg = ""
         for _ in filters[chatid]:
             msg += f"<b>• {_}</b>\n"
-        await message.edit(f"<b>Список фильтров в этом чате: {len(filters[chatid])}\n\n{msg}</b>")
+        await message.edit(f"<b>List of filters in this chat: {len(filters[chatid])}\n\n{msg}</b>")
 
     async def watcher(self, message):
         try:
