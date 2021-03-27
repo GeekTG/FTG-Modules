@@ -19,12 +19,11 @@ class DownloaderMod(loader.Module):
     strings = {'name': 'Downloader'}
 
     async def dlrcmd(self, message):
-        """Команда .dlr <реплай на файл> <название (по желанию)> скачивает
-        файл, либо сохраняет текст в файл на который был сделан реплай. """
+        """.dlr <path/file_name> - download file to server"""
         name = utils.get_args_raw(message)
         reply = await message.get_reply_message()
         if reply:
-            await message.edit('Скачиваем...')
+            await message.edit('Downloading...')
             if reply.text:
                 text = reply.text
                 fname = f'{name or message.id + reply.id}.txt'
@@ -32,23 +31,23 @@ class DownloaderMod(loader.Module):
                 file.write(text)
                 file.close()
                 await message.edit(
-                    f'Файл сохранён как: <code>{fname}</code>.\n\nВы можете '
-                    f'отправить его в этот чат с помощью команды <code>.ulf '
-                    f'{fname}</code>.')
+                    f'FIle saved as: <code>{fname}</code>.\n\nYou '
+                    f'can send it with command: '
+                    f'<code>.ulf {fname}</code>.')
             else:
                 ext = reply.file.ext
                 fname = f'{name or message.id + reply.id}{ext}'
                 await message.client.download_media(reply, fname)
                 await message.edit(
-                    f'Этот файл сохранён как: <code>{fname}</code>.\n\nВы '
-                    f'можете отправить его в этот чат с помощью команды '
+                    f'FIle saved as: <code>{fname}</code>.\n\nYou '
+                    f'can send it with command: '
                     f'<code>.ulf {fname}</code>.')
         else:
-            return await message.edit('Нет реплая.')
+            return await message.edit('There is no reply')
 
     async def ulfcmd(self, message):
-        """Команда .ulf <d>* <название файла> отправляет файл в чат.\n* -
-        удалить файл после отправки. """
+        """.ulf <file_name/path> send file from server
+        <d> - Delete file after sending"""
         name = utils.get_args_raw(message)
         d = False
         if 'd ' in name:
@@ -56,24 +55,24 @@ class DownloaderMod(loader.Module):
         if name:
             try:
                 name = name.replace('d ', '')
-                await message.edit(f'Отправляем <code>{name}</code>...')
+                await message.edit(f'Sending <code>{name}</code>...')
                 if d == True:
                     await message.client.send_file(message.to_id, f'{name}')
                     await message.edit(
-                        f'Отправляем <code>{name}</code>... Успешно!\nУдаляем '
+                        f'Sending <code>{name}</code>... Success!\Deleting '
                         f'<code>{name}</code>...')
                     os.remove(name)
                     await message.edit(
-                        f'Отправляем <code>{name}</code>... Успешно!\nУдаляем '
-                        f'<code>{name}</code>... Успешно!')
+                        f'Sending <code>{name}</code>... Deleting!\nУдаляем '
+                        f'<code>{name}</code>... Success!')
                     await sleep(0.5)
                 else:
                     await message.client.send_file(message.to_id, name)
             except:
-                return await message.edit('Такой файл не существует.')
+                return await message.edit('File does not exist')
             await message.delete()
         else:
-            return await message.edit('Нет аргументов.')
+            return await message.edit('No args')
 
     async def dltiktokcmd(self, message):
         """TikTok video downloader"""
