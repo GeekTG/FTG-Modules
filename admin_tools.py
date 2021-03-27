@@ -9,6 +9,7 @@ from telethon.errors import (ChatAdminRequiredError, UserAdminInvalidError, Floo
 from telethon.tl.types import (ChatAdminRights, ChatBannedRights)
 from telethon.tl.functions.channels import (EditAdminRequest, EditBannedRequest, EditPhotoRequest)
 from telethon.tl.functions.messages import EditChatAdminRequest
+
 logger = logging.getLogger(__name__)
 
 # ================== CONSTANS ========================
@@ -61,10 +62,12 @@ UNBAN_RIGHTS = ChatBannedRights(until_date=None,
                                 send_inline=None,
                                 embed_links=None)
 
+
 # =====================================================
 
 def register(cb):
     cb(AdminToolsMod())
+
 
 class AdminToolsMod(loader.Module):
     """Chat administration."""
@@ -95,7 +98,7 @@ class AdminToolsMod(loader.Module):
                'kicked_for_reason': '<b>{} kicked from chat.\nReason: {}.</b>',
                'banning': '<b>Ban...</b>',
                'banned': '<b>{} banned in chat.</b>',
-               'banned_for_reason': '<b>{} banned in chat.\nReason: {}</b>', 
+               'banned_for_reason': '<b>{} banned in chat.\nReason: {}</b>',
                'ban_none': '<b>No one to ban.</b>',
                'unban_none': '<b>No one to unban.</b>',
                'unbanned': '<b>{} unbanned in chat.</b>',
@@ -107,7 +110,6 @@ class AdminToolsMod(loader.Module):
                'no_reply': '<b>No reply.</b>',
                'del_u_search': '<b>Search for deleted accounts...</b>',
                'del_u_kicking': '<b>Kick deleted accounts...\nOh~, I can do it?!</b>'}
-
 
     async def ecpcmd(self, gpic):
         """Command .ecp changes the pic of the chat.\nUse: .ecp <reply to pic/sticker>."""
@@ -135,7 +137,6 @@ class AdminToolsMod(loader.Module):
                 return await utils.answer(gpic, self.strings('no_rights', gpic))
         else:
             return await utils.answer(gpic, self.strings('this_isn`t_a_chat', gpic))
-
 
     async def promotecmd(self, promt):
         """Command .promote for promote user to admin rights.\nUse: .promote <@ or reply> <rank>."""
@@ -171,7 +172,6 @@ class AdminToolsMod(loader.Module):
         else:
             return await utils.answer(promt, self.strings('this_isn`t_a_chat', promt))
 
-
     async def demotecmd(self, demt):
         """Command .demote for demote user to admin rights.\nUse: .demote <@ or reply>."""
         if demt.chat:
@@ -203,7 +203,6 @@ class AdminToolsMod(loader.Module):
         else:
             return await utils.answer(demt, self.strings('this_isn`t_a_chat', demt))
 
-
     async def pincmd(self, pint):
         """Command .pin for pin message in the chat.\nUse: .pin <reply>."""
         if pint.chat:
@@ -219,7 +218,6 @@ class AdminToolsMod(loader.Module):
         else:
             await utils.answer(pint, self.strings('this_isn`t_a_chat', pint))
 
-
     async def unpincmd(self, unpon):
         """Command .unpin for unpin message in the chat.\nUse: .unpin."""
         if unpon.chat:
@@ -232,7 +230,6 @@ class AdminToolsMod(loader.Module):
             await utils.answer(unpon, self.strings('unpinned', unpon))
         else:
             await utils.answer(unpon, self.strings('this_isn`t_a_chat', unpon))
-
 
     async def kickcmd(self, kock):
         """Command .kick for kick the user.\nUse: .kick <@ or reply>."""
@@ -265,14 +262,14 @@ class AdminToolsMod(loader.Module):
                     return await utils.answer(kock, self.strings('no_rights', kock))
                 else:
                     if reason:
-                        return await utils.answer(kock, self.strings('kicked_for_reason', kock).format(user.first_name, reason))
+                        return await utils.answer(kock, self.strings('kicked_for_reason', kock).format(user.first_name,
+                                                                                                       reason))
                     if reason == False:
                         return await utils.answer(kock, self.strings('kicked', kock).format(user.first_name))
             except ValueError:
                 return await utils.answer(kock, self.strings('no_args', kock))
         else:
             return await utils.answer(kock, self.strings('this_isn`t_a_chat', kock))
-
 
     async def bancmd(self, bon):
         """Command .ban for ban the user.\nUse: .ban <@ or reply>."""
@@ -300,7 +297,8 @@ class AdminToolsMod(loader.Module):
                             reason = utils.get_args_raw(bon).split(' ', 1)[1]
                 try:
                     await utils.answer(bon, self.strings('banning', bon))
-                    await bon.client(EditBannedRequest(bon.chat_id, user.id, ChatBannedRights(until_date=None, view_messages=True)))
+                    await bon.client(
+                        EditBannedRequest(bon.chat_id, user.id, ChatBannedRights(until_date=None, view_messages=True)))
                     async for msgs in bon.client.iter_messages(bon.to_id, from_user=user.id):
                         await msgs.delete()
                 except ChatAdminRequiredError:
@@ -311,7 +309,8 @@ class AdminToolsMod(loader.Module):
                     pass
                 else:
                     if reason:
-                        return await utils.answer(bon, self.strings('banned_for_reason', bon).format(user.first_name, reason))
+                        return await utils.answer(bon, self.strings('banned_for_reason', bon).format(user.first_name,
+                                                                                                     reason))
                     if reason == False:
                         return await utils.answer(bon, self.strings('banned', bon).format(user.first_name, reason))
             except ValueError:
@@ -319,11 +318,10 @@ class AdminToolsMod(loader.Module):
         else:
             return await utils.answer(bon, self.strings('this_isn`t_a_chat', bon))
 
-
     async def unbancmd(self, unbon):
         """Command .unban for unban the user.\nUse: .unban <@ or reply>."""
         if unbon.chat:
-            reply = await unbon.get_reply_message() 
+            reply = await unbon.get_reply_message()
             chat = await unbon.get_chat()
             if not chat.admin_rights and not chat.creator:
                 return await utils.answer(unbon, self.strings('not_admin', unbon))
@@ -338,14 +336,14 @@ class AdminToolsMod(loader.Module):
                 return await utils.answer(unbon, self.strings('who', unbon))
             logger.debug(user)
             try:
-                await unbon.client(EditBannedRequest(unbon.chat_id, user.id, ChatBannedRights(until_date=None, view_messages=False)))
+                await unbon.client(
+                    EditBannedRequest(unbon.chat_id, user.id, ChatBannedRights(until_date=None, view_messages=False)))
             except:
                 return await utils.answer(unbon, self.strings('no_rights', unbon))
             else:
                 return await utils.answer(unbon, self.strings('unbanned', unbon).format(user.first_name))
         else:
             return await utils.answer(unbon, self.strings('this_isn`t_a_chat', unbon))
-
 
     async def mutecmd(self, mot):
         """Command .mute for mute the user.\nUse: .mute <@ or reply> <time (1m, 1h, 1d)>."""
@@ -398,7 +396,8 @@ class AdminToolsMod(loader.Module):
                             timee = ChatBannedRights(until_date=time.time() + int(num), send_messages=True)
                             try:
                                 await mot.client(EditBannedRequest(mot.chat_id, user.id, timee))
-                                await utils.answer(mot, self.strings('muted', mot).format(utils.escape_html(user.first_name)) + text)
+                                await utils.answer(mot, self.strings('muted', mot).format(
+                                    utils.escape_html(user.first_name)) + text)
                                 return
                             except:
                                 await utils.answer(mot, self.strings('no_rights', mot))
@@ -436,7 +435,8 @@ class AdminToolsMod(loader.Module):
                     timee = ChatBannedRights(until_date=time.time() + int(num), send_messages=True)
                     try:
                         await mot.client(EditBannedRequest(mot.chat_id, user.id, timee))
-                        await utils.answer(mot, self.strings('muted', mot).format(utils.escape_html(user.first_name)) + text)
+                        await utils.answer(mot,
+                                           self.strings('muted', mot).format(utils.escape_html(user.first_name)) + text)
                         return
                     except:
                         await utils.answer(mot, self.strings('no_rights', mot))
@@ -451,12 +451,11 @@ class AdminToolsMod(loader.Module):
         else:
             await utils.answer(mot, self.strings('this_isn`t_a_chat', mot))
 
-
     async def unmutecmd(self, unmot):
         """Command .unmute for unmute the user.\nUse: .unmute <@ or reply>."""
         if unmot.chat:
             try:
-                reply = await unmot.get_reply_message() 
+                reply = await unmot.get_reply_message()
                 chat = await unmot.get_chat()
                 if not chat.admin_rights and not chat.creator:
                     return await utils.answer(unmot, self.strings('not_admin', unmot))
@@ -474,12 +473,12 @@ class AdminToolsMod(loader.Module):
                 except:
                     return await utils.answer(unmot, self.strings('not_admin', unmot))
                 else:
-                    return await utils.answer(unmot, self.strings('unmuted', unmot).format(utils.escape_html(user.first_name)))
+                    return await utils.answer(unmot,
+                                              self.strings('unmuted', unmot).format(utils.escape_html(user.first_name)))
             except:
                 return await utils.answer(unmot, self.strings('wtf_is_it', unmot))
         else:
             return await utils.answer(unmot, self.strings('this_isn`t_a_chat', unmot))
-
 
     async def deluserscmd(self, delus):
         """Command .delusers shows a list of all deleted accounts in the chat.\nUse: .delusers <clean>."""
@@ -488,7 +487,7 @@ class AdminToolsMod(loader.Module):
             return
         con = utils.get_args_raw(delus)
         del_u = 0
-        
+
         del_status = '<b>No deleted accounts, chat cleared.</b>'
         if con != "clean":
             await utils.answer(delus, self.strings('del_u_search', delus))
@@ -529,10 +528,10 @@ class AdminToolsMod(loader.Module):
 
         if del_a == 1:
             del_status = f"<b>Kicked {del_u} deleted account.\n" \
-                            f"{del_a} deleted admin`s account not kicked.</b>"
+                         f"{del_a} deleted admin`s account not kicked.</b>"
         if del_a > 0:
             del_status = f"<b>Kicked {del_u} deleted account.\n" \
-                            f"{del_a} deleted admin`s accounts not kicked.</b>"
+                         f"{del_a} deleted admin`s accounts not kicked.</b>"
         await delus.edit(del_status)
 
 
@@ -540,15 +539,16 @@ def resizepic(reply):
     im = Image.open(io.BytesIO(reply))
     w, h = im.size
     x = min(w, h)
-    x_ = (w-x)//2
-    y_ = (h-x)//2
+    x_ = (w - x) // 2
+    y_ = (h - x) // 2
     _x = x_ + x
     _y = y_ + x
-    im = im.crop(( x_, y_, _x, _y ))
+    im = im.crop((x_, y_, _x, _y))
     out = io.BytesIO()
     out.name = "outsuder.png"
     im.save(out)
     return out.getvalue()
+
 
 async def check_media(message, reply):
     if reply and reply.media:
