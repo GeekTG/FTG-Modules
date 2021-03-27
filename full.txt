@@ -26,3 +26,5 @@ translate
 calculator
 filter
 tags
+audio_editor
+file_uploader
