@@ -34,23 +34,19 @@ class DemotivatorMod(loader.Module):
 
     @loader.owner
     async def demoticmd(self, message):
-        """текст + фото или ответ на фото
-           не мнёт фотки"""
+        """Demotiving photo without compression"""
         await cmds(message, 0)
 
     async def demotcmd(self, message):
-        """текст + фото или ответ на фото
-           мнёт фотки"""
+        """Demotiving photo"""
         await cmds(message, 1)
 
     async def bottomcmd(self, message):
-        """Используй: .bottom <реплай на картинку/стикер>
-        <white/black>;ничего <текст>. """
+        """Imposes text in the photo from below"""
         return await procces_img(message, 1)
 
     async def topcmd(self, message):
-        """Используй: .top <реплай на картинку/стикер> <white/black>;ничего
-        <текст>. """
+        """Imposes text on the photo at the top"""
         return await procces_img(message, 2)
 
     async def centercmd(self, message):
@@ -59,22 +55,20 @@ class DemotivatorMod(loader.Module):
         return await procces_img(message, 3)
 
     async def demotirandcmd(self, message):
-        """текст + фото или ответ на фото
-           не мнёт фотки"""
+        """Random demotiving photo without compression"""
         await cmdrands(message, 0)
 
     async def demotrandcmd(self, message):
-        """текст + фото или ответ на фото
-           мнёт фотки"""
+        """Random demotiving photo"""
         await cmdrands(message, 1)
 
     async def nqcmd(self, message):
-        """Используй: .nq <текст или реплай>."""
+        """Quotes from the message"""
         chat = "@ShittyQuoteBot"
         text = utils.get_args_raw(message)
         reply = await message.get_reply_message()
         if not text and not reply:
-            await message.edit("<b>Нет текста или реплая.</b>")
+            await message.edit("<b>No reply</b>")
             return
         await message.edit("<b>Demotivating...</b>")
         async with message.client.conversation(chat) as conv:
@@ -85,7 +79,7 @@ class DemotivatorMod(loader.Module):
                     await message.client.send_message(chat, text)
                     response = await response
                 except YouBlockedUserError:
-                    await message.edit("<b>Разблокируй @ShittyQuoteBot</b>")
+                    await message.edit("<b>Unblock @ShittyQuoteBot</b>")
                     return
             else:
                 try:
@@ -96,7 +90,7 @@ class DemotivatorMod(loader.Module):
                                                       f"{reply.raw_text} (с) {user.first_name}")
                     response = await response
                 except YouBlockedUserError:
-                    await message.edit("<b>Разблокируй @ShittyQuoteBot</b>")
+                    await message.edit("<b>Unblock @ShittyQuoteBot</b>")
                     return
         if response.text:
             await message.client.send_message(message.to_id,
@@ -113,11 +107,11 @@ class DemotivatorMod(loader.Module):
                                                     revoke=True))
 
     async def mqcmd(self, message):
-        """.mq <реплай на текст>"""
+        """Quotes from the message 2"""
         bw = False if utils.get_args(message) else True
         reply = await message.get_reply_message()
         if not reply or not reply.raw_text:
-            await message.edit("<b>Ответь командой на умную цитату!</b>")
+            await message.edit("<b>Reply to message!</b>")
             return
         sender = reply.sender_id
 
@@ -159,7 +153,7 @@ async def cmds(message, type):
     if not event:
         if message.client._conversations.get(1376531590) is not None:
             return await message.edit(
-                "<b>подожди перед тем как создавать новый демотиватор.</b>")
+                "<b>Please wait.</b>")
 
         reply = await message.get_reply_message()
         if not reply or not reply.media or not any([
@@ -167,15 +161,15 @@ async def cmds(message, type):
             if getattr(reply, _, None) is not None
         ]):
             return await message.edit(
-                "<b>нужен реплай на фотку/видео/стикер!</b>")
+                "<b>Reply to photo/video/sticker</b>")
         if reply.file.size / 1024 / 1024 > 4:
-            return await message.edit("<b>бот принимает видео до 4 мб</b>")
+            return await message.edit("<b>Video only up to 4mb</b>")
         args = utils.get_args_raw(message) or reply.message
         if not args:
-            return await message.edit('<b>укажи аргументы после команды...</b>')
+            return await message.edit('<b>No text</b>')
         if len(args) > 500:
             return await message.edit(
-                "<b>бот принимает текст длинной до 500 символов</b>")
+                "<b>Text only up to 500 symbols</b>")
 
         await message.edit("<b>Demotivating...</b>")
         async with message.client.conversation(CHAT, timeout=160) as conv:
@@ -188,22 +182,22 @@ async def cmds(message, type):
                 if not response.media:
                     if response.raw_text.startswith("[400]"):
                         return await message.edit(
-                            "<b>демотиваторы можно создавать раз в 10 секунд, пожалейте сервер</b>")
+                            "<b>Please wait 10 sec</b>")
                     response = await conv.wait_event(
                         NewMessage(incoming=True, from_users=CHAT))
 
             except YouBlockedUserError:
-                return await message.edit(f'<b>Разблокируй @{CHAT}</b>')
+                return await message.edit(f'<b>Unblock @{CHAT}</b>')
 
             except (TimeoutError, CancelledError):
                 return await message.edit(
-                    "<b>бот не ответил => @krabodyan ебланище</b>")
+                    "<b>Bot isn`t responding</b>")
 
             if response.media is None:
-                return await message.edit("<b>что-то пошло не так.</b>")
+                return await message.edit("<b>Error</b>")
 
             await message.client.send_file(message.to_id, response.media,
-                                        reply_to=reply)
+                                           reply_to=reply)
             await message.delete()
             await message.client(
                 functions.messages.DeleteHistoryRequest(peer='IvIy_bot',
@@ -494,7 +488,7 @@ async def procces_img(message, way):
     col = 1
     reply = await message.get_reply_message()
     txt = utils.get_args_raw(message)
-    await message.edit("подождем...")
+    await message.edit("Waiting...")
 
     if txt in cols:
         col = cols[txt]
@@ -502,7 +496,7 @@ async def procces_img(message, way):
     if not txt:
         txt = "я лошара."
     if not reply:
-        await message.edit("нет реплая на картинку/стикер.")
+        await message.edit("Reply to photo/sticker")
         return
     if txt.split(" ")[0] in cols:
         col = cols[txt.split(" ")[0]]
