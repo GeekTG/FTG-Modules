@@ -25,3 +25,4 @@ spam
 translate
 calculator
 filter
+tags
