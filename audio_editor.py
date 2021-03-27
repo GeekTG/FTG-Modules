@@ -13,7 +13,7 @@ from .. import loader, utils
 @loader.tds
 class AudioEditorMod(loader.Module):
     """Module for working with sound"""
-    strings = {"name": "Audio Editor"}
+    strings = {"name": "AudioEditor"}
 
     async def basscmd(self, message):
         """.bass [level bass'а 2-100 (Default 2)] <reply to audio>
