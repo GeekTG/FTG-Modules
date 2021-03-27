@@ -23,3 +23,5 @@ typer
 recent_actions
 spam
 translate
+calculator
+filter
