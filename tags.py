@@ -8,11 +8,11 @@ from .. import loader, utils
 
 @loader.tds
 class TagMod(loader.Module):
-    """Скрытно тегнуть пользователя."""
+    """Secretly tag a user"""
     strings = {'name': 'Tags'}
 
     async def tagcmd(self, message):
-        """Использование: .tag <@> <текст (по желанию)>."""
+        """.tag <@> <text>."""
         args = utils.get_args_raw(message).split(' ')
         reply = await message.get_reply_message()
         user, tag = None, None
@@ -29,7 +29,7 @@ class TagMod(loader.Module):
         await message.client.send_message(message.to_id, f'{tag} <a href="tg://user?id={user.id}">\u2060</a>', reply_to=reply.id if reply else None)
 
     async def tagallcmd(self, message):
-        """Используй .tagall <текст (по желанию)>."""
+        """.tagall <text> - tag all users in chat"""
         args = utils.get_args_raw(message)
         tag = args or "Hey"
         await message.delete()

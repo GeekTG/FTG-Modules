@@ -33,12 +33,12 @@ class TextEditorMod(loader.Module):
                                           lambda m: self.strings("delay_text_cfg_doc"))
 
     async def switchcmd(self, message):
-        """Если ты допустил ошибку и набрал текст не сменив раскладку
-        клавиатуры то вернись в его начало и допиши `.switch` и твой текст
-        станет читабельным. Если ты всё же отправил сообщение не в той
-        расскладке, то просто ответь на него этой командой и он измениться.
-        если же твой собеседник допустил ошибку, то просто ответь на его
-        сообщение и сообщение с командой измениться. """
+        """If you made a mistake and typed the text without changing the layout
+        then go back to the beginning and add `.switch` and your text will
+        be readable. If you still sent the message in the wrong folder
+        the layout, then just answer it with this command and it will change.
+        if your interlocutor made a mistake, then just answer it
+        the message and the message with the change command. """
         RuKeys = """ёйцукенгшщзхъфывапролджэячсмитьбю.Ё"№;%:?ЙЦУКЕНГ
         ШЩЗХЪФЫВАПРОЛДЖЭ/ЯЧСМИТЬБЮ, """
         EnKeys = """`qwertyuiop[]asdfghjkl;'zxcvbnm,./~@#$%^&QWERTYUIOP{
@@ -48,7 +48,7 @@ class TextEditorMod(loader.Module):
             reply = await message.get_reply_message()
             text = reply.raw_text
             if not text:
-                await message.edit('Тут текста нету...')
+                await message.edit('There is no text here...')
                 return
             change = str.maketrans(RuKeys + EnKeys, EnKeys + RuKeys)
             text = str.translate(text, change)
@@ -62,7 +62,7 @@ class TextEditorMod(loader.Module):
         else:
             text = utils.get_args_raw(message)
             if not text:
-                await message.edit('Тут текста нету...')
+                await message.edit('There is no text here...')
                 return
             change = str.maketrans(RuKeys + EnKeys, EnKeys + RuKeys)
             text = str.translate(text, change)
@@ -113,7 +113,7 @@ class TextEditorMod(loader.Module):
 
     @loader.ratelimit
     async def typercmd(self, message):
-        """.type <message>"""
+        """.type <message> - type effect"""
         a = utils.get_args_raw(message)
         if not a:
             await utils.answer(message, self.strings("no_message", message))
@@ -129,17 +129,17 @@ class TextEditorMod(loader.Module):
             await asyncio.sleep(0.02)
 
     async def revcmd(self, message):
-        """Используй .rev <текст или реплай>."""
+        """.rev <text or reply> - reverse text"""
         if message.text:
             text = utils.get_args_raw(message)
             reply = await message.get_reply_message()
 
             if not text and not reply:
-                return await message.edit("Нет текста или реплая.")
+                return await message.edit("No text or reply")
 
             return await message.edit((text or reply.raw_text)[::-1])
         else:
-            return await message.edit("Это не текст.")
+            return await message.edit("This is not a text")
 
 
 async def update_message(message, m, entities):
