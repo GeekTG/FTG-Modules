@@ -50,8 +50,7 @@ class DemotivatorMod(loader.Module):
         return await procces_img(message, 2)
 
     async def centercmd(self, message):
-        """Используй: .center <реплай на картинку/стикер>
-        <white/black>;ничего <текст>. """
+        """Imposes text on the photo at the center"""
         return await procces_img(message, 3)
 
     async def demotirandcmd(self, message):

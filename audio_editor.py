@@ -25,7 +25,7 @@ class AudioEditorMod(loader.Module):
             if args.isdigit() and (1 < int(args) < 101):
                 lvl = int(args)
             else:
-                return await message.edit(f"[BassBoost] Specify the level from 2 to 100...")
+                return await message.edit(f"<b>[BassBoost]</b> Specify the level from 2 to 100...")
         audio = await get_audio(message, "BassBoost")
         if not audio: return
         sample_track = list(audio.audio.get_array_of_samples())
@@ -47,7 +47,7 @@ class AudioEditorMod(loader.Module):
             if args.isdigit() and (1 < int(args) < 101):
                 lvl = int(args)
             else:
-                return await message.edit(f"[Distort] Specify the level from 2 to 100...")
+                return await message.edit(f"<b>[Distort]</b> Specify the level from 2 to 100...")
         audio = await get_audio(message, "Distort")
         if not audio:
             return
@@ -160,14 +160,14 @@ class AudioEditorMod(loader.Module):
         """.cuts <start(ms):end(ms)> <reply to audio>
         Cut audio"""
         args = utils.get_args_raw(message)
-        if not args: return await message.edit("[Cut] Specify the time in the format start(ms):end(ms)")
+        if not args: return await message.edit("<b>[Cut]</b> Specify the time in the format start(ms):end(ms)")
         else:
             r = re.compile(r'^(?P<start>\d+):(?P<end>\d+)$')
             ee = r.match(args)
             if ee:
                 start = int(ee.group('start'))
                 end   = int(ee.group('end'))
-            else: return await message.edit(f"[Cut] Specify the time in the format start(ms):end(ms)")
+            else: return await message.edit(f"<b>[Cut]</b> Specify the time in the format start(ms):end(ms)")
         audio = await get_audio(message, "Cut")
         if not audio: return
         out = audio.audio[start:end]
@@ -190,13 +190,13 @@ async def get_audio(message, pref):
         ae.reply = reply
         ae.voice = reply.document.attributes[0].voice
         ae.duration = reply.document.attributes[0].duration
-        await message.edit(f"[{pref}] Downloading...")
+        await message.edit(f"<b>[{pref}]</b> Downloading...")
         ae.audio = AudioSegment.from_file(
             io.BytesIO(await reply.download_media(bytes)))
-        await message.edit(f"[{pref}] Working...")
+        await message.edit(f"<b>[{pref}]</b> Working...")
         return ae
     else:
-        await message.edit(f"[{pref}] reply to audio...")
+        await message.edit(f"<b>[{pref}]</b> reply to audio...")
         return None
 
 
@@ -204,12 +204,12 @@ async def go_out(message, audio, out, pref, title, fs=None):
     o = io.BytesIO()
     o.name = "audio." + ("ogg" if audio.voice else "mp3")
     if audio.voice: out.split_to_mono()
-    await message.edit(f"[{pref}] Exporting...")
+    await message.edit(f"<b>[{pref}]</b> Exporting...")
     out.export(o, format="ogg" if audio.voice else "mp3",
                bitrate="64k" if audio.voice else None,
                codec="libopus" if audio.voice else None)
     o.seek(0)
-    await message.edit(f"[{pref}] Sending...")
+    await message.edit(f"<b>[{pref}]</b> Sending...")
     await message.client.send_file(message.to_id, o, reply_to=audio.reply.id,
                                    voice_note=audio.voice, attributes=[
             types.DocumentAttributeAudio(duration=fs if fs else audio.duration,

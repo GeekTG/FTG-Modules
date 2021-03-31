@@ -17,15 +17,15 @@ class TranslatorMod(loader.Module):
     strings = {'name': 'Translate'}
 
     async def gtrslcmd(self, message):
-        """Используй: .gtrsl <с какого языка перевести> <на какой перевести>
-        <текст> или .gtrsl <на какой перевести> <реплай>; langs. """
+        """Use it: .gtrsl <what language to translate from> <to which language to translate>
+        <text> or .gtrsl <to translate> <reply>; langs"""
         args = utils.get_args_raw(message)
         reply = await message.get_reply_message()
         langs = LANGUAGES
         lang = args.split()
         tr = Translator().translate
         if not args and not reply:
-            return await message.edit("Нет аргументов или реплая.")
+            return await message.edit("No arguments or reply")
         if args == "langs":
             return await message.edit(
                 "<code>" + '\n'.join(str(langs).split(', ')) + "</code>")
@@ -72,7 +72,7 @@ class TranslatorMod(loader.Module):
                 response = await response
                 await mm.delete()
             except YouBlockedUserError:
-                await message.edit('<code>Разблокируй @YTranslateBot</code>')
+                await message.edit('<code>Unblock @YTranslateBot</code>')
                 return
             await message.edit(str(response.text).split(": ", 1)[1])
             await message.client(

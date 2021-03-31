@@ -19,8 +19,8 @@ class URlMod(loader.Module):
     """URL Module"""
     strings = {
         "name": "URL",
-        "some_rong": "<b>Ты делаешь что-то не так!\nНапиши</b> <code>.help "
-                     "gg.gg</code> <b>для информации.</b>",
+        "some_rong": "<b>You're doing something wrong!\write</b> <code>.help "+
+            "gg.gg</code> <b>for information.</b>",
         "result": "<b>Here you go, help yourself.</b>\n<a href='{}'>{}</a>",
         "default": "How to use Google?"
     }
@@ -29,7 +29,7 @@ class URlMod(loader.Module):
         self.client = client
 
     async def ggcmd(self, message):
-        """.gg <длинная ссылка или реплай на ссылку> """
+        """.gg <link or reply_to_link>"""
         m_text = utils.get_args_raw(message)
         if not m_text:
             reply = await message.get_reply_message()
@@ -59,15 +59,15 @@ class URlMod(loader.Module):
         await utils.answer(message, short)
 
     async def lgtcmd(self, message):
-        """Сократить ссылку с помощью сервиса verylegit.link"""
+        """Shorten the link using the verylegit.link service"""
         args = utils.get_args_raw(message)
-        if not args: return await message.edit("Нет аргументов.")
+        if not args: return await message.edit("No arguments")
         link = os.popen(
             f"curl verylegit.link/sketchify -d long_url={args}").read()
         await message.edit(f"Ссылка:\n> {link}")
 
     async def clckcmd(self, message):
-        """Сократить ссылку с помощью сервиса clck.ru"""
+        """Shorten the link using the service clck.ru"""
         m_text = utils.get_args_raw(message)
         if not m_text:
             reply = await message.get_reply_message()
@@ -99,7 +99,7 @@ class URlMod(loader.Module):
                                utils.escape_html(text)))
 
     async def nullcmd(self, message):
-        """Сократить ссылку с помощью сервиса nullify"""
+        """Shorten the link using the nullify service"""
         chat = '@nullifybot'
         reply = await message.get_reply_message()
         async with message.client.conversation(chat) as conv:
@@ -114,7 +114,7 @@ class URlMod(loader.Module):
                 response = await response
                 await mm.delete()
             except YouBlockedUserError:
-                await message.edit('<code>Разблокируй @nullifybot</code>')
+                await message.edit('<code>Unblock @nullifybot</code>')
                 return
             await message.edit(response.text.replace("🔗 Твоя ссылка: ", ""))
             await message.client(functions.messages.DeleteHistoryRequest(
