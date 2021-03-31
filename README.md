@@ -1,3 +1,3 @@
-# FTG-Modules
+# Friendly-Telegram Modules
 
-## It's the FTG Modules repo
+## FTG Modules for [GeekTG/Friendly-Telegram](https://github.com/GeekTG/Friendly-Telegram)
