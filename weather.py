@@ -11,25 +11,23 @@ class WeatherMod(loader.Module):
     """Weather Module"""
     strings = {'name': 'Weather'}
 
-    async def pwcmd(self, message):
+    async def pwcmd(self, m):
         """"Picture of weather.\n.aw <city>"""
-        args = utils.get_args_raw(message).replace(' ', '+')
+        args = utils.get_args_raw(m).replace(' ', '%20')
         city = requests.get(
             f"https://wttr.in/{args if args != None else ''}.png").content
-        await message.client.send_file(message.to_id, city)
-        await message.delete()
+        await utils.answer(m, city)
 
-    async def awcmd(self, message):
+    async def awcmd(self, m):
         """ASCII-art of weather.\n.aw <city>"""
-        city = utils.get_args_raw(message)
+        city = utils.get_args_raw(m).replace(' ', '%20')
         r = requests.get(
             f"https://wttr.in/{city if city != None else ''}?0?q?T&lang=ru")
-        await message.edit(f"<code>Город: {r.text}</code>")
+        await utils.answer(m, f"<code>City: {r.text}</code>")
 
-    @loader.sudo
-    async def wcmd(self, message):
+    async def wcmd(self, m):
         """.w <city>"""
-        city = utils.get_args(message)
+        city = utils.get_args(m).replace(' ', '%20')
         msg = []
         if city:
             for i in city:
@@ -37,7 +35,7 @@ class WeatherMod(loader.Module):
                     "https://wttr.in/" + i + "?format=%l:+%c+%t,+%w+%m"
                 )
                 msg.append(r.text)
-            await message.edit("".join(msg))
+            await utils.answer(m, "".join(msg))
         else:
             r = requests.get("https://wttr.in/?format=%l:+%c+%t,+%w+%m")
-            await message.edit(r.text)
+            await utils.answer(m, r.text)
