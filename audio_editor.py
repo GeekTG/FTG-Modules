@@ -30,7 +30,7 @@ class AudioEditorMod(loader.Module):
         if not args:
             lvl = 2.0
         else:
-            if re.match(r'^\d+(.\d+){0,1}$', args) and (1.0 < float(args) < 100.1):
+            if re.match(r'^\d+(\.\d+){0,1}$', args) and (1.0 < float(args) < 100.1):
                 lvl = float(args)
             else:
                 return await utils.answer(message, self.strings("set_value", message).format('BassBoost', 2.0, 100.0))
@@ -52,7 +52,7 @@ class AudioEditorMod(loader.Module):
         if not args:
             lvl = 25.0
         else:
-            if re.match(r'^\d+(.\d+){0,1}$', args) and (1.0 < float(args) < 100.1):
+            if re.match(r'^\d+(\.\d+){0,1}$', args) and (1.0 < float(args) < 100.1):
                 lvl = float(args)
             else:
                 return await utils.answer(message, self.strings("set_value", message).format('Distort', 2.0, 100.0))
