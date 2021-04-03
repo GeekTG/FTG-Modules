@@ -30,8 +30,8 @@ class AudioEditorMod(loader.Module):
         if not args:
             lvl = 2
         else:
-            if args.isdigit() and (1 < int(args) < 101):
-                lvl = int(args)
+            if args.isdigit() and (1.0 < float(args) < 100.1):
+                lvl = float(args)
             else:
                 return await utils.answer(message, self.strings("set_value", message).format('BassBoost', 2, 100))
         audio = await get_audio(self, message, "BassBoost")
