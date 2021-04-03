@@ -20,7 +20,7 @@ class DttsMod(loader.Module):
 
     def __init__(self):
         self.config = loader.ModuleConfig("TTS_LANG", "en", lambda m: self.strings("tts_lang_cfg", m))
-        self.is_ffmpeg = check_ffmpeg()
+        self.is_ffmpeg = os.system("ffmpeg -version") == 0
 
     async def say(self, message, speaker, text, file=".dtts.mp3"):
         reply = await message.get_reply_message()
@@ -71,11 +71,15 @@ class DttsMod(loader.Module):
         """Convert text to speech with Google APIs"""
         reply = await message.get_reply_message()
         text = utils.get_args_raw(message.message)
+
         if not text:
             if message.is_reply:
                 text = (await message.get_reply_message()).message
             else:
                 return await utils.answer(message, self.strings("no_text", message))
+
+        if message.out:
+            await message.delete()
 
         tts = await utils.run_sync(gTTS, text, lang=self.config["TTS_LANG"])
         voice = io.BytesIO()
@@ -89,14 +93,6 @@ class DttsMod(loader.Module):
             duration = None
 
         await message.client.send_file(message.chat_id, voice, voice_note=True, reply_to=reply, duration=duration)
-
-
-def check_ffmpeg():
-    """Checks is there ffmpeg"""
-    if os.system("ffmpeg -version") == 0:
-        return True
-    else:
-        return False
 
 
 def to_voice(item):
