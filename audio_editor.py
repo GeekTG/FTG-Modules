@@ -28,12 +28,12 @@ class AudioEditorMod(loader.Module):
         BassBoost"""
         args = utils.get_args_raw(message)
         if not args:
-            lvl = 2
+            lvl = 2.0
         else:
-            if args.isdigit() and (1.0 < float(args) < 100.1):
+            if re.match(r'^\d+(.\d+){0,1}$', args) and (1.0 < float(args) < 100.1):
                 lvl = float(args)
             else:
-                return await utils.answer(message, self.strings("set_value", message).format('BassBoost', 2, 100))
+                return await utils.answer(message, self.strings("set_value", message).format('BassBoost', 2.0, 100.0))
         audio = await get_audio(self, message, "BassBoost")
         if not audio: return
         sample_track = list(audio.audio.get_array_of_samples())
@@ -50,12 +50,12 @@ class AudioEditorMod(loader.Module):
         Distort"""
         args = utils.get_args_raw(message)
         if not args:
-            lvl = 25
+            lvl = 25.0
         else:
-            if args.isdigit() and (1 < int(args) < 101):
-                lvl = int(args)
+            if re.match(r'^\d+(.\d+){0,1}$', args) and (1.0 < float(args) < 100.1):
+                lvl = float(args)
             else:
-                return await utils.answer(message, self.strings("set_value", message).format('Distort', 2, 100))
+                return await utils.answer(message, self.strings("set_value", message).format('Distort', 2.0, 100.0))
         audio = await get_audio(self, message, "Distort")
         if not audio:
             return
