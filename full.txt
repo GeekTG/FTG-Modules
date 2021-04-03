@@ -5,6 +5,7 @@ noterminal
 afk
 dice
 info
+tts
 lydia
 lyrics
 purge
