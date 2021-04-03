@@ -36,3 +36,4 @@ url
 user
 distort
 downloader
+ytdl
