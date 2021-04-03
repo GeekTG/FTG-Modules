@@ -13,7 +13,15 @@ from .. import loader, utils
 @loader.tds
 class AudioEditorMod(loader.Module):
     """Module for working with sound"""
-    strings = {"name": "AudioEditor"}
+    strings = {
+        "name": "AudioEditor",
+        "downloading": "<b>[{}]</b> Downloading...",
+        "working"    : "<b>[{}]</b> Working...",
+        "exporting"  : "<b>[{}]</b> Exporting...",
+        "set_value"  : "<b>[{}]</b> Specify the level from {} to {}...",
+        "reply"      : "<b>[{}]</b> reply to audio...",
+        "set_time"   : "<b>[{}]</b> Specify the time in the format start(ms):end(ms)"
+        }
 
     async def basscmd(self, message):
         """.bass [level bass'а 2-100 (Default 2)] <reply to audio>
@@ -25,8 +33,8 @@ class AudioEditorMod(loader.Module):
             if args.isdigit() and (1 < int(args) < 101):
                 lvl = int(args)
             else:
-                return await message.edit(f"<b>[BassBoost]</b> Specify the level from 2 to 100...")
-        audio = await get_audio(message, "BassBoost")
+                return await utils.answer(message, self.strings("set_value", message).format('BassBoost', 2, 100))
+        audio = await get_audio(self, message, "BassBoost")
         if not audio: return
         sample_track = list(audio.audio.get_array_of_samples())
         est_mean = np.mean(sample_track)
@@ -47,8 +55,8 @@ class AudioEditorMod(loader.Module):
             if args.isdigit() and (1 < int(args) < 101):
                 lvl = int(args)
             else:
-                return await message.edit(f"<b>[Distort]</b> Specify the level from 2 to 100...")
-        audio = await get_audio(message, "Distort")
+                return await utils.answer(message, self.strings("set_value", message).format('Distort', 2, 100))
+        audio = await get_audio(self, message, "Distort")
         if not audio:
             return
         out = audio.audio + lvl
@@ -57,7 +65,7 @@ class AudioEditorMod(loader.Module):
     async def echoscmd(self, message):
         """.echos <reply to audio>
             Echo effect"""
-        audio = await get_audio(message, "Echo")
+        audio = await get_audio(self, message, "Echo")
         if not audio: return
         out = AudioSegment.empty()
         n = 200
@@ -67,117 +75,116 @@ class AudioEditorMod(loader.Module):
             echo = audio.audio - 10
             out = out.overlay(audio.audio, n)
             n += 200
-        await go_out(message, audio, out, audio.pref, audio.pref)
+        await go_out(audio.message, audio, out, audio.pref, audio.pref)
 
     async def volupcmd(self, message):
         """.volup <reply to audio>
             VolUp 10dB"""
-        audio = await get_audio(message, "+10dB")
+        audio = await get_audio(self, message, "+10dB")
         if not audio: return
         out = audio.audio + 10
-        await go_out(message, audio, out, audio.pref, audio.pref)
+        await go_out(audio.message, audio, out, audio.pref, audio.pref)
 
     async def voldwcmd(self, message):
         """.voldw <reply to audio>
             VolDw 10dB"""
-        audio = await get_audio(message, "-10dB")
+        audio = await get_audio(self, message, "-10dB")
         if not audio: return
         out = audio.audio - 10
-        await go_out(message, audio, out, audio.pref, audio.pref)
+        await go_out(audio.message, audio, out, audio.pref, audio.pref)
 
     async def revscmd(self, message):
         """.revs <reply to audio>
             Reverse audio"""
-        audio = await get_audio(message, "Reverse")
+        audio = await get_audio(self, message, "Reverse")
         if not audio: return
         out = audio.audio.reverse()
-        await go_out(message, audio, out, audio.pref, audio.pref)
+        await go_out(audio.message, audio, out, audio.pref, audio.pref)
 
     async def repscmd(self, message):
         """.reps <reply to audio>
             Repeat audio 2 times"""
-        audio = await get_audio(message, "Repeat")
+        audio = await get_audio(self, message, "Repeat")
         if not audio: return
         out = audio.audio * 2
-        await go_out(message, audio, out, audio.pref, audio.pref)
+        await go_out(audio.message, audio, out, audio.pref, audio.pref)
 
     async def slowscmd(self, message):
         """.slows <reply to audio>
             SlowDown 0.5x"""
-        audio = await get_audio(message, "SlowDown")
+        audio = await get_audio(self, message, "SlowDown")
         if not audio: return
         s2 = audio.audio._spawn(audio.audio.raw_data, overrides={
             "frame_rate": int(audio.audio.frame_rate * 0.5)})
         out = s2.set_frame_rate(audio.audio.frame_rate)
-        await go_out(message, audio, out, audio.pref, audio.pref, audio.duration * 2)
+        await go_out(audio.message, audio, out, audio.pref, audio.pref, audio.duration * 2)
 
     async def fastscmd(self, message):
         """.fasts <reply to audio>
         SpeedUp 1.5x"""
-        audio = await get_audio(message, "SpeedUp")
+        audio = await get_audio(self, message, "SpeedUp")
         if not audio: return
         s2 = audio.audio._spawn(audio.audio.raw_data, overrides={
             "frame_rate": int(audio.audio.frame_rate * 1.5)})
         out = s2.set_frame_rate(audio.audio.frame_rate)
-        await go_out(message, audio, out, audio.pref, audio.pref,
+        await go_out(audio.message, audio, out, audio.pref, audio.pref,
                      round(audio.duration / 2))
 
     async def rightscmd(self, message):
         """.rights <reply to audio>
             Push sound to right channel"""
-        audio = await get_audio(message, "Right channel")
+        audio = await get_audio(self, message, "Right channel")
         if not audio: return
         out = effects.pan(audio.audio, +1.0)
-        await go_out(message, audio, out, audio.pref, audio.pref)
+        await go_out(audio.message, audio, out, audio.pref, audio.pref)
 
     async def leftscmd(self, message):
         """.lefts <reply to audio>
             Push sound to left channel"""
-        audio = await get_audio(message, "Left channel")
+        audio = await get_audio(self, message, "Left channel")
         if not audio: return
         out = effects.pan(audio.audio, -1.0)
-        await go_out(message, audio, out, audio.pref, audio.pref)
+        await go_out(audio.message, audio, out, audio.pref, audio.pref)
 
     async def normscmd(self, message):
         """.norms <reply to audio>
             Normalize sound (from quiet to normal)"""
-        audio = await get_audio(message, "Normalization")
+        audio = await get_audio(self, message, "Normalization")
         if not audio: return
         out = effects.normalize(audio.audio)
-        await go_out(message, audio, out, audio.pref, audio.pref)
+        await go_out(audio.message, audio, out, audio.pref, audio.pref)
 
     async def byrobertscmd(self, message):
         '''.byroberts <reply to audio>
             Add at the end "Directed by Robert B Weide"'''
-        audio = await get_audio(message, "Directed by...")
+        audio = await get_audio(self, message, "Directed by...")
         if not audio: return
         out = audio.audio + AudioSegment.from_file(io.BytesIO(requests.get(
             "https://raw.githubusercontent.com/D4n13l3k00/files-for-modules/master/directed.mp3").content)).apply_gain(
             +8)
-        await go_out(message, audio, out, audio.pref, audio.pref)
+        await go_out(audio.message, audio, out, audio.pref, audio.pref)
 
     async def cutscmd(self, message):
         """.cuts <start(ms):end(ms)> <reply to audio>
         Cut audio"""
         args = utils.get_args_raw(message)
-        if not args: return await message.edit("<b>[Cut]</b> Specify the time in the format start(ms):end(ms)")
+        if not args: return await utils.answer(message, self.strings("set_time", message).format('Cut'))
         else:
             r = re.compile(r'^(?P<start>\d+):(?P<end>\d+)$')
             ee = r.match(args)
             if ee:
                 start = int(ee.group('start'))
                 end   = int(ee.group('end'))
-            else: return await message.edit(f"<b>[Cut]</b> Specify the time in the format start(ms):end(ms)")
-        audio = await get_audio(message, "Cut")
+            else: return await utils.answer(message, self.strings("set_time", message).format('Cut'))
+        audio = await get_audio(self, message, "Cut")
         if not audio: return
         out = audio.audio[start:end]
-        await go_out(message, audio, out, audio.pref, audio.pref)
+        await go_out(audio.message, audio, out, audio.pref, audio.pref)
         
-
-
-async def get_audio(message, pref):
+async def get_audio(self, message, pref):
     class audio_ae_class():
         audio = None
+        message = None
         duration = None
         voice = None
         pref = None
@@ -190,13 +197,13 @@ async def get_audio(message, pref):
         ae.reply = reply
         ae.voice = reply.document.attributes[0].voice
         ae.duration = reply.document.attributes[0].duration
-        await message.edit(f"<b>[{pref}]</b> Downloading...")
+        ae.message = await utils.answer(message, self.strings("downloading", message).format(pref))
         ae.audio = AudioSegment.from_file(
             io.BytesIO(await reply.download_media(bytes)))
-        await message.edit(f"<b>[{pref}]</b> Working...")
+        await utils.answer(message, self.strings("working", message).format(pref))
         return ae
     else:
-        await message.edit(f"<b>[{pref}]</b> reply to audio...")
+        await utils.answer(message, self.strings("reply", message).format(pref))
         return None
 
 
@@ -204,15 +211,13 @@ async def go_out(message, audio, out, pref, title, fs=None):
     o = io.BytesIO()
     o.name = "audio." + ("ogg" if audio.voice else "mp3")
     if audio.voice: out.split_to_mono()
-    await message.edit(f"<b>[{pref}]</b> Exporting...")
+    await utils.answer(message, AudioEditorMod.strings["exporting"].format(pref))
     out.export(o, format="ogg" if audio.voice else "mp3",
                bitrate="64k" if audio.voice else None,
                codec="libopus" if audio.voice else None)
     o.seek(0)
-    await message.edit(f"<b>[{pref}]</b> Sending...")
-    await message.client.send_file(message.to_id, o, reply_to=audio.reply.id,
+    await utils.answer(message, o, reply_to=audio.reply.id,
                                    voice_note=audio.voice, attributes=[
             types.DocumentAttributeAudio(duration=fs if fs else audio.duration,
                                          title=title,
                                          performer="AudioEditor")] if not audio.voice else None)
-    await message.delete()
