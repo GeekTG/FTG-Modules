@@ -200,7 +200,7 @@ async def get_audio(self, message, pref):
         ae.message = await utils.answer(message, self.strings("downloading", message).format(pref))
         ae.audio = AudioSegment.from_file(
             io.BytesIO(await reply.download_media(bytes)))
-        await utils.answer(message, self.strings("working", message).format(pref))
+        ae.message = await utils.answer(ae.message, self.strings("working", message).format(pref))
         return ae
     else:
         await utils.answer(message, self.strings("reply", message).format(pref))
@@ -211,7 +211,7 @@ async def go_out(message, audio, out, pref, title, fs=None):
     o = io.BytesIO()
     o.name = "audio." + ("ogg" if audio.voice else "mp3")
     if audio.voice: out.split_to_mono()
-    await utils.answer(message, AudioEditorMod.strings["exporting"].format(pref))
+    message = await utils.answer(message, AudioEditorMod.strings["exporting"].format(pref))
     out.export(o, format="ogg" if audio.voice else "mp3",
                bitrate="64k" if audio.voice else None,
                codec="libopus" if audio.voice else None)
