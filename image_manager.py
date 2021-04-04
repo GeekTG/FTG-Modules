@@ -23,10 +23,8 @@ class ImageManagerMod(loader.Module):
         s = "[ImageManager -> DelBg]\n"
         reply = await m.get_reply_message()
         im = await get_img_from_msg(reply)
-        if not im:
-            await m.edit(s + "Reply to image")
-            return
-        await m.edit(s + "Working...")
+        if not im: return await utils.answer(m,  s + "Reply to image")
+        await utils.answer(m,  s + "Working...")
         im2 = Image.open(im).convert("RGBA")
         w, h = im2.size
         for x in range(w):
@@ -36,24 +34,18 @@ class ImageManagerMod(loader.Module):
         output = io.BytesIO()
         as_file = bool(utils.get_args_raw(m))
         output.name = "delbg." + ("png" if as_file else "webp")
-        if not as_file:
-            im2.thumbnail((512, 512))
+        if not as_file: im2.thumbnail((512, 512))
         im2.save(output)
         output.seek(0)
         del im2
-        await m.client.send_file(m.to_id, output, force_document=as_file, reply_to=reply.id)
-        await m.delete()
+        await utils.answer(m, output, force_document=as_file, reply_to=reply.id)
 
     async def delbg2cmd(self, m):
         """Deletes black color
         Return sticker webp"""
-        s = "[ImageManager -> DelBg]\n"
         reply = await m.get_reply_message()
         im = await get_img_from_msg(reply)
-        if not im:
-            await m.edit(s + "Reply to image")
-            return
-        await m.edit(s + "Working...")
+        if not im: return await utils.answer(m, "Reply to image")   
         im2 = Image.open(im).convert("RGBA")
         w, h = im2.size
         for x in range(w):
@@ -63,176 +55,115 @@ class ImageManagerMod(loader.Module):
         output = io.BytesIO()
         as_file = bool(utils.get_args_raw(m))
         output.name = "delbg." + ("png" if as_file else "webp")
-        if not as_file:
-            im2.thumbnail((512, 512))
+        if not as_file: im2.thumbnail((512, 512))
         im2.save(output)
         output.seek(0)
         del im2
-        await m.client.send_file(m.to_id, output, force_document=as_file, reply_to=reply.id)
-        await m.delete()
+        await utils.answer(m, output, force_document=as_file, reply_to=reply.id)
 
     async def resizecmd(self, m):
         """<x:int> <y:int>
         Resize image"""
-        s = "[ImageManager -> Resize]\n"
         reply = await m.get_reply_message()
         im = await get_img_from_msg(reply)
-        if not im:
-            await m.edit(s + "Reply to image")
-            return
+        if not im: return await utils.answer(m,  "Reply to image")
         args = utils.get_args_raw(m)
-        if not args:
-            await m.edit(s + "Specify x:int y:int")
-            return
+        if not args: return await utils.answer(m, "Specify x:int y:int")
         rr = re.compile(r"^(\d+)\s+(\d+)$")
-        if not rr.match(args):
-            await m.edit(s + "Specify x:int y:int")
-            return
+        if not rr.match(args): return await utils.answer(m, "Specify x:int y:int")
         x = int(rr.findall(args)[0][0])
         y = int(rr.findall(args)[0][1])
-        await m.edit(s + "Working...")
         im2 = Image.open(im)
         im2 = im2.resize((x, y))
         out = io.BytesIO()
         iswebp = True if reply.file.ext == ".webp" else False
-        if iswebp:
-            im2.thumbnail((512, 512))
+        if iswebp: im2.thumbnail((512, 512))
         out.name = "resized." + (".webp" if iswebp else ".png")
         im2.save(out)
         out.seek(0)
-        await m.client.send_file(m.to_id, out, reply_to=reply.id)
-        await m.delete()
+        await utils.answer(m,  out, reply_to=reply.id)
 
     async def rotatecmd(self, m):
         """<rotate:int>
         Rotate image"""
-        s = "[ImageManager -> Rotate]\n"
         reply = await m.get_reply_message()
         im = await get_img_from_msg(reply)
-        if not im:
-            await m.edit(s + "Reply to image")
-            return
+        if not im: return await utils.answer(m, "Reply to image")
         args = utils.get_args_raw(m)
-        if not args:
-            await m.edit(s + "Specify <rotate:int>")
-            return
+        if not args: return await utils.answer(m, "Specify <rotate:int>")
         rr = re.compile(r"^(-*\d+)$")
-        if not rr.match(args):
-            await m.edit(s + "Specify <rotate:int>")
-            return
+        if not rr.match(args): return await utils.answer(m, "Specify <rotate:int>")
         c = int(rr.findall(args)[0])
         im2 = Image.open(im)
         im2 = im2.rotate(c, expand=True)
         out = io.BytesIO()
         iswebp = True if reply.file.ext == ".webp" else False
-        if iswebp:
-            im2.thumbnail((512, 512))
+        if iswebp: im2.thumbnail((512, 512))
         out.name = "rotate." + (".webp" if iswebp else ".png")
         im2.save(out)
         out.seek(0)
-        await m.client.send_file(m.to_id, out, reply_to=reply.id)
-        await m.delete()
+        await utils.answer(m,  out, reply_to=reply.id)
 
     async def invertcmd(self, m):
         """Invert image's colors"""
-        s = "[ImageManager -> Invert]\n"
         reply = await m.get_reply_message()
         im = await get_img_from_msg(reply)
-        if not im:
-            await m.edit(s + "Reply to image")
-            return
-        await m.edit(s + "Working...")
-        await m.client.send_file(m.to_id, await invert_image(im, reply.file.ext), reply_to=reply.id)
-        await m.delete()
+        if not im: return await utils.answer(m, "Reply to image")
+        await utils.answer(m,  await invert_image(im, reply.file.ext), reply_to=reply.id)
 
     async def contrstcmd(self, m):
         """<level:float or int>
         Change the image contrast"""
-        s = "[ImageManager -> Contrast]\n"
         reply = await m.get_reply_message()
         im = await get_img_from_msg(reply)
-        if not im:
-            await m.edit(s + "Reply to image")
-            return
-        await m.edit(s + "Working...")
+        if not im: return await utils.answer(m, "Reply to image")
         args = utils.get_args_raw(m)
-        if not args:
-            await m.edit(s + "Specify level:float or int")
-            return
+        if not args: return await utils.answer(m, "Specify level:float or int")
         rr = re.compile(r"^(\d+|\d+\.\d+)$")
-        if not rr.match(args):
-            await m.edit(s + "Specify level:float or int")
-            return
+        if not rr.match(args): return await utils.answer(m, "Specify level:float or int")
         c = float(rr.findall(args)[0])
-        await m.client.send_file(m.to_id, await contrast(im, c, reply.file.ext), reply_to=reply.id)
-        await m.delete()
+        await utils.answer(m,  await contrast(im, c, reply.file.ext), reply_to=reply.id)
 
     async def convpcmd(self, m):
         """Sticker to image
         Image to sticker"""
-        s = "[ImageManager -> Converter]\n"
         reply = await m.get_reply_message()
         im = await get_img_from_msg(reply)
-        if not im:
-            await m.edit(s + "Reply to image")
-            return
-        await m.edit(s + "Working...")
+        if not im: return await utils.answer(m, "Reply to image")
         im2 = Image.open(im)
         iswebp = True if reply.file.ext == ".webp" else False
         out = io.BytesIO()
-        if iswebp:
-            out.name = "conv.png"
-        else:
-            im2.thumbnail((512, 512))
-            out.name = "conv.webp"
+        if iswebp: out.name = "conv.png"
+        else: im2.thumbnail((512, 512)); out.name = "conv.webp"
         im2.save(out)
         out.seek(0)
-        await m.client.send_file(m.to_id, out, reply_to=reply.id)
-        await m.delete()
+        await utils.answer(m,  out, reply_to=reply.id)
 
     async def brightcmd(self, m):
         """<level:float or int>
         Change the brightness of the image"""
-        s = "[ImageManager -> Bright]\n"
         reply = await m.get_reply_message()
         im = await get_img_from_msg(reply)
-        if not im:
-            await m.edit(s + "Reply to image")
-            return
-        await m.edit(s + "Working...")
+        if not im: return await utils.answer(m, "Reply to image")
         args = utils.get_args_raw(m)
-        if not args:
-            await m.edit(s + "Specify level:float or int")
-            return
+        if not args: return await utils.answer(m, "Specify level:float or int")
         rr = re.compile(r"^(\d+|\d+\.\d+)$")
-        if not rr.match(args):
-            await m.edit(s + "Specify level:float or int")
-            return
+        if not rr.match(args): return await utils.answer(m, "Specify level:float or int")
         c = float(rr.findall(args)[0])
-        await m.client.send_file(m.to_id, setbright(im, c, reply.file.ext), reply_to=reply.id)
-        await m.delete()
+        await utils.answer(m, setbright(im, c, reply.file.ext), reply_to=reply.id)
 
     async def sharpnesscmd(self, m):
         """<level:float or int>
         Change the sharpness of the image"""
-        s = "[ImageManager -> Sharpness]\n"
         reply = await m.get_reply_message()
         im = await get_img_from_msg(reply)
-        if not im:
-            await m.edit(s + "Reply to image")
-            return
-        await m.edit(s + "Working...")
+        if not im: return await utils.answer(m, "Reply to image")
         args = utils.get_args_raw(m)
-        if not args:
-            await m.edit(s + "Specify <level:float or int>")
-            return
+        if not args: return await utils.answer(m, "Specify <level:float or int>")
         rr = re.compile(r"^(\d+|\d+\.\d+)$")
-        if not rr.match(args):
-            await m.edit(s + "Specify <level:float or int>")
-            return
+        if not rr.match(args): return await utils.answer(m, "Specify <level:float or int>")
         c = float(rr.findall(args)[0])
-        await m.client.send_file(m.to_id, setsharpness(im, c, reply.file.ext), reply_to=reply.id)
-        await m.delete()
+        await utils.answer(m, setsharpness(im, c, reply.file.ext), reply_to=reply.id)
 
 
 async def get_img_from_msg(reply):
