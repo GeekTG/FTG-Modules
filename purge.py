@@ -22,17 +22,17 @@ class PurgeMod(loader.Module):
         if not message.is_reply:
             await utils.answer(message, self.strings("from_where", message))
             return
-
         from_users = set()
         args = utils.get_args(message)
         for arg in args:
             try:
+                try: arg = int(arg)
+                except: pass
                 entity = await message.client.get_entity(arg)
                 if isinstance(entity, telethon.tl.types.User):
                     from_users.add(entity.id)
             except ValueError:
                 pass
-
         msgs = []
         from_ids = set()
         if await message.client.is_bot():
