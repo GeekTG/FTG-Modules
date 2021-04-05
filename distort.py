@@ -19,7 +19,12 @@ logger = logging.getLogger(__name__)
 @loader.tds
 class DistortMod(loader.Module):
     """Stickers or photo distort"""
-    strings = {"name": "Distort"}
+    strings = {
+        "name": "Distort",
+        "bad_input": "<code>Reply to image or stick!</code>",
+        "processing": "<code>D i s t o r t i n g . . .</code>",
+        "bad_input_tgs": "<code>Reply to animated sticker</code>"
+    }
 
     async def client_ready(self, client, db):
         self.client = client
@@ -29,15 +34,15 @@ class DistortMod(loader.Module):
         """Animated stickers distort"""
         reply = await message.get_reply_message()
         if not reply:
-            await message.edit("Reply to animated sticker")
+            await utils.answer(message, self.strings("bad_input_tgs", message))
             return
         if not reply.file:
-            await message.edit("Reply to animated sticker")
+            await utils.answer(message, self.strings("bad_input_tgs", message))
             return
         if not reply.file.name.endswith(".tgs"):
-            await message.edit("Reply to animated sticker")
+            await utils.answer(message, self.strings("bad_input_tgs", message))
             return
-        await message.edit("Distorting...")
+        message = await utils.answer(message, self.strings("processing", message))
         await reply.download_media("tgs.tgs")
         os.system("lottie_convert.py tgs.tgs json.json")
         with open("json.json", "r") as f:
@@ -51,12 +56,13 @@ class DistortMod(loader.Module):
         with open("json.json", "w") as f:
             f.write(stick)
             f.close()
-        await message.edit("Sending...")
         os.system("lottie_convert.py json.json tgs.tgs")
-        await reply.reply(file="tgs.tgs")
+        with open("tgs.tgs", "rb") as f:
+            file = io.BytesIO(f.read())
+            file.name = "tgs.tgs"
+            await utils.answer(message, file)
         os.remove("tgs.tgs")
         os.remove("json.json")
-        await message.delete()
 
     @loader.sudo
     async def distortcmd(self, message):
@@ -65,17 +71,16 @@ class DistortMod(loader.Module):
         .distort 50
         .distort 50 im
         .distort im 50
-        im => кидает стикеры как фото
-        50 => (от 0 до дохуя) процент сжатия"""
+        im => sends as photo
+        50 => (from 0 to 100) percent of distortion, 0 is maximum distortion"""
         if message.is_reply:
             reply_message = await message.get_reply_message()
             data, mime = await check_media(reply_message)
             if isinstance(data, bool):
-                await utils.answer(message,
-                                   "<code>Reply to image or stick!</code>")
+                await utils.answer(message, self.strings("bad_input", message))
                 return
         else:
-            await utils.answer(message, "<code>Reply to image or stick!</code>")
+            await utils.answer(message, self.strings("bad_input", message))
             return
         rescale_rate = 70
         a = utils.get_args(message)
@@ -90,8 +95,8 @@ class DistortMod(loader.Module):
                     if rescale_rate <= 0:
                         rescale_rate = 70
 
-        await message.edit("<b>Distorting...</b>")
-        file = await message.client.download_media(data, bytes)
+        message = await utils.answer(message, self.strings("processing", message))
+        file = await self.client.download_media(data, bytes)
         file, img = io.BytesIO(file), io.BytesIO()
         img.name = 'img.png'
         IM.open(file).save(img, 'PNG')
@@ -102,10 +107,8 @@ class DistortMod(loader.Module):
         out.name = f'out.{mime}'
         im.save(out, mime.upper())
         out.seek(0)
-        await message.edit("<b>Sending...</b>")
-        await message.client.send_file(message.to_id, out,
-                                       reply_to=reply_message.id)
-        await message.delete()
+
+        await utils.answer(message, out)
 
     async def jpegdcmd(self, message):
         """JPEG style distort"""
@@ -113,23 +116,22 @@ class DistortMod(loader.Module):
             reply_message = await message.get_reply_message()
             data = await check_mediaa(reply_message)
             if isinstance(data, bool):
-                await message.delete()
+                await utils.answer(message, self.strings("bad_input", message))
                 return
         else:
-            await message.delete()
+            await utils.answer(message, self.strings("bad_input", message))
             return
 
+        message = await utils.answer(message, self.strings("processing", message))
         image = io.BytesIO()
-        await message.client.download_media(data, image)
+        await self.client.download_media(data, image)
         image = IM.open(image)
         fried_io = io.BytesIO()
         fried_io.name = "image.jpeg"
         image = image.convert("RGB")
         image.save(fried_io, "JPEG", quality=0)
         fried_io.seek(0)
-        await message.delete()
-        await message.client.send_file(message.chat_id, fried_io,
-                                       reply_to=reply_message.id)
+        await utils.answer(message, fried_io)
 
 
 async def distort(file, rescale_rate):
