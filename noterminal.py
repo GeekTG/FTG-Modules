@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 class noTerminalMod(loader.Module):
     """Runs commands"""
 
-    strings = {"name": "noTerminal",
+    strings = {"name": "NoTerminal",
                "flood_wait_protect_cfg_doc": "How long to wait in seconds between edits in commands",
                "what_to_kill": "<b>Reply to a terminal command to terminate it</b>",
                "kill_fail": "<b>Could not kill process</b>",

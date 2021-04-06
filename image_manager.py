@@ -14,7 +14,7 @@ import re
 @loader.tds
 class ImageManagerMod(loader.Module):
     """ImageManager - Simple work with imgaes"""
-    strings = {"name": "ImageManager"}
+    strings = {"name": "Image Manager"}
 
     @loader.owner
     async def delbgcmd(self, m):
