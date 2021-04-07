@@ -2,26 +2,15 @@
 
 # Module author: @Fl1yd
 
-import io, logging, time
-from .. import loader, utils, security
+import io, time
+from .. import loader, utils
 from PIL import Image
-from telethon.errors import (ChatAdminRequiredError, UserAdminInvalidError, FloodWaitError, PhotoCropSizeSmallError)
-from telethon.tl.types import (ChatAdminRights, ChatBannedRights)
-from telethon.tl.functions.channels import (EditAdminRequest, EditBannedRequest, EditPhotoRequest)
+from telethon.errors import ChatAdminRequiredError, UserAdminInvalidError, PhotoCropSizeSmallError
+from telethon.tl.types import ChatAdminRights, ChatBannedRights
+from telethon.tl.functions.channels import EditAdminRequest, EditBannedRequest, EditPhotoRequest
 from telethon.tl.functions.messages import EditChatAdminRequest
 
-logger = logging.getLogger(__name__)
-
 # ================== CONSTANS ========================
-
-PROMOTE_RIGHTS = ChatAdminRights(post_messages=True,
-                                 add_admins=None,
-                                 invite_users=True,
-                                 change_info=None,
-                                 ban_users=True,
-                                 delete_messages=True,
-                                 pin_messages=True,
-                                 edit_messages=True)
 
 DEMOTE_RIGHTS = ChatAdminRights(post_messages=None,
                                 add_admins=None,
@@ -41,6 +30,7 @@ UNMUTE_RIGHTS = ChatBannedRights(until_date=None,
                                  send_games=False,
                                  send_inline=False,
                                  embed_links=False)
+
 
 BANNED_RIGHTS = ChatBannedRights(until_date=None,
                                  view_messages=True,
@@ -62,15 +52,11 @@ UNBAN_RIGHTS = ChatBannedRights(until_date=None,
                                 send_inline=None,
                                 embed_links=None)
 
-
 # =====================================================
 
-def register(cb):
-    cb(AdminToolsMod())
-
-
+@loader.tds
 class AdminToolsMod(loader.Module):
-    """Chat administration."""
+    """Admin Tools"""
     strings = {'name': 'Admin Tools',
                'not_pic': '<b>This isn`t an pic/sticker.</b>',
                'wait': '<b>Waiting...</b>',
@@ -111,444 +97,422 @@ class AdminToolsMod(loader.Module):
                'del_u_search': '<b>Search for deleted accounts...</b>',
                'del_u_kicking': '<b>Kick deleted accounts...\nOh~, I can do it?!</b>'}
 
-    async def ecpcmd(self, gpic):
+
+
+    async def ecpcmd(self, message):
         """Command .ecp changes the pic of the chat.\nUse: .ecp <reply to pic/sticker>."""
-        if gpic.chat:
+        if message.chat:
             try:
-                reply = await gpic.get_reply_message()
-                chat = await gpic.get_chat()
+                reply = await message.get_reply_message()
+                
+                chat = await message.get_chat()
                 if not chat.admin_rights and not chat.creator:
-                    return await utils.answer(gpic, self.strings('not_admin', gpic))
+                    return await utils.answer(message, self.strings('not_admin', message))
+                
                 if reply:
-                    pic = await check_media(gpic, reply)
+                    pic = await check_media(message, reply)
                     if not pic:
-                        return await utils.answer(gpic, self.strings('not_pic', gpic))
+                        return await utils.answer(message, self.strings('not_pic', message))
                 else:
-                    return await utils.answer(gpic, self.strings('no_reply', gpic))
-                await utils.answer(gpic, self.strings('wait', gpic))
+                    return await utils.answer(message, self.strings('no_reply', message))
+                
+                await utils.answer(message, self.strings('wait', message))
+                
                 what = resizepic(pic)
                 if what:
                     try:
-                        await gpic.client(EditPhotoRequest(gpic.chat_id, await gpic.client.upload_file(what)))
+                        await message.client(EditPhotoRequest(message.chat_id, await message.client.upload_file(what)))
                     except PhotoCropSizeSmallError:
-                        return await utils.answer(gpic, self.strings('pic_so_small', gpic))
-                await utils.answer(gpic, self.strings('pic_changed', gpic))
+                        return await utils.answer(message, self.strings('pic_so_small', message))
+                await utils.answer(message, self.strings('pic_changed', message))
             except ChatAdminRequiredError:
-                return await utils.answer(gpic, self.strings('no_rights', gpic))
+                return await utils.answer(message, self.strings('no_rights', message))
         else:
-            return await utils.answer(gpic, self.strings('this_isn`t_a_chat', gpic))
+            return await utils.answer(message, self.strings('this_isn`t_a_chat', message))
 
-    async def promotecmd(self, promt):
+
+    async def promotecmd(self, message):
         """Command .promote for promote user to admin rights.\nUse: .promote <@ or reply> <rank>."""
-        if promt.chat:
+        if message.chat:
             try:
-                args = utils.get_args_raw(promt).split(' ')
-                reply = await promt.get_reply_message()
+                args = utils.get_args_raw(message).split(' ')
+                reply = await message.get_reply_message()
                 rank = 'admin'
-                chat = await promt.get_chat()
-                if not chat.admin_rights and not chat.creator:
-                    return await utils.answer(promt, self.strings('not_admin', promt))
+                
+                chat = await message.get_chat()
+                adm_rights = chat.admin_rights 
+                if not adm_rights and not chat.creator:
+                    return await utils.answer(message, self.strings('not_admin', message))
+                
                 if reply:
-                    args = utils.get_args_raw(promt)
-                    if args:
-                        rank = args
-                    else:
-                        rank = rank
-                    user = await utils.get_user(reply)
+                    args = utils.get_args_raw(message)
+                    if args: rank = args
+                    else: rank = rank
+                    user = await message.client.get_entity(reply.sender_id)
                 else:
-                    user = await promt.client.get_entity(args[0])
+                    user = await message.client.get_entity(args[0] if not args[0].isnumeric() else int(args[0]))
                     if len(args) == 1:
                         rank = rank
                     elif len(args) >= 2:
-                        rank = utils.get_args_raw(promt).split(' ', 1)[1]
+                        rank = utils.get_args_raw(message).split(' ', 1)[1]
                 try:
-                    await promt.client(EditAdminRequest(promt.chat_id, user.id, PROMOTE_RIGHTS, rank))
+                    await message.client(EditAdminRequest(message.chat_id, user.id, ChatAdminRights(add_admins=False, invite_users=adm_rights.invite_users,
+                                                                                                    change_info=False, ban_users=adm_rights.ban_users,
+                                                                                                    delete_messages=adm_rights.delete_messages, pin_messages=adm_rights.pin_messages), rank))
                 except ChatAdminRequiredError:
-                    return await utils.answer(promt, self.strings('no_rights', promt))
+                    return await utils.answer(message, self.strings('no_rights', message))
                 else:
-                    return await utils.answer(promt, self.strings('promoted', promt).format(user.first_name, rank))
+                    return await utils.answer(message, self.strings('promoted', message).format(user.first_name, rank))
             except ValueError:
-                return await utils.answer(promt, self.strings('no_args', promt))
+                return await utils.answer(message, self.strings('no_args', message))
         else:
-            return await utils.answer(promt, self.strings('this_isn`t_a_chat', promt))
+            return await utils.answer(message, self.strings('this_isn`t_a_chat', message))
 
-    async def demotecmd(self, demt):
+
+    async def demotecmd(self, message):
         """Command .demote for demote user to admin rights.\nUse: .demote <@ or reply>."""
-        if demt.chat:
+        if not message.is_private:
             try:
-                reply = await demt.get_reply_message()
-                chat = await demt.get_chat()
+                reply = await message.get_reply_message()
+                
+                chat = await message.get_chat()
                 if not chat.admin_rights and not chat.creator:
-                    return await utils.answer(demt, self.strings('not_admin', demt))
+                    return await utils.answer(message, self.strings('not_admin', message))
+                
                 if reply:
-                    user = await utils.get_user(await demt.get_reply_message())
+                    user = await message.client.get_entity(reply.sender_id)
                 else:
-                    args = utils.get_args(demt)
+                    args = utils.get_args_raw(message)
                     if not args:
-                        return await utils.answer(demt, self.strings('demote_none', demt))
-                    user = await demt.client.get_entity(args[0])
-                if not user:
-                    return await utils.answer(demt, self.strings('who', demt))
+                        return await utils.answer(message, self.strings('demote_none', message))
+                    user = await message.client.get_entity(args if not args.isnumeric() else int(args))
+                
                 try:
-                    if demt.is_channel:
-                        await demt.client(EditAdminRequest(demt.chat_id, user.id, DEMOTE_RIGHTS, ""))
+                    if message.is_channel:
+                        await message.client(EditAdminRequest(message.chat_id, user.id, DEMOTE_RIGHTS, ""))
                     else:
-                        await demt.client(EditChatAdminRequest(demt.chat_id, user.id, False))
-                except:
-                    return await utils.answer(demt, self.strings('no_rights', demt))
+                        await message.client(EditChatAdminRequest(message.chat_id, user.id, False))
+                except ChatAdminRequiredError:
+                    return await utils.answer(message, self.strings('no_rights', message))
                 else:
-                    return await utils.answer(demt, self.strings('demoted', demt).format(user.first_name))
-            except:
-                return await utils.answer(demt, self.strings('wtf_is_it'))
+                    return await utils.answer(message, self.strings('demoted', message).format(user.first_name))
+            except ValueError:
+                return await utils.answer(message, self.strings('no_args'))
         else:
-            return await utils.answer(demt, self.strings('this_isn`t_a_chat', demt))
+            return await utils.answer(message, self.strings('this_isn`t_a_chat', message))
 
-    async def pincmd(self, pint):
+
+    async def pincmd(self, message):
         """Command .pin for pin message in the chat.\nUse: .pin <reply>."""
-        if pint.chat:
-            reply = await pint.get_reply_message()
+        if not message.is_private:
+            reply = await message.get_reply_message()
             if not reply:
-                return await utils.answer(pint, self.strings('pin_none', pint))
-            await utils.answer(pint, self.strings('pinning', pint))
+                return await utils.answer(message, self.strings('pin_none', message))
+            
+            await utils.answer(message, self.strings('pinning', message))
             try:
-                await pint.client.pin_message(pint.chat, message=reply.id, notify=False)
+                await message.client.pin_message(message.chat, message=reply.id, notify=False)
             except ChatAdminRequiredError:
-                return await utils.answer(pint, self.strings('no_rights', pint))
-            await utils.answer(pint, self.strings('pinned', pint))
+                return await utils.answer(message, self.strings('no_rights', message))
+            await utils.answer(message, self.strings('pinned', message))
         else:
-            await utils.answer(pint, self.strings('this_isn`t_a_chat', pint))
+            await utils.answer(message, self.strings('this_isn`t_a_chat', message))
 
-    async def unpincmd(self, unpon):
+
+    async def unpincmd(self, message):
         """Command .unpin for unpin message in the chat.\nUse: .unpin."""
-        if unpon.chat:
-            await utils.answer(unpon, self.strings('unpinning', unpon))
+        if not message.is_private:
+            await utils.answer(message, self.strings('unpinning', message))
+            
             try:
-                await unpon.client.pin_message(unpon.chat, message=None, notify=None)
+                await message.client.pin_message(message.chat, message=None, notify=None)
             except ChatAdminRequiredError:
-                await utils.answer(unpon, self.strings('no_rights', unpon))
-                return
-            await utils.answer(unpon, self.strings('unpinned', unpon))
+                return await utils.answer(message, self.strings('no_rights', message))
+            await utils.answer(message, self.strings('unpinned', message))
         else:
-            await utils.answer(unpon, self.strings('this_isn`t_a_chat', unpon))
+            await utils.answer(message, self.strings('this_isn`t_a_chat', message))
 
-    async def kickcmd(self, kock):
+
+    async def kickcmd(self, message):
         """Command .kick for kick the user.\nUse: .kick <@ or reply>."""
-        if kock.chat:
+        if not message.is_private:
             try:
-                args = utils.get_args_raw(kock).split(' ')
-                reason = utils.get_args_raw(kock)
-                reply = await kock.get_reply_message()
-                chat = await kock.get_chat()
+                args = utils.get_args_raw(message).split(' ')
+                reason = utils.get_args_raw(message)
+                reply = await message.get_reply_message()
+                
+                chat = await message.get_chat()
                 if not chat.admin_rights and not chat.creator:
-                    return await utils.answer(kock, self.strings('not_admin', kock))
+                    return await utils.answer(message, self.strings('not_admin', message))
+                else:
+                    if chat.admin_rights.ban_users == False:
+                        return await utils.answer(message, self.strings('no_rights', message))
+                
                 if reply:
-                    user = await utils.get_user(reply)
-                    args = utils.get_args_raw(kock)
+                    user = await message.client.get_entity(reply.sender_id)
+                    args = utils.get_args_raw(message)
                     if args:
                         reason = args
                 else:
-                    user = await kock.client.get_entity(args[0])
+                    user = await message.client.get_entity(args[0] if not args[0].isnumeric() else int(args[0]))
                     if args:
                         if len(args) == 1:
-                            args = utils.get_args_raw(kock)
-                            user = await kock.client.get_entity(args)
+                            args = utils.get_args_raw(message)
+                            user = await message.client.get_entity(args if not args.isnumeric() else int(args))
                             reason = False
                         elif len(args) >= 2:
-                            reason = utils.get_args_raw(kock).split(' ', 1)[1]
+                            reason = utils.get_args_raw(message).split(' ', 1)[1]
+                
+                await utils.answer(message, self.strings('kicking', message))
                 try:
-                    await utils.answer(kock, self.strings('kicking', kock))
-                    await kock.client.kick_participant(kock.chat_id, user.id)
-                except ChatAdminRequiredError:
-                    return await utils.answer(kock, self.strings('no_rights', kock))
-                else:
-                    if reason:
-                        return await utils.answer(kock, self.strings('kicked_for_reason', kock).format(user.first_name,
-                                                                                                       reason))
-                    if reason == False:
-                        return await utils.answer(kock, self.strings('kicked', kock).format(user.first_name))
-            except ValueError:
-                return await utils.answer(kock, self.strings('no_args', kock))
-        else:
-            return await utils.answer(kock, self.strings('this_isn`t_a_chat', kock))
-
-    async def bancmd(self, bon):
-        """Command .ban for ban the user.\nUse: .ban <@ or reply>."""
-        if bon.chat:
-            try:
-                args = utils.get_args_raw(bon).split(' ')
-                reason = utils.get_args_raw(bon)
-                reply = await bon.get_reply_message()
-                chat = await bon.get_chat()
-                if not chat.admin_rights and not chat.creator:
-                    return await utils.answer(bon, self.strings('not_admin', bon))
-                if reply:
-                    user = await utils.get_user(reply)
-                    args = utils.get_args_raw(bon)
-                    if args:
-                        reason = args
-                else:
-                    user = await bon.client.get_entity(args[0])
-                    if args:
-                        if len(args) == 1:
-                            args = utils.get_args_raw(bon)
-                            user = await bon.client.get_entity(args)
-                            reason = False
-                        elif len(args) >= 2:
-                            reason = utils.get_args_raw(bon).split(' ', 1)[1]
-                try:
-                    await utils.answer(bon, self.strings('banning', bon))
-                    await bon.client(
-                        EditBannedRequest(bon.chat_id, user.id, ChatBannedRights(until_date=None, view_messages=True)))
-                    async for msgs in bon.client.iter_messages(bon.to_id, from_user=user.id):
-                        await msgs.delete()
-                except ChatAdminRequiredError:
-                    return await utils.answer(bon, self.strings('no_rights', bon))
+                    await message.client.kick_participant(message.chat_id, user.id)
                 except UserAdminInvalidError:
-                    return await utils.answer(bon, self.strings('no_rights', bon))
-                except:
-                    pass
-                else:
-                    if reason:
-                        return await utils.answer(bon, self.strings('banned_for_reason', bon).format(user.first_name,
-                                                                                                     reason))
-                    if reason == False:
-                        return await utils.answer(bon, self.strings('banned', bon).format(user.first_name, reason))
+                    return await utils.answer(message, self.strings('no_rights', message))
+                if not reason:
+                    return await utils.answer(message, self.strings('kicked', message).format(user.first_name))
+                if reason:
+                    return await utils.answer(message, self.strings('kicked_for_reason', message).format(user.first_name, reason))
+                
+                return await utils.answer(message, self.strings('kicked', message).format(user.first_name))
             except ValueError:
-                return await utils.answer(bon, self.strings('no_args', bon))
+                return await utils.answer(message, self.strings('no_args', message))
         else:
-            return await utils.answer(bon, self.strings('this_isn`t_a_chat', bon))
+            return await utils.answer(message, self.strings('this_isn`t_a_chat', message))
 
-    async def unbancmd(self, unbon):
-        """Command .unban for unban the user.\nUse: .unban <@ or reply>."""
-        if unbon.chat:
-            reply = await unbon.get_reply_message()
-            chat = await unbon.get_chat()
-            if not chat.admin_rights and not chat.creator:
-                return await utils.answer(unbon, self.strings('not_admin', unbon))
-            if reply:
-                user = await utils.get_user(reply)
-            else:
-                args = utils.get_args(unbon)
-                if not args:
-                    return await utils.answer(unbon, self.strings('unban_none', unbon))
-                user = await unbon.client.get_entity(args[0])
-            if not user:
-                return await utils.answer(unbon, self.strings('who', unbon))
-            logger.debug(user)
-            try:
-                await unbon.client(
-                    EditBannedRequest(unbon.chat_id, user.id, ChatBannedRights(until_date=None, view_messages=False)))
-            except:
-                return await utils.answer(unbon, self.strings('no_rights', unbon))
-            else:
-                return await utils.answer(unbon, self.strings('unbanned', unbon).format(user.first_name))
-        else:
-            return await utils.answer(unbon, self.strings('this_isn`t_a_chat', unbon))
 
-    async def mutecmd(self, mot):
-        """Command .mute for mute the user.\nUse: .mute <@ or reply> <time (1m, 1h, 1d)>."""
-        if mot.chat:
+    async def bancmd(self, message):
+        """Command .ban for ban the user.\nUse: .ban <@ or reply>."""
+        if not message.is_private:
             try:
-                reply = await mot.get_reply_message()
-                chat = await mot.get_chat()
+                args = utils.get_args_raw(message).split(' ')
+                reason = utils.get_args_raw(message)
+                reply = await message.get_reply_message()
+                
+                chat = await message.get_chat()
                 if not chat.admin_rights and not chat.creator:
-                    return await utils.answer(mot, self.strings('not_admin', mot))
+                    return await utils.answer(message, self.strings('not_admin', message))
+                else:
+                    if chat.admin_rights.ban_users == False:
+                        return await utils.answer(message, self.strings('no_rights', message))
+                
                 if reply:
-                    user = await utils.get_user(reply)
-
+                    user = await message.client.get_entity(reply.sender_id)
+                    args = utils.get_args_raw(message)
+                    if args:
+                        reason = args
                 else:
-                    who = utils.get_args_raw(mot).split(' ')
-                    user = await mot.client.get_entity(who[0])
-
-                    if len(who) == 1:
-                        timee = ChatBannedRights(until_date=True, send_messages=True)
-                        await mot.client(EditBannedRequest(mot.chat_id, user.id, timee))
-                        await mot.edit('<b>{} now muted.</b>'.format(user.first_name))
-                        return
-
-                    if not user:
-                        return await utils.answer(mot, self.strings('mute_none', mot))
-                    if user:
-                        tim = who[1]
-                        if tim:
-                            if len(tim) != 2:
-                                return await utils.answer(mot, self.strings('no_args', mot))
-                            num = ''
-                            t = ''
-                            for q in tim:
-                                if q.isdigit():
-                                    num += q
-                                else:
-                                    t += q
-
-                            text = f'<b>{num}'
-                            if t == 'm':
-                                num = int(num) * 60
-                                text += ' mins.</b>'
-                            elif t == 'h':
-                                num = int(num) * 3600
-                                text += ' hours.</b>'
-                            elif t == 'd':
-                                num = int(num) * 86400
-                                text += ' days.</b>'
-                            else:
-                                return await utils.answer(mot, self.strings('no_args', mot))
-                            timee = ChatBannedRights(until_date=time.time() + int(num), send_messages=True)
-                            try:
-                                await mot.client(EditBannedRequest(mot.chat_id, user.id, timee))
-                                await utils.answer(mot, self.strings('muted', mot).format(
-                                    utils.escape_html(user.first_name)) + text)
-                                return
-                            except:
-                                await utils.answer(mot, self.strings('no_rights', mot))
-                        else:
-                            timee = ChatBannedRights(until_date=True, send_messages=True)
-                            await mot.client(EditBannedRequest(mot.chat_id, user.id, timee))
-                            await mot.edit('<b>{} now muted.</b>'.format(user.first_name))
-                            return
-
-                logger.debug(user)
-                tim = utils.get_args(mot)
-                if tim:
-                    if len(tim[0]) < 2:
-                        return await utils.answer(mot, self.strings('no_args', mot))
-                    num = ''
-                    t = ''
-                    for q in tim[0]:
-                        if q.isdigit():
-                            num += q
-                        else:
-                            t += q
-
-                    text = f'<b>{num}'
-                    if t == 'm':
-                        num = int(num) * 60
-                        text += 'mins.</b>'
-                    elif t == 'd':
-                        num = int(num) * 86400
-                        text += ' days.</b>'
-                    elif t == 'h':
-                        num = int(num) * 3600
-                        text += ' hours.</b>'
-                    else:
-                        return await utils.answer(mot, self.strings('no_args', mot))
-                    timee = ChatBannedRights(until_date=time.time() + int(num), send_messages=True)
-                    try:
-                        await mot.client(EditBannedRequest(mot.chat_id, user.id, timee))
-                        await utils.answer(mot,
-                                           self.strings('muted', mot).format(utils.escape_html(user.first_name)) + text)
-                        return
-                    except:
-                        await utils.answer(mot, self.strings('no_rights', mot))
-                else:
-                    timee = ChatBannedRights(until_date=True, send_messages=True)
-                    await mot.client(EditBannedRequest(mot.chat_id, user.id, timee))
-                    await mot.edit('<b>{} now muted.</b>'.format(user.first_name))
-                    return
-            except:
-                await utils.answer(mot, self.strings('mute_none', mot))
-                return
-        else:
-            await utils.answer(mot, self.strings('this_isn`t_a_chat', mot))
-
-    async def unmutecmd(self, unmot):
-        """Command .unmute for unmute the user.\nUse: .unmute <@ or reply>."""
-        if unmot.chat:
-            try:
-                reply = await unmot.get_reply_message()
-                chat = await unmot.get_chat()
-                if not chat.admin_rights and not chat.creator:
-                    return await utils.answer(unmot, self.strings('not_admin', unmot))
-                if reply:
-                    user = await utils.get_user(reply)
-                else:
-                    args = utils.get_args(unmot)
-                    if not args:
-                        return await utils.answer(unmot, self.strings('unmute_none', unmot))
-                    user = await unmot.client.get_entity(args[0])
-                if not user:
-                    return await utils.answer(unmot, self.strings('who', unmot))
+                    user = await message.client.get_entity(args[0] if not args[0].isnumeric() else int(args[0]))
+                    if args:
+                        if len(args) == 1:
+                            args = utils.get_args_raw(message)
+                            user = await message.client.get_entity(args if not args.isnumeric() else int(args))
+                            reason = False
+                        elif len(args) >= 2:
+                            reason = utils.get_args_raw(message).split(' ', 1)[1]
                 try:
-                    await unmot.client(EditBannedRequest(unmot.chat_id, user.id, UNMUTE_RIGHTS))
-                except:
-                    return await utils.answer(unmot, self.strings('not_admin', unmot))
-                else:
-                    return await utils.answer(unmot,
-                                              self.strings('unmuted', unmot).format(utils.escape_html(user.first_name)))
-            except:
-                return await utils.answer(unmot, self.strings('wtf_is_it', unmot))
+                    await utils.answer(message, self.strings('banning', message))
+                    await message.client(EditBannedRequest(message.chat_id, user.id, ChatBannedRights(until_date=None, view_messages=True)))
+                except UserAdminInvalidError:
+                    return await utils.answer(message, self.strings('no_rights', message))
+                if not reason:
+                    return await utils.answer(message, self.strings('banned', message).format(user.first_name))
+                if reason:
+                    return await utils.answer(message, self.strings('banned_for_reason', message).format(user.first_name, reason))
+                return await utils.answer(message, self.strings('banned', message).format(user.first_name))
+            except ValueError:
+                return await utils.answer(message, self.strings('no_args', message))
         else:
-            return await utils.answer(unmot, self.strings('this_isn`t_a_chat', unmot))
+            return await utils.answer(message, self.strings('this_isn`t_a_chat', message))
 
-    async def deluserscmd(self, delus):
+
+    async def unbancmd(self, message):
+        """Command .unban for unban the user.\nUse: .unban <@ or reply>."""
+        if not message.is_private:
+            try:
+                reply = await message.get_reply_message() 
+                
+                chat = await message.get_chat()
+                if not chat.admin_rights and not chat.creator:
+                    return await utils.answer(message, self.strings('not_admin', message))
+                else:
+                    if chat.admin_rights.ban_users == False:
+                        return await utils.answer(message, self.strings('no_rights', message))
+                
+                if reply:
+                    user = await message.client.get_entity(reply.sender_id)
+                else:
+                    args = utils.get_args_raw(message)
+                    if not args:
+                        return await utils.answer(message, self.strings('unban_none', message))
+                    user = await message.client.get_entity(args if not args.isnumeric() else int(args))
+                await message.client(EditBannedRequest(message.chat_id, user.id, ChatBannedRights(until_date=None, view_messages=False)))
+                
+                return await utils.answer(message, self.strings('unbanned', message).format(user.first_name))
+            except ValueError:
+                return await utils.answer(message, self.strings('no_args', message))
+        else:
+            return await utils.answer(message, self.strings('this_isn`t_a_chat', message))
+
+
+    async def mutecmd(self, message):
+        """Command .mute for mute the user.\nUse: .mute <@ or reply> <time (1m, 1h, 1d)>."""
+        if not message.is_private:
+            args = utils.get_args_raw(message).split()
+            reply = await message.get_reply_message()
+            timee = False
+
+            try:
+                if reply:
+                        user = await message.client.get_entity(reply.sender_id)
+                        args = utils.get_args_raw(message)
+                        if args:
+                            timee = args
+                else:
+                    user = await message.client.get_entity(args[0] if not args[0].isnumeric() else int(args[0]))
+                    if args:
+                        if len(args) == 1:
+                            args = utils.get_args_raw(message)
+                            user = await message.client.get_entity(args if not args.isnumeric() else int(args))
+                            timee = False
+                        elif len(args) >= 2:
+                            timee = utils.get_args_raw(message).split(' ', 1)[1]
+            except ValueError:
+                return await utils.answer(message, self.strings('no_args', message))
+
+            if timee:
+                n = ''
+                t = ''
+
+                for _ in timee:
+                    if _.isdigit():
+                        n += _
+                    else:
+                        t += _
+
+                text = f"<b>{n}"
+
+                if t == "m":
+                    n = int(n) * 60
+                    text += " мин.</b>"
+                
+                elif t == "h":
+                    n = int(n) * 3600
+                    text += " час.</b>"
+
+                elif t == "d":
+                    n = int(n) * 86400
+                    text += " дн.</b>"
+                
+                else:
+                    return await utils.answer(message, self.strings('no_args', message))
+
+                try:
+                    tm = ChatBannedRights(until_date=time.time() + int(n), send_messages=True)
+                    await message.client(EditBannedRequest(message.chat_id, user.id, tm))
+                    return await utils.answer(message, self.strings('muted', message).format(user.first_name) + text)
+                except UserAdminInvalidError:
+                    return await utils.answer(message, self.strings('no_rights', message))                
+            else:
+                try:
+                    tm = ChatBannedRights(until_date=True, send_messages=True)
+                    await message.client(EditBannedRequest(message.chat_id, user.id, tm))
+                    return await message.edit('<b>{} теперь в муте.</b>'.format(user.first_name))
+                except UserAdminInvalidError:
+                    return await utils.answer(message, self.strings('no_rights', message))
+        else:
+            await utils.answer(message, self.strings('this_isn`t_a_chat', message))
+
+
+    async def unmutecmd(self, message):
+        """Command .unmute for unmute the user.\nUse: .unmute <@ or reply>."""
+        if not message.is_private:
+            try:
+                reply = await message.get_reply_message() 
+                
+                chat = await message.get_chat()
+                if not chat.admin_rights and not chat.creator:
+                    return await utils.answer(message, self.strings('not_admin', message))
+                else:
+                    if chat.admin_rights.ban_users == False:
+                        return await utils.answer(message, self.strings('no_rights', message))
+                
+                if reply:
+                    user = await message.client.get_entity(reply.sender_id)
+                else:
+                    args = utils.get_args_raw(message)
+                    if not args:
+                        return await utils.answer(message, self.strings('unmute_none', message))
+                    user = await message.client.get_entity(args if not args.isnumeric() else int(args))
+                await message.client(EditBannedRequest(message.chat_id, user.id, UNMUTE_RIGHTS))
+                
+                return await utils.answer(message, self.strings('unmuted', message).format(user.first_name))
+            except ValueError:
+                return await utils.answer(message, self.strings('no_args', message))
+        else:
+            return await utils.answer(message, self.strings('this_isn`t_a_chat', message))
+
+
+    async def deluserscmd(self, message):
         """Command .delusers shows a list of all deleted accounts in the chat.\nUse: .delusers <clean>."""
-        if not delus.is_group:
-            await utils.answer(delus, self.strings('this_isn`t_a_chat', delus))
-            return
-        con = utils.get_args_raw(delus)
-        del_u = 0
+        if message.is_private:
+            return await utils.answer(message, self.strings('this_isn`t_a_chat', message))
 
-        del_status = '<b>No deleted accounts, chat cleared.</b>'
+        con = utils.get_args_raw(message)
+        del_u = 0
+        del_status = '<b>Нет удалённых аккаунтов, чат очищен.</b>'
+
         if con != "clean":
-            await utils.answer(delus, self.strings('del_u_search', delus))
-            async for user in delus.client.iter_participants(delus.chat_id):
+            await utils.answer(message, self.strings('del_u_search', message))
+            async for user in message.client.iter_participants(message.chat_id):
                 if user.deleted:
                     del_u += 1
-
             if del_u == 1:
-                del_status = f"<b>Found {del_u} deleted account, clean them with </b><code>.delusers clean</code><b>.</b>"
+                del_status = f"<b>Найден {del_u} удаленный аккаунт в чате, очистите их с помощью </b><code>.delusers clean</code><b>.</b>"
             if del_u > 0:
-                del_status = f"<b>Found {del_u} deleted accounts, clean them with </b><code>.delusers clean</code><b>.</b>"
-            await delus.edit(del_status)
-            return
+                del_status = f"<b>Найдено {del_u} удаленных аккаунтов в чате, очистите их с помощью </b><code>.delusers clean</code><b>.</b>"
+            return await message.edit(del_status)
 
-        chat = await delus.get_chat()
+        chat = await message.get_chat()
         if not chat.admin_rights and not chat.creator:
-            return await utils.answer(delus, self.strings('not_admin', delus))
-        await utils.answer(delus, self.strings('del_u_kicking', delus))
+            return await utils.answer(message, self.strings('not_admin', message))
+        else:
+            if chat.admin_rights.ban_users == False:
+                return await utils.answer(message, self.strings('no_rights', message))
+
+        await utils.answer(message, self.strings('del_u_kicking', message))
         del_u = 0
         del_a = 0
-
-        async for user in delus.client.iter_participants(delus.chat_id):
+        async for user in message.client.iter_participants(message.chat_id):
             if user.deleted:
                 try:
-                    await delus.client(EditBannedRequest(delus.chat_id, user.id, BANNED_RIGHTS))
-                except ChatAdminRequiredError:
-                    return await utils.answer(delus, self.strings('no_rights', delus))
+                    await message.client(EditBannedRequest(message.chat_id, user.id, BANNED_RIGHTS))
                 except UserAdminInvalidError:
                     del_u -= 1
                     del_a += 1
-                await delus.client(EditBannedRequest(delus.chat_id, user.id, UNBAN_RIGHTS))
+                await message.client(EditBannedRequest(message.chat_id, user.id, UNBAN_RIGHTS))
                 del_u += 1
-
-        if del_u == 1:
-            del_status = f"<b>Kicked {del_u} deleted account.</b>"
         if del_u > 0:
-            del_status = f"<b>Kicked {del_u} deleted accounts.</b>"
+            del_status = f"<b>Kicked {del_u} deleted account(s).</b>"
 
-        if del_a == 1:
-            del_status = f"<b>Kicked {del_u} deleted account.\n" \
-                         f"{del_a} deleted admin`s account not kicked.</b>"
         if del_a > 0:
-            del_status = f"<b>Kicked {del_u} deleted account.\n" \
-                         f"{del_a} deleted admin`s accounts not kicked.</b>"
-        await delus.edit(del_status)
+            del_status = f"<b>Kicked {del_u} deleted account(s).\n" \
+                         f"{del_a} deleted admins account are not kicked.</b>"
+        await message.edit(del_status)
 
 
 def resizepic(reply):
     im = Image.open(io.BytesIO(reply))
     w, h = im.size
     x = min(w, h)
-    x_ = (w - x) // 2
-    y_ = (h - x) // 2
+    x_ = (w-x)//2
+    y_ = (h-x)//2
     _x = x_ + x
     _y = y_ + x
-    im = im.crop((x_, y_, _x, _y))
+    im = im.crop(( x_, y_, _x, _y ))
     out = io.BytesIO()
-    out.name = "outsuder.png"
+    out.name = "outsider.png"
     im.save(out)
     return out.getvalue()
-
 
 async def check_media(message, reply):
     if reply and reply.media:
