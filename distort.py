@@ -21,9 +21,9 @@ class DistortMod(loader.Module):
     """Stickers or photo distort"""
     strings = {
         "name": "Distort",
-        "bad_input": "<code>Reply to image or stick!</code>",
-        "processing": "<code>D i s t o r t i n g . . .</code>",
-        "bad_input_tgs": "<code>Reply to animated sticker</code>"
+        "bad_input": "<b>Reply to image or stick!</b>",
+        "processing": "<b>Distorting...</b>",
+        "bad_input_tgs": "<b>Reply to animated sticker</b>"
     }
 
     async def client_ready(self, client, db):
