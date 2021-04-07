@@ -15,7 +15,6 @@ admin_tools
 stickers
 information
 quotes
-backupman
 autoprofile
 nopm
 recent_actions
