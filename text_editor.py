@@ -39,9 +39,9 @@ class TextEditorMod(loader.Module):
         the layout, then just answer it with this command and it will change.
         if your interlocutor made a mistake, then just answer it
         the message and the message with the change command. """
-        RuKeys = """ёйцукенгшщзхъфывапролджэячсмитьбю.Ё"№;%:?ЙЦУКЕНГ
+        ru_keys = """ёйцукенгшщзхъфывапролджэячсмитьбю.Ё"№;%:?ЙЦУКЕНГ
         ШЩЗХЪФЫВАПРОЛДЖЭ/ЯЧСМИТЬБЮ, """
-        EnKeys = """`qwertyuiop[]asdfghjkl;'zxcvbnm,./~@#$%^&QWERTYUIOP{
+        en_keys = """`qwertyuiop[]asdfghjkl;'zxcvbnm,./~@#$%^&QWERTYUIOP{
         }ASDFGHJKL:"|ZXCVBNM<>? """
 
         if message.is_reply:
@@ -50,7 +50,7 @@ class TextEditorMod(loader.Module):
             if not text:
                 await message.edit('There is no text here...')
                 return
-            change = str.maketrans(RuKeys + EnKeys, EnKeys + RuKeys)
+            change = str.maketrans(ru_keys + en_keys, en_keys + ru_keys)
             text = str.translate(text, change)
 
             if message.sender_id != reply.sender_id:
@@ -64,7 +64,7 @@ class TextEditorMod(loader.Module):
             if not text:
                 await message.edit('There is no text here...')
                 return
-            change = str.maketrans(RuKeys + EnKeys, EnKeys + RuKeys)
+            change = str.maketrans(ru_keys + en_keys, en_keys + ru_keys)
             text = str.translate(text, change)
             await message.edit(text)
 
