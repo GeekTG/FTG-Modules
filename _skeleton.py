@@ -49,7 +49,7 @@ class YourMod(loader.Module):
         
         self.db = db # Database of FTG
         # self.db.get("Key", "Value", `Any`)
-        #  `Any` - The value that will be returned if the key is not found
+        #  `Any` - The value that will be returned if the key/value is not found
         # self.db.set("Key", "Value")
     
     # To add a module command, create an asynchronous function that must end in cmd
