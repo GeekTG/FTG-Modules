@@ -2,12 +2,13 @@
 
 # Module author: @xadjIlut
 
-from telethon import events
-from telethon.errors.rpcerrorlist import YouBlockedUserError
-from telethon.tl.types import MessageEntityMention as mem
-from .. import loader, utils
 from datetime import datetime
 from statistics import mean, median, stdev
+
+from telethon import events
+from telethon.tl.types import MessageEntityMention as mem
+
+from .. import loader, utils
 
 
 @loader.tds

@@ -4,18 +4,20 @@
 
 # requires: Pillow
 
+import io
 import logging
-from PIL import Image, ImageDraw, ImageOps, ImageFont
+import textwrap
+from asyncio.exceptions import TimeoutError, CancelledError
 from textwrap import wrap
+
+import requests
+from PIL import Image, ImageDraw, ImageOps, ImageFont
 from telethon import events
 from telethon import functions
-from telethon.events import NewMessage
 from telethon.errors.rpcerrorlist import YouBlockedUserError
-from asyncio.exceptions import TimeoutError, CancelledError
+from telethon.events import NewMessage
+
 from .. import loader, utils
-import io
-import requests
-import textwrap
 
 logger = logging.getLogger(__name__)
 

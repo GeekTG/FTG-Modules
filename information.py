@@ -3,13 +3,15 @@
 # Module author: @Fl1yd
 
 import os
-from .. import loader, utils
-from telethon.tl.functions.photos import GetUserPhotosRequest
-from telethon.tl.functions.users import GetFullUserRequest
+from datetime import datetime
+
 from telethon.tl.functions.channels import GetFullChannelRequest, GetParticipantsRequest
 from telethon.tl.functions.messages import GetHistoryRequest
+from telethon.tl.functions.photos import GetUserPhotosRequest
+from telethon.tl.functions.users import GetFullUserRequest
 from telethon.tl.types import MessageActionChannelMigrateFrom, ChannelParticipantsAdmins, UserStatusOnline
-from datetime import datetime
+
+from .. import loader, utils
 
 
 @loader.tds

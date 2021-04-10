@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from .. import loader, utils
-
 import logging
 
 from telethon import functions, types
+
+from .. import loader, utils
 
 logger = logging.getLogger(__name__)
 
@@ -30,8 +30,8 @@ class AntiPMMod(loader.Module):
                "notif_off": "<b>Notifications from denied PMs are silenced.</b>",
                "notif_on": "<b>Notifications from denied PMs are now activated.</b>",
                "go_away": ("Hey there! Unfortunately, I don't accept private messages from "
-                            "strangers.\n\nPlease contact me in a group, or <b>wait</b> "
-                            "for me to approve you."),
+                           "strangers.\n\nPlease contact me in a group, or <b>wait</b> "
+                           "for me to approve you."),
                "triggered": ("Hey! I don't appreciate you barging into my PM like this! "
                              "Did you even ask me for approving you to PM? No? Goodbye then."
                              "\n\nPS: you've been reported as spam already.")}
@@ -135,7 +135,8 @@ class AntiPMMod(loader.Module):
                         del limit[message.sender_id]
                         self._db.set(__name__, "limit", limit)
                     else:
-                        self._db.set(__name__, "limit", {**limit, message.sender_id: limit.get(message.sender_id, 0) + 1})
+                        self._db.set(__name__, "limit",
+                                     {**limit, message.sender_id: limit.get(message.sender_id, 0) + 1})
                 if self._db.get(__name__, "notif", False):
                     await message.client.send_read_acknowledge(message.chat_id)
 

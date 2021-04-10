@@ -3,6 +3,7 @@
 # Module author: @ftgmodulesbyfl1yd
 
 import random
+
 from .. import loader, utils
 
 
@@ -24,9 +25,11 @@ class TagMod(loader.Module):
             elif len(args) >= 2:
                 user = await message.client.get_entity(args[0] if not args[0].isnumeric() else int(args[0]))
                 tag = utils.get_args_raw(message).split(' ', 1)[1]
-        except: return await message.edit("Failed to find a user.")
+        except:
+            return await message.edit("Failed to find a user.")
         await message.delete()
-        await message.client.send_message(message.to_id, f'{tag} <a href="tg://user?id={user.id}">\u2060</a>', reply_to=reply.id if reply else None)
+        await message.client.send_message(message.to_id, f'{tag} <a href="tg://user?id={user.id}">\u2060</a>',
+                                          reply_to=reply.id if reply else None)
 
     async def tagallcmd(self, message):
         """.tagall <text> - tag all users in chat"""

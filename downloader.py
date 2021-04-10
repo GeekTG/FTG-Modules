@@ -2,15 +2,17 @@
 
 # Module author: @GovnoCodules, @ftgmodulesbyfl1yd
 
-from .. import loader, utils
-from requests import get
 import io
-from telethon.tl.types import MessageEntityUrl, MessageEntityTextUrl
 import os
 from asyncio import sleep
+
+from requests import get
 from telethon import events
-from telethon.errors.rpcerrorlist import YouBlockedUserError
 from telethon import functions
+from telethon.errors.rpcerrorlist import YouBlockedUserError
+from telethon.tl.types import MessageEntityUrl, MessageEntityTextUrl
+
+from .. import loader, utils
 
 
 @loader.tds
@@ -99,7 +101,7 @@ class DownloaderMod(loader.Module):
                 await message.edit('<code>Разблокируй @ttsavebot</code>')
                 return
             await message.client.send_file(message.to_id, response3.media,
-                                         reply_to=reply)
+                                           reply_to=reply)
             await message.delete()
             await message.client(functions.messages.DeleteHistoryRequest(
                 peer='ttsavebot',
@@ -160,7 +162,7 @@ async def downloading(message, big=False):
                 f.close()
                 await message.edit("<b>Sending...</b>\n" + url)
                 await message.client.send_file(message.to_id, open(fname, "rb"),
-                                             reply_to=reply)
+                                               reply_to=reply)
                 os.remove(fname)
             else:
                 file = io.BytesIO(text.content)

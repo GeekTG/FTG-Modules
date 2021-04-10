@@ -2,10 +2,9 @@
 
 # Module author: @ftgmodulesbyfl1yd
 
-from telethon.tl import functions
-from .. import loader, utils
-import logging
 from asyncio import sleep, gather
+
+from .. import loader, utils
 
 
 @loader.tds
@@ -82,7 +81,8 @@ class SpamMod(loader.Module):
                     await message.respond(spammsg)
                     await sleep(time)
         except:
-            return await message.client.send_message(message.to_id, '.delayspam <time(sec):int> <count:int> <args or reply>.')
+            return await message.client.send_message(message.to_id,
+                                                     '.delayspam <time(sec):int> <count:int> <args or reply>.')
 
     async def replayspamcmd(self, message):
         """Reply spam. Use a reply to a message: .replayspam <count:int> <args>."""

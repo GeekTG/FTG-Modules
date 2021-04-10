@@ -4,12 +4,14 @@
 
 # requires: search-engine-parser>=0.6.2
 
-from .. import loader, utils
-import json
 import io
-import requests
+import json
 import logging
+
+import requests
 from search_engine_parser import GoogleSearch
+
+from .. import loader, utils
 
 logger = logging.getLogger(__name__)
 
@@ -67,7 +69,7 @@ class SearchMod(loader.Module):
         results = zip(gresults["titles"], gresults["links"], gresults["descriptions"])
         for result in results:
             msg += self.strings("result").format(utils.escape_html(result[0]), utils.escape_html(result[1]),
-                                                          utils.escape_html(result[2]))
+                                                 utils.escape_html(result[2]))
         await utils.answer(message, self.strings("results", message).format(utils.escape_html(text)) + msg)
 
 

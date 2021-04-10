@@ -2,9 +2,11 @@
 
 # Module author: @dekftgmodules
 
-from .. import loader, utils
-from telethon import functions
 from asyncio import sleep
+
+from telethon import functions
+
+from .. import loader, utils
 
 
 @loader.tds

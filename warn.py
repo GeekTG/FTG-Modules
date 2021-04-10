@@ -2,10 +2,12 @@
 
 # Module author: @ftgmodulesbyfl1yd
 
-from .. import utils, loader
-from telethon.tl.types import ChatBannedRights
-from telethon.tl.functions.channels import EditBannedRequest
 from telethon.errors import UserAdminInvalidError
+from telethon.tl.functions.channels import EditBannedRequest
+from telethon.tl.types import ChatBannedRights
+
+from .. import utils, loader
+
 
 @loader.tds
 class WarnsMod(loader.Module):
@@ -68,21 +70,26 @@ class WarnsMod(loader.Module):
                 self.db.set("Warns", "warns", warns)
                 try:
                     if warns[chatid]["action"] == "kick":
-                            await message.client.kick_participant(int(chatid), user.id)
+                        await message.client.kick_participant(int(chatid), user.id)
                     elif warns[chatid]["action"] == "ban":
-                        await message.client(EditBannedRequest(int(chatid), user.id, ChatBannedRights(until_date=None, view_messages=True)))
+                        await message.client(EditBannedRequest(int(chatid), user.id,
+                                                               ChatBannedRights(until_date=None, view_messages=True)))
                     elif warns[chatid]["action"] == "mute":
-                        await message.client(EditBannedRequest(int(chatid), user.id , ChatBannedRights(until_date=True, send_messages=True)))
-                    else: pass
+                        await message.client(EditBannedRequest(int(chatid), user.id,
+                                                               ChatBannedRights(until_date=True, send_messages=True)))
+                    else:
+                        pass
                 except UserAdminInvalidError:
                     return await message.edit("<b>У меня нет достаточных прав.</b>")
                 else:
-                    return await message.edit(f"<b>{user.first_name} получил {count}/{warns[chatid]['limit']} предупреждения, и был ограничен в чате.</b>")
+                    return await message.edit(
+                        f"<b>{user.first_name} получил {count}/{warns[chatid]['limit']} предупреждения, и был ограничен в чате.</b>")
             self.db.set("Warns", "warns", warns)
-            await message.edit(f"<b><a href=\"tg://user?id={user.id}\">{user.first_name}</a> получил {count}/{warns[chatid]['limit']} предупреждений.</b>" + (f"\nПричина: {reason}.</b>" if reason != "Необоснованно" else ""))
+            await message.edit(
+                f"<b><a href=\"tg://user?id={user.id}\">{user.first_name}</a> получил {count}/{warns[chatid]['limit']} предупреждений.</b>" + (
+                    f"\nПричина: {reason}.</b>" if reason != "Необоснованно" else ""))
         else:
             return await message.edit("<b>Это не чат!</b>")
-
 
     async def warnslimitcmd(self, message):
         """Установить лимит предупреждений. Используй: .warnslimit <кол-во:int>."""
@@ -99,12 +106,12 @@ class WarnsMod(loader.Module):
             try:
                 warns[chatid].update({"limit": int(args)})
                 self.db.set("Warns", "warns", warns)
-                return await message.edit(f"<b>Лимит предупреждений в этом чате был установлен на: {warns[chatid]['limit']}</b>")
+                return await message.edit(
+                    f"<b>Лимит предупреждений в этом чате был установлен на: {warns[chatid]['limit']}</b>")
             except ValueError:
                 return await message.edit("Значение должно быть числом.")
         else:
             return await message.edit("<b>Это не чат!</b>")
-
 
     async def warnscmd(self, message):
         """Посмотреть кол-во варнов. Используй: .warns <@ или реплай> или <list>."""
@@ -146,12 +153,13 @@ class WarnsMod(loader.Module):
                 for _ in warns[chatid][userid]:
                     count += 1
                     msg += f"<b>{count})</b> {_}\n"
-                return await message.edit(f"<b>Предупреждения <a href=\"tg://user?id={user.id}\">{user.first_name}</a>:\n\n{msg}</b>")
+                return await message.edit(
+                    f"<b>Предупреждения <a href=\"tg://user?id={user.id}\">{user.first_name}</a>:\n\n{msg}</b>")
             except KeyError:
-                return await message.edit(f"<b>У <a href=\"tg://user?id={user.id}\">{user.first_name}</a> нет предупреждений.</b>")
+                return await message.edit(
+                    f"<b>У <a href=\"tg://user?id={user.id}\">{user.first_name}</a> нет предупреждений.</b>")
         else:
             return await message.edit("<b>Это не чат!</b>")
-
 
     async def swarncmd(self, message):
         """Изменить режим ограничения. Используй: .swarn <kick/ban/mute/none>."""
@@ -173,14 +181,16 @@ class WarnsMod(loader.Module):
                 elif args == "none":
                     warns[chatid].update({"action": "none"})
                 else:
-                    return await message.edit("<b>Такого режима нет в списке.\nДоступные режимы: kick/ban/mute/none.</b>")
+                    return await message.edit(
+                        "<b>Такого режима нет в списке.\nДоступные режимы: kick/ban/mute/none.</b>")
                 self.db.set("AntiMention", "action", warns)
-                return await message.edit(f"<b>Теперь при достижения лимита предупреждений будет выполняться действие: {warns[chatid]['action']}.</b>")
+                return await message.edit(
+                    f"<b>Теперь при достижения лимита предупреждений будет выполняться действие: {warns[chatid]['action']}.</b>")
             else:
-                return await message.edit(f"<b>При достижения лимита предупреждений будет выполняться действие: {warns[chatid]['action']}.</b>")
+                return await message.edit(
+                    f"<b>При достижения лимита предупреждений будет выполняться действие: {warns[chatid]['action']}.</b>")
         else:
             return await message.edit("<b>Это не чат!</b>")
-
 
     async def clearwarnscmd(self, message):
         """Очистить все варны. Используй: .clearwarns <@ или реплай>."""
@@ -206,8 +216,10 @@ class WarnsMod(loader.Module):
                 if len(warns[chatid][userid]) == 0:
                     warns[chatid].pop(userid)
                 self.db.set("Warns", "warns", warns)
-                return await message.edit(f"<b>У <a href=\"tg://user?id={user.id}\">{user.first_name}</a> удалено последнее предупреждение.</b>")
+                return await message.edit(
+                    f"<b>У <a href=\"tg://user?id={user.id}\">{user.first_name}</a> удалено последнее предупреждение.</b>")
             except KeyError:
-                return await message.edit(f"<b>У <a href=\"tg://user?id={user.id}\">{user.first_name}</a> нет предупреждений.</b>")
+                return await message.edit(
+                    f"<b>У <a href=\"tg://user?id={user.id}\">{user.first_name}</a> нет предупреждений.</b>")
         else:
             return await message.edit("<b>Это не чат!</b>")

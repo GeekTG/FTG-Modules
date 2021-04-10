@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from .. import loader, utils
-
 import asyncio
 import logging
+
+from .. import loader, utils
 
 logger = logging.getLogger(__name__)
 
@@ -142,5 +142,3 @@ class RangeMod(loader.Module):
             return
 
         await self._do_range(range_args, delay, message)
-
-

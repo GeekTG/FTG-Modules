@@ -4,11 +4,12 @@
 
 # requires: googletrans==4.0.0rc1
 
-from .. import loader, utils
 from googletrans import LANGUAGES, Translator
+from telethon import events
 from telethon import functions
 from telethon.errors.rpcerrorlist import YouBlockedUserError
-from telethon import events
+
+from .. import loader, utils
 
 
 @loader.tds

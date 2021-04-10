@@ -2,14 +2,16 @@
 
 # Module author: @GovnoCodules, @ftgmodulesbyfl1yd
 
-import urllib
-from telethon.errors.rpcerrorlist import YouBlockedUserError
-from telethon import events
-from .. import loader, utils
 import logging
-from requests import get, post
 import os
+import urllib
+
+from requests import post
+from telethon import events
 from telethon import functions
+from telethon.errors.rpcerrorlist import YouBlockedUserError
+
+from .. import loader, utils
 
 logger = logging.getLogger(__name__)
 
@@ -19,8 +21,8 @@ class URlMod(loader.Module):
     """URL Module"""
     strings = {
         "name": "URL",
-        "some_rong": "<b>You're doing something wrong!\write</b> <code>.help "+
-            "gg.gg</code> <b>for information.</b>",
+        "some_rong": "<b>You're doing something wrong!\write</b> <code>.help " +
+                     "gg.gg</code> <b>for information.</b>",
         "result": "<b>Here you go, help yourself.</b>\n<a href='{}'>{}</a>",
         "default": "How to use Google?"
     }

@@ -2,14 +2,15 @@
 
 # Module author: @dekftgmodules, @ftgmodulesbyfl1yd
 
-from telethon import functions, types
-from .. import loader, utils
-from asyncio import sleep
 import os
-from telethon.tl.functions.account import UpdateProfileRequest
-from telethon.tl.functions.users import GetFullUserRequest
+from asyncio import sleep
+
+from telethon import functions
 from telethon.errors.rpcerrorlist import UsernameOccupiedError
 from telethon.tl.functions.account import UpdateProfileRequest, UpdateUsernameRequest
+from telethon.tl.functions.users import GetFullUserRequest
+
+from .. import loader, utils
 
 
 @loader.tds
@@ -188,7 +189,7 @@ class UserMod(loader.Module):
                 os.system("rm -rf ava.mp4 gifava.mp4 gifavaa.mp4 tgs*")
             except:
                 await message.edit(
-                    "Damn, what a fool I am, I don't know a gif/animated sticker/video from any other file.\n\n"+
+                    "Damn, what a fool I am, I don't know a gif/animated sticker/video from any other file.\n\n" +
                     "<b>THIS FILE IS NOT SUPPORTED!!!</b>(or just some tech.error c: )")
                 try:
                     os.system("rm -rf ava.mp4 gifava.mp4 gifavaa.mp4 tgs*")

@@ -2,12 +2,13 @@
 
 # Module author: @DneZyeK
 
-from .. import loader, utils
-import logging
 import asyncio
-import telethon
-import os
+import logging
 import re
+
+import telethon
+
+from .. import loader, utils
 
 logger = logging.getLogger(__name__)
 

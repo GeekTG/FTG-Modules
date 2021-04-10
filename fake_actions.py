@@ -2,10 +2,12 @@
 
 # Module author: @ftgmodulesbyfl1yd, @GovnoCodules
 
-from random import choice, randint
-from .. import loader, utils
 from asyncio import sleep
-from telethon import events, errors, functions, types
+from random import randint
+
+from telethon import functions
+
+from .. import loader, utils
 
 
 @loader.tds

@@ -4,14 +4,16 @@
 
 # requires: lottie cairosvg pillow wand
 
+import io
+import logging
 import os
 from random import choice, randint
-import io
-from telethon.tl.types import DocumentAttributeFilename
-import logging
+
 from PIL import Image as IM
-from .. import loader, utils
+from telethon.tl.types import DocumentAttributeFilename
 from wand.image import Image
+
+from .. import loader, utils
 
 logger = logging.getLogger(__name__)
 

@@ -2,12 +2,13 @@
 
 # Module author: Official Repo, @GovnoCodules
 
-import logging
-from .. import loader, utils
-import telethon
-import io
-from telethon.errors.rpcerrorlist import MessageNotModifiedError
 import asyncio
+import io
+import logging
+
+from telethon.errors.rpcerrorlist import MessageNotModifiedError
+
+from .. import loader, utils
 
 logger = logging.getLogger(__name__)
 

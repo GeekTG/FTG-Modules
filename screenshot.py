@@ -4,16 +4,18 @@
 
 # requires: pygments
 
-from .. import loader, utils
-from requests import get
 import io
 import logging
-import pygments
-from pygments.lexers import Python3Lexer
-from pygments.formatters import ImageFormatter
 import os
-logger = logging.getLogger(__name__)
 
+import pygments
+from pygments.formatters import ImageFormatter
+from pygments.lexers import Python3Lexer
+from requests import get
+
+from .. import loader, utils
+
+logger = logging.getLogger(__name__)
 
 
 @loader.tds

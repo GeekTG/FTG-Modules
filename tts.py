@@ -1,10 +1,12 @@
 # requires: pydub requests gtts hachoir
 import io
 import os
+
 import requests
-from .. import loader, utils
-from pydub import AudioSegment
 from gtts import gTTS
+from pydub import AudioSegment
+
+from .. import loader, utils
 
 
 def register(cb):

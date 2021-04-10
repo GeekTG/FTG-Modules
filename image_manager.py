@@ -4,11 +4,13 @@
 
 # requires: pillow
 
-from .. import loader, utils
 import io
-from PIL import Image, ImageDraw, ImageEnhance
-import PIL.ImageOps
 import re
+
+import PIL.ImageOps
+from PIL import Image, ImageEnhance
+
+from .. import loader, utils
 
 
 @loader.tds
@@ -23,8 +25,8 @@ class ImageManagerMod(loader.Module):
         s = "[ImageManager -> DelBg]\n"
         reply = await m.get_reply_message()
         im = await get_img_from_msg(reply)
-        if not im: return await utils.answer(m,  s + "Reply to image")
-        await utils.answer(m,  s + "Working...")
+        if not im: return await utils.answer(m, s + "Reply to image")
+        await utils.answer(m, s + "Working...")
         im2 = Image.open(im).convert("RGBA")
         w, h = im2.size
         for x in range(w):
@@ -45,7 +47,7 @@ class ImageManagerMod(loader.Module):
         Return sticker webp"""
         reply = await m.get_reply_message()
         im = await get_img_from_msg(reply)
-        if not im: return await utils.answer(m, "Reply to image")   
+        if not im: return await utils.answer(m, "Reply to image")
         im2 = Image.open(im).convert("RGBA")
         w, h = im2.size
         for x in range(w):
@@ -66,7 +68,7 @@ class ImageManagerMod(loader.Module):
         Resize image"""
         reply = await m.get_reply_message()
         im = await get_img_from_msg(reply)
-        if not im: return await utils.answer(m,  "Reply to image")
+        if not im: return await utils.answer(m, "Reply to image")
         args = utils.get_args_raw(m)
         if not args: return await utils.answer(m, "Specify x:int y:int")
         rr = re.compile(r"^(\d+)\s+(\d+)$")
@@ -81,7 +83,7 @@ class ImageManagerMod(loader.Module):
         out.name = "resized." + (".webp" if iswebp else ".png")
         im2.save(out)
         out.seek(0)
-        await utils.answer(m,  out, reply_to=reply.id)
+        await utils.answer(m, out, reply_to=reply.id)
 
     async def rotatecmd(self, m):
         """<rotate:int>
@@ -102,14 +104,14 @@ class ImageManagerMod(loader.Module):
         out.name = "rotate." + (".webp" if iswebp else ".png")
         im2.save(out)
         out.seek(0)
-        await utils.answer(m,  out, reply_to=reply.id)
+        await utils.answer(m, out, reply_to=reply.id)
 
     async def invertcmd(self, m):
         """Invert image's colors"""
         reply = await m.get_reply_message()
         im = await get_img_from_msg(reply)
         if not im: return await utils.answer(m, "Reply to image")
-        await utils.answer(m,  await invert_image(im, reply.file.ext), reply_to=reply.id)
+        await utils.answer(m, await invert_image(im, reply.file.ext), reply_to=reply.id)
 
     async def contrstcmd(self, m):
         """<level:float or int>
@@ -122,7 +124,7 @@ class ImageManagerMod(loader.Module):
         rr = re.compile(r"^(\d+|\d+\.\d+)$")
         if not rr.match(args): return await utils.answer(m, "Specify level:float or int")
         c = float(rr.findall(args)[0])
-        await utils.answer(m,  await contrast(im, c, reply.file.ext), reply_to=reply.id)
+        await utils.answer(m, await contrast(im, c, reply.file.ext), reply_to=reply.id)
 
     async def convpcmd(self, m):
         """Sticker to image
@@ -133,11 +135,13 @@ class ImageManagerMod(loader.Module):
         im2 = Image.open(im)
         iswebp = True if reply.file.ext == ".webp" else False
         out = io.BytesIO()
-        if iswebp: out.name = "conv.png"
-        else: im2.thumbnail((512, 512)); out.name = "conv.webp"
+        if iswebp:
+            out.name = "conv.png"
+        else:
+            im2.thumbnail((512, 512)); out.name = "conv.webp"
         im2.save(out)
         out.seek(0)
-        await utils.answer(m,  out, reply_to=reply.id)
+        await utils.answer(m, out, reply_to=reply.id)
 
     async def brightcmd(self, m):
         """<level:float or int>

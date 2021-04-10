@@ -3,9 +3,10 @@
 # Module author: @Fl1yd
 
 import requests
-from .. import utils, loader
-from telethon.tl.types import ChatBannedRights as cb
 from telethon.tl.functions.channels import EditBannedRequest as eb
+from telethon.tl.types import ChatBannedRights as cb
+
+from .. import utils, loader
 
 
 @loader.tds

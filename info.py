@@ -1,8 +1,6 @@
-
-
+import asyncio
 import logging
 import platform
-import asyncio
 import shutil
 import sys
 

@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from .. import loader, utils
 import logging
 import urllib
+
+from .. import loader, utils
 
 logger = logging.getLogger(__name__)
 

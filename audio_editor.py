@@ -4,9 +4,15 @@
 
 # requires: pydub numpy requests
 
-import io, math, os, requests, numpy as np, re
+import io
+import math
+import numpy as np
+import re
+import requests
+
 from pydub import AudioSegment, effects
 from telethon import types
+
 from .. import loader, utils
 
 
@@ -16,12 +22,12 @@ class AudioEditorMod(loader.Module):
     strings = {
         "name": "AudioEditor",
         "downloading": "<b>[{}]</b> Downloading...",
-        "working"    : "<b>[{}]</b> Working...",
-        "exporting"  : "<b>[{}]</b> Exporting...",
-        "set_value"  : "<b>[{}]</b> Specify the level from {} to {}...",
-        "reply"      : "<b>[{}]</b> reply to audio...",
-        "set_time"   : "<b>[{}]</b> Specify the time in the format start(ms):end(ms)"
-        }
+        "working": "<b>[{}]</b> Working...",
+        "exporting": "<b>[{}]</b> Exporting...",
+        "set_value": "<b>[{}]</b> Specify the level from {} to {}...",
+        "reply": "<b>[{}]</b> reply to audio...",
+        "set_time": "<b>[{}]</b> Specify the time in the format start(ms):end(ms)"
+    }
 
     async def basscmd(self, message):
         """.bass [level bass'а 2-100 (Default 2)] <reply to audio>
@@ -168,19 +174,22 @@ class AudioEditorMod(loader.Module):
         """.cuts <start(ms):end(ms)> <reply to audio>
         Cut audio"""
         args = utils.get_args_raw(message)
-        if not args: return await utils.answer(message, self.strings("set_time", message).format('Cut'))
+        if not args:
+            return await utils.answer(message, self.strings("set_time", message).format('Cut'))
         else:
             r = re.compile(r'^(?P<start>\d+):(?P<end>\d+)$')
             ee = r.match(args)
             if ee:
                 start = int(ee.group('start'))
-                end   = int(ee.group('end'))
-            else: return await utils.answer(message, self.strings("set_time", message).format('Cut'))
+                end = int(ee.group('end'))
+            else:
+                return await utils.answer(message, self.strings("set_time", message).format('Cut'))
         audio = await get_audio(self, message, "Cut")
         if not audio: return
         out = audio.audio[start:end]
         await go_out(audio.message, audio, out, audio.pref, audio.pref)
-        
+
+
 async def get_audio(self, message, pref):
     class audio_ae_class():
         audio = None
@@ -217,7 +226,7 @@ async def go_out(message, audio, out, pref, title, fs=None):
                codec="libopus" if audio.voice else None)
     o.seek(0)
     await utils.answer(message, o, reply_to=audio.reply.id,
-                                   voice_note=audio.voice, attributes=[
+                       voice_note=audio.voice, attributes=[
             types.DocumentAttributeAudio(duration=fs if fs else audio.duration,
                                          title=title,
                                          performer="AudioEditor")] if not audio.voice else None)

@@ -2,14 +2,14 @@
 
 # Module author: @DneZyeK
 
-import logging
-import traceback
-import sys
 import itertools
+import logging
+import sys
+import traceback
 import types
-from meval import meval
 
 import telethon
+from meval import meval
 
 from .. import loader, utils
 

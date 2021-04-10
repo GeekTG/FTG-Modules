@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from .. import loader, utils
 import logging
+
 import telethon
+
+from .. import loader, utils
 
 logger = logging.getLogger(__name__)
 
@@ -26,8 +28,10 @@ class PurgeMod(loader.Module):
         args = utils.get_args(message)
         for arg in args:
             try:
-                try: arg = int(arg)
-                except: pass
+                try:
+                    arg = int(arg)
+                except:
+                    pass
                 entity = await message.client.get_entity(arg)
                 if isinstance(entity, telethon.tl.types.User):
                     from_users.add(entity.id)

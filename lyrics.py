@@ -2,10 +2,11 @@
 
 # requires: lyricsgenius
 
-from .. import loader, utils
-
 import logging
+
 import lyricsgenius
+
+from .. import loader, utils
 
 logger = logging.getLogger(__name__)
 

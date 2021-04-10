@@ -2,15 +2,15 @@
 
 # requires: git+https://gitlab.com/mattia.basaglia/python-lottie@master cairosvg Pillow>=6.1.0
 
-from .. import loader, utils
-
+import asyncio
+import itertools
 import logging
 import warnings
-import itertools
-import asyncio
-
 from io import BytesIO
+
 from PIL import Image
+
+from .. import loader, utils
 
 logger = logging.getLogger(__name__)
 
@@ -115,7 +115,7 @@ class StickersMod(loader.Module):
                             await utils.answer(message, self.strings("not_animated_pack", message))
                             msgs = []
                             async for msg in message.client.iter_messages(entity="t.me/"
-                                                                          + self.config["STICKERS_USERNAME"],
+                                                                                 + self.config["STICKERS_USERNAME"],
                                                                           min_id=first.id, reverse=True):
                                 msgs += [msg.id]
                             logger.debug(msgs)
@@ -193,7 +193,7 @@ class StickersMod(loader.Module):
                                 await utils.answer(message, self.strings("animated_pack", message))
                                 msgs = []
                                 async for msg in message.client.iter_messages(entity="t.me/"
-                                                                              + self.config["STICKERS_USERNAME"],
+                                                                                     + self.config["STICKERS_USERNAME"],
                                                                               min_id=first.id,
                                                                               reverse=True):
                                     msgs += [msg.id]
@@ -207,7 +207,7 @@ class StickersMod(loader.Module):
                                 await utils.answer(message, self.strings("pack_full", message))
                                 msgs = []
                                 async for msg in message.client.iter_messages(entity="t.me/"
-                                                                              + self.config["STICKERS_USERNAME"],
+                                                                                     + self.config["STICKERS_USERNAME"],
                                                                               min_id=first.id,
                                                                               reverse=True):
                                     if msg.id != m0.id:
@@ -239,7 +239,7 @@ class StickersMod(loader.Module):
                                 return
                             msgs = []
                             async for msg in message.client.iter_messages(entity="t.me/"
-                                                                          + self.config["STICKERS_USERNAME"],
+                                                                                 + self.config["STICKERS_USERNAME"],
                                                                           min_id=first.id,
                                                                           reverse=True):
                                 msgs += [msg.id]

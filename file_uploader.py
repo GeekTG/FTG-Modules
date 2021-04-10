@@ -2,17 +2,18 @@
 
 # Module author: @GovnoCodules
 
-from .. import loader, utils
-import logging
-from requests import post
-import requests
-from telethon.tl.types import DocumentAttributeFilename
-from telethon.errors.rpcerrorlist import YouBlockedUserError
-from telethon import events
 import io
+import logging
 from io import BytesIO
-from PIL import Image
 
+import requests
+from PIL import Image
+from requests import post
+from telethon import events
+from telethon.errors.rpcerrorlist import YouBlockedUserError
+from telethon.tl.types import DocumentAttributeFilename
+
+from .. import loader, utils
 
 logger = logging.getLogger(__name__)
 

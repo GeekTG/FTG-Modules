@@ -9,18 +9,15 @@
 
 # requires: Pillow requests lottie cairosvg
 
-import logging
-import subprocess
-from .. import loader, utils
-import telethon
-import requests
+import hashlib
 import io
 import json
+import logging
 import os
+
 import PIL
-import sys
-import lottie
-import hashlib
+import requests
+import telethon
 from telethon.tl.types import (MessageEntityBold, MessageEntityItalic,
                                MessageEntityMention, MessageEntityTextUrl,
                                MessageEntityCode, MessageEntityMentionName,
@@ -29,10 +26,11 @@ from telethon.tl.types import (MessageEntityBold, MessageEntityItalic,
                                MessageEntityStrike, MessageEntityUnderline,
                                MessageEntityPhone, ChannelParticipantsAdmins,
                                ChannelParticipantCreator,
-                               ChannelParticipantAdmin,
                                PeerChannel,
-                               PeerChat, User, PeerUser,
+                               User, PeerUser,
                                MessageMediaUnsupported)
+
+from .. import loader, utils
 
 logger = logging.getLogger(__name__)
 
@@ -582,7 +580,8 @@ class mQuotesMod(loader.Module):
         if avatar:
             msg['author']['picture'] = {'file': f'@av{str(user.id).lstrip("-")}'}
             files.append(("files", (
-            f'@av{str(user.id if not str(user).isdigit() else user).lstrip("-")}', open(avatar, "rb"), "image/jpg")))
+                f'@av{str(user.id if not str(user).isdigit() else user).lstrip("-")}', open(avatar, "rb"),
+                "image/jpg")))
         else:
             files.append(("files", ("file", bytearray(), "text/text")))
         data = {

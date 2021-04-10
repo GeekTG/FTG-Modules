@@ -2,13 +2,15 @@
 
 # requires: coffeehouse>=2.2.0
 
-from .. import loader, utils
-import logging
 import asyncio
-import time
+import logging
 import random
+import time
+
 import coffeehouse
 from telethon import functions, types
+
+from .. import loader, utils
 
 logger = logging.getLogger(__name__)
 
@@ -18,9 +20,9 @@ class LydiaMod(loader.Module):
     """Talks to a robot instead of a human"""
     strings = {"name": "Lydia anti-PM",
                "enable_disable_error_group": "<b>The AI service cannot be"
-               " enabled or disabled in this chat. Is this a group chat?</b>",
+                                             " enabled or disabled in this chat. Is this a group chat?</b>",
                "enable_error_user": "<b>The AI service cannot be"
-               " enabled for this user. Perhaps it wasn't disabled?</b>",
+                                    " enabled for this user. Perhaps it wasn't disabled?</b>",
                "notif_off": "<b>Notifications from PMs are silenced.</b>",
                "notif_on": "<b>Notifications from PMs are now activated.</b>",
                "successfully_enabled": "<b>AI enabled for this user. </b>",
@@ -30,7 +32,7 @@ class LydiaMod(loader.Module):
                "cleanup_ids": "<b>Successfully cleaned up lydia-disabled IDs</b>",
                "cleanup_sessions": "<b>Successfully cleaned up lydia sessions.</b>",
                "doc_client_key": "The API key for lydia, acquire from"
-               " https://coffeehouse.intellivoid.net",
+                                 " https://coffeehouse.intellivoid.net",
                "doc_ignore_no_common": "Boolean to ignore users who have no chats in common with you",
                "doc_notif": "Boolean for notifications from PMs.",
                "doc_disabled": "Whether Lydia defaults to enabled"
