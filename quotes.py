@@ -7,7 +7,7 @@
 # Module authors: @mishase, @rf0x1d, @D4n13l3k00
 # Special thanks to: @h3xcode
 
-# requires: Pillow requests lottie cairosvg 
+# requires: Pillow requests lottie cairosvg
 
 import logging
 import subprocess
@@ -20,7 +20,6 @@ import os
 import PIL
 import sys
 import lottie
-import Crypto
 import hashlib
 from telethon.tl.types import (MessageEntityBold, MessageEntityItalic,
                                MessageEntityMention, MessageEntityTextUrl,
