@@ -4,12 +4,12 @@
 
 import asyncio
 import logging
-import random
 import time
 
 import coffeehouse
 from telethon import functions, types
 
+import random
 from .. import loader, utils
 
 logger = logging.getLogger(__name__)

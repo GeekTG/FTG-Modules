@@ -1,24 +1,35 @@
+# -*- coding: utf-8 -*-
+
+# Module author: Official Repo
+
 import asyncio
 import logging
 
 from telethon.tl.types import InputMediaDice
 
+from random import random
 from .. import loader, utils, security
 
 logger = logging.getLogger(__name__)
 
 
 @loader.tds
-class DiceMod(loader.Module):
-	"""Dice"""
-	strings = {"name": "Dice"}
+class RandomMod(loader.Module):
+	"""Random Module"""
+	strings = {"name": "Random",
+	           "yes_words_cfg_doc": "Yes words",
+	           "no_words_cfg_doc": "No words"
+	           }
 
 	def __init__(self):
-		self.config = loader.ModuleConfig("POSSIBLE_VALUES", {"": [1, 2, 3, 4, 5, 6],
-		                                                      "🎲": [1, 2, 3, 4, 5, 6],
-		                                                      "🎯": [1, 2, 3, 4, 5, 6],
-		                                                      "🏀": [1, 2, 3, 4, 5]},
-		                                  "Mapping of emoji to possible values")
+		self.config = loader.ModuleConfig(
+			"YES_WORDS", ["Yes", "Yup", "Absolutely", "Non't"], lambda m: self.strings("yes_words_cfg_doc"),
+			"NO_WORDS", ["No", "Nope", "Nah", "Yesn't"], lambda m: self.strings("no_words_cfg_doc"),
+			"POSSIBLE_VALUES", {"": [1, 2, 3, 4, 5, 6],
+			                    "🎲": [1, 2, 3, 4, 5, 6],
+			                    "🎯": [1, 2, 3, 4, 5, 6],
+			                    "🏀": [1, 2, 3, 4, 5]},
+			"Mapping of emoji to possible values")
 
 	@loader.unrestricted
 	async def dicecmd(self, message):
@@ -69,3 +80,14 @@ class DiceMod(loader.Module):
 			except IndexError:
 				emoji = "🎲"
 			await message.reply(file=InputMediaDice(emoji))
+
+	@loader.unrestricted
+	async def yesnocmd(self, message):
+		"""Make a life choice"""
+		yes = self.config["YES_WORDS"]
+		no = self.config["NO_WORDS"]
+		if random.getrandbits(1):
+			response = random.choice(yes)
+		else:
+			response = random.choice(no)
+		await utils.answer(message, response)

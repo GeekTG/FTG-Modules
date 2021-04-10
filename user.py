@@ -93,6 +93,7 @@ class UserMod(loader.Module):
 		if not s: await message.edit("Account cloned!")
 
 	async def restusercmd(self, message):
+		"""Restore user to state before copying"""
 		await message.edit("<b>Restoring account...</b>")
 		us = self.db.get(__name__, "about")
 		first = self.db.get(__name__, "first")

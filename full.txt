@@ -3,7 +3,6 @@ notes
 notexec
 noterminal
 afk
-dice
 info
 tts
 lydia
@@ -41,3 +40,9 @@ pmlog
 ytdl
 range
 warn
+welcome
+random
+voice_recognition
+music
+image_tools
+chat

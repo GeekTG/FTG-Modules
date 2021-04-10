@@ -7,12 +7,12 @@
 import io
 import logging
 import os
-from random import choice, randint
 
 from PIL import Image as IM
 from telethon.tl.types import DocumentAttributeFilename
 from wand.image import Image
 
+from random import choice, randint
 from .. import loader, utils
 
 logger = logging.getLogger(__name__)

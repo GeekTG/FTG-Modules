@@ -145,7 +145,7 @@ async def read_stream(func, stream, delay):
 				# Send all pending data
 				last_task.cancel()
 				await func(data.decode("utf-8"))
-				# If there is no last task there is inherently no data, so theres no point sending a blank string
+			# If there is no last task there is inherently no data, so theres no point sending a blank string
 			break
 		data += dat
 		if last_task:
@@ -194,7 +194,8 @@ class MessageEditor:
 		except telethon.errors.rpcerrorlist.MessageTooLongError as e:
 			logger.error(e)
 			logger.error(text)
-		# The message is never empty due to the template header
+
+	# The message is never empty due to the template header
 
 	async def cmd_ended(self, rc):
 		self.rc = rc

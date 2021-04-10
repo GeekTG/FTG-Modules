@@ -8,3 +8,11 @@ quotes
 translate
 filter
 purge
+notexec
+noterminal
+chat
+user
+screenshot
+spam
+demot
+distort
