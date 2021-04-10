@@ -14,7 +14,6 @@ import io
 import json
 import logging
 import os
-
 import PIL
 import requests
 import telethon
@@ -181,8 +180,7 @@ class mQuotesMod(loader.Module):
 			text = msg.raw_text
 			markdown = await get_markdown(msg)
 			admintitle = str()
-			if isinstance(msg.to_id, PeerChannel) \
-					and msg.fwd_from:
+			if isinstance(msg.to_id, PeerChannel) and msg.fwd_from:
 				user = msg.forward.chat
 			else:
 				user = await msg.get_sender()
@@ -222,8 +220,7 @@ class mQuotesMod(loader.Module):
 						profile_photo_url = msg.forward.sender.id
 					elif msg.forward.chat:
 						profile_photo_url = user
-					if msg.fwd_from is not None \
-							and msg.fwd_from.post_author is not None:
+					if msg.fwd_from is not None and msg.fwd_from.post_author is not None:
 						name += f" ({msg.fwd_from.post_author})"
 					if not pfp:
 						pfp = await self.client \
@@ -236,11 +233,7 @@ class mQuotesMod(loader.Module):
 				user_id = msg.sender_id if \
 					msg.sender_id != 1087968824 \
 					else message.chat_id
-				if not message.chat or \
-						(user_id != message.chat_id or isinstance(
-							message.chat,
-							User
-						)):
+				if not message.chat or (user_id != message.chat_id or isinstance(message.chat, User)):
 					sender = await self.client.get_entity(user_id)
 					name = telethon.utils.get_display_name(sender)
 					pfp = media_files.get(
@@ -296,8 +289,7 @@ class mQuotesMod(loader.Module):
 							"author": reply_name,
 							"text": reply_text,
 						}
-						if "@mediareply{}".format(message_reply.id) \
-								in media_files:
+						if "@mediareply{}".format(message_reply.id) in media_files:
 							reply_message["thumbnail"] = {
 								"file": "@mediareply{}".format(message_reply.id)
 							}
@@ -317,8 +309,7 @@ class mQuotesMod(loader.Module):
 							"author": reply_name,
 							"text": reply_text,
 						}
-						if "@mediareply{}".format(message_reply.id) \
-								in media_files:
+						if "@mediareply{}".format(message_reply.id) in media_files:
 							reply_message["thumbnail"] = {
 								"file": "@mediareply{}".format(message_reply.id)
 							}
