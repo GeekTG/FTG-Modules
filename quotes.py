@@ -34,7 +34,7 @@ from .. import loader, utils
 
 logger = logging.getLogger(__name__)
 
-BUILD_ID = "e5d12c41-9d94-4b61-a615-c2d25a787142"  # None to disable autoupdates
+BUILD_ID = "b890541d-be52-4b9d-8ced-f5359d9d7109"  # None to disable autoupdates
 MODULE_PATH = "https://quotes.mishase.dev/f/module.py"
 
 
