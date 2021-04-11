@@ -89,7 +89,7 @@ class ImageToolsMod(loader.Module):
 			return
 
 		await message.edit("Soaping...")
-		file = await self.client.download_media(data, bytes)
+		file = await message.client.download_media(data, bytes)
 		media = await Soaping(file, soap)
 		await message.delete()
 
