@@ -1,10 +1,10 @@
-notes
-terminal
-info
 afk
-stickers
-information
-quotes
-translate
 filter
+info
+information
+notes
 purge
+quotes
+stickers
+terminal
+translate
