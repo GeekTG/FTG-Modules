@@ -46,3 +46,4 @@ voice_recognition
 music
 image_tools
 chat
+text_generator
