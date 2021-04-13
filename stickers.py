@@ -54,6 +54,9 @@ class StickersMod(loader.Module):
 		                                  lambda m: self.strings("default_sticker_emoji_cfg_doc", m))
 		self._lock = asyncio.Lock()
 
+	async def client_ready(self, client, db):
+		self.client = client
+
 	async def kangcmd(self, message):  # noqa: C901 # TODO: split this into helpers
 		"""Use in reply or with an attached media:
 		   .kang <pack name> [emojis]
