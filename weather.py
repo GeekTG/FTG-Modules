@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Module author: @GovnoCodules
+# Module author: @govnocodules + @ftgmodulesbyfl1yd
 
 import requests
 
@@ -28,15 +28,12 @@ class WeatherMod(loader.Module):
 
 	async def wcmd(self, m):
 		""".w <city>"""
-		city = utils.get_args(m).replace(' ', '%20')
-		msg = []
+		city = utils.get_args_raw(m).replace(' ', '%20')
 		if city:
-			for i in city:
-				r = requests.get(
-					"https://wttr.in/" + i + "?format=%l:+%c+%t,+%w+%m"
-				)
-				msg.append(r.text)
-			await utils.answer(m, "".join(msg))
+			r = requests.get(
+				"https://wttr.in/" + city + "?format=%l:+%c+%t,+%w+%m"
+			)
+			await utils.answer(m, r.text)
 		else:
 			r = requests.get("https://wttr.in/?format=%l:+%c+%t,+%w+%m")
 			await utils.answer(m, r.text)
