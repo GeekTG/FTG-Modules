@@ -29,13 +29,10 @@ class WeatherMod(loader.Module):
 	async def wcmd(self, m):
 		""".w <city>"""
 		city = utils.get_args_raw(m).replace(' ', '%20')
-		msg = []
 		if city:
-			for i in city:
-				r = requests.get(
-					"https://wttr.in/" + i + "?format=%l:+%c+%t,+%w+%m"
-				)
-				msg.append(r.text)
+			r = requests.get(
+				"https://wttr.in/" + city + "?format=%l:+%c+%t,+%w+%m"
+			)
 			await utils.answer(m, "".join(msg))
 		else:
 			r = requests.get("https://wttr.in/?format=%l:+%c+%t,+%w+%m")
