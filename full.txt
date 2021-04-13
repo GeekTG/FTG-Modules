@@ -26,6 +26,7 @@ notexec
 ping
 pmlog
 purge
+qr_code
 quotes
 random
 range
