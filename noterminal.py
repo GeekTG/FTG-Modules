@@ -18,29 +18,29 @@ class noTerminalMod(loader.Module):
 	"""Runs commands"""
 
 	strings = {"name": "NoTerminal",
-	           "flood_wait_protect_cfg_doc": "How long to wait in seconds between edits in commands",
-	           "what_to_kill": "<b>Reply to a terminal command to terminate it</b>",
-	           "kill_fail": "<b>Could not kill process</b>",
-	           "killed": "<b>Killed</b>",
-	           "no_cmd": "<b>No command is running in that message</b>",
-	           "running": "<b>Running command</b> <code>{}</code>",
-	           "finished": "\n<b>Command finished with return code</b> <code>{}</code>",
-	           "stdout": "\n<b>Stdout:</b>\n<code>",
-	           "stderr": "</code>\n\n<b>Stderr:</b>\n<code>",
-	           "end": "</code>",
-	           "auth_fail": "<b>Authentication failed, please try again</b>",
-	           "auth_needed": "<a href=\"tg://user?id={}\">Interactive authentication required</a>",
-	           "auth_msg": ("<b>Please edit this message to the password for</b> "
-	                        "<code>{}</code> <b>to run</b> <code>{}</code>"),
-	           "auth_locked": "<b>Authentication failed, please try again later</b>",
-	           "auth_ongoing": "<b>Authenticating...</b>",
-	           "done": "<b>Done</b>",
-	           "what_note": "<b>What noterminal should be executed?</b>",
-	           "no_note": "<b>noteminal not found</b>"}
+			   "flood_wait_protect_cfg_doc": "How long to wait in seconds between edits in commands",
+			   "what_to_kill": "<b>Reply to a terminal command to terminate it</b>",
+			   "kill_fail": "<b>Could not kill process</b>",
+			   "killed": "<b>Killed</b>",
+			   "no_cmd": "<b>No command is running in that message</b>",
+			   "running": "<b>Command:</b> <code>{}</code>",
+			   "finished": "\n<b>Code:</b> <code>{}</code>",
+			   "stdout": "\n<b>Stdout:</b>\n<code>",
+			   "stderr": "</code>\n\n<b>Stderr:</b>\n<code>",
+			   "end": "</code>",
+			   "auth_fail": "<b>Authentication failed, please try again</b>",
+			   "auth_needed": "<a href=\"tg://user?id={}\">Interactive authentication required</a>",
+			   "auth_msg": ("<b>Please edit this message to the password for</b> "
+							"<code>{}</code> <b>to run</b> <code>{}</code>"),
+			   "auth_locked": "<b>Authentication failed, please try again later</b>",
+			   "auth_ongoing": "<b>Authenticating...</b>",
+			   "done": "<b>Done</b>",
+			   "what_note": "<b>What noterminal should be executed?</b>",
+			   "no_note": "<b>noteminal not found</b>"}
 
 	def __init__(self):
 		self.config = loader.ModuleConfig("FLOOD_WAIT_PROTECT", 2,
-		                                  lambda m: self.strings("flood_wait_protect_cfg_doc", m))
+										  lambda m: self.strings("flood_wait_protect_cfg_doc", m))
 		self.activecmds = {}
 
 	async def client_ready(self, client, db):
@@ -83,15 +83,15 @@ class noTerminalMod(loader.Module):
 			if needsswitch:
 				cmd = " ".join([cmd.split(" ", 1)[0], "-S", cmd.split(" ", 1)[1]])
 		sproc = await asyncio.create_subprocess_shell(cmd, stdin=asyncio.subprocess.PIPE,
-		                                              stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE,
-		                                              cwd=utils.get_base_dir())
+													  stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE,
+													  cwd=utils.get_base_dir())
 		if editor is None:
 			editor = SudoMessageEditor(message, cmd, self.config, self.strings, message)
 		editor.update_process(sproc)
 		self.activecmds[hash_msg(message)] = sproc
 		await editor.redraw()
 		await asyncio.gather(read_stream(editor.update_stdout, sproc.stdout, self.config["FLOOD_WAIT_PROTECT"]),
-		                     read_stream(editor.update_stderr, sproc.stderr, self.config["FLOOD_WAIT_PROTECT"]))
+							 read_stream(editor.update_stderr, sproc.stderr, self.config["FLOOD_WAIT_PROTECT"]))
 		await editor.cmd_ended(await sproc.wait())
 		del self.activecmds[hash_msg(message)]
 
@@ -230,7 +230,7 @@ class SudoMessageEditor(MessageEditor):
 		lastlines = lastline.rsplit(" ", 1)
 		handled = False
 		if len(lines) > 1 and re.fullmatch(self.WRONG_PASS,
-		                                   lines[-2]) and lastlines[0] == self.PASS_REQ and self.state == 1:
+										   lines[-2]) and lastlines[0] == self.PASS_REQ and self.state == 1:
 			logger.debug("switching state to 0")
 			await self.authmsg.edit(self.strings("auth_failed", self.request_message))
 			self.state = 0
@@ -248,17 +248,17 @@ class SudoMessageEditor(MessageEditor):
 			command = "<code>" + utils.escape_html(self.command) + "</code>"
 			user = utils.escape_html(lastlines[1][:-1])
 			self.authmsg = await self.message[0].client.send_message("me",
-			                                                         self.strings("auth_msg",
-			                                                                      self.request_message).format(command,
-			                                                                                                   user))
+																	 self.strings("auth_msg",
+																				  self.request_message).format(command,
+																											   user))
 			logger.debug("sent message to self")
 			self.message[0].client.remove_event_handler(self.on_message_edited)
 			self.message[0].client.add_event_handler(self.on_message_edited,
-			                                         telethon.events.messageedited.MessageEdited(chats=["me"]))
+													 telethon.events.messageedited.MessageEdited(chats=["me"]))
 			logger.debug("registered handler")
 			handled = True
 		if len(lines) > 1 and (re.fullmatch(self.TOO_MANY_TRIES, lastline)
-		                       and (self.state == 1 or self.state == 3 or self.state == 4)):
+							   and (self.state == 1 or self.state == 3 or self.state == 4)):
 			logger.debug("password wrong lots of times")
 			await utils.answer(self.message, self.strings("auth_locked", self.request_message))
 			await self.authmsg.delete()
