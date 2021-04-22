@@ -19,7 +19,6 @@ information
 lydia
 lyrics
 music
-nopm
 noterminal
 notes
 notexec
