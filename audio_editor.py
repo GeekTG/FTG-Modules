@@ -1,12 +1,17 @@
 # Coded by D4n1l3k300
-# t.me/D4n13l3k00
+#   t.me/D4n13l3k00
 
 # requires: pydub numpy requests
 
-import io, math, os, requests, numpy as np, re
+import io, math, os, re
+
+import numpy as np
+import requests
 from pydub import AudioSegment, effects
 from telethon import types
+
 from .. import loader, utils
+
 
 @loader.tds
 class AudioEditorMod(loader.Module):
@@ -26,38 +31,26 @@ class AudioEditorMod(loader.Module):
         """.bass [level bass'а 2-100 (Default 2)] <reply to audio>
         BassBoost"""
         args = utils.get_args_raw(m)
-        if not args:
-            lvl = 2.0
+        if not args: lvl = 2.0
         else:
-            if re.match(r'^\d+(\.\d+){0,1}$', args) and (1.0 < float(args) < 100.1):
-                lvl = float(args)
-            else:
-                return await utils.answer(m, self.strings("set_value", m).format('BassBoost', 2.0, 100.0))
+            if re.match(r'^\d+(\.\d+){0,1}$', args) and (1.0 < float(args) < 100.1): lvl = float(args)
+            else: return await utils.answer(m, self.strings("set_value", m).format('BassBoost', 2.0, 100.0))
         audio = await get_audio(self, m, "BassBoost")
         if not audio: return
         sample_track = list(audio.audio.get_array_of_samples())
-        est_mean = np.mean(sample_track)
-        est_std = 3 * np.std(sample_track) / (math.sqrt(2))
-        bass_factor = int(round((est_std - est_mean) * 0.005))
-        attenuate_db = 0
-        filtered = audio.audio.low_pass_filter(bass_factor)
-        out = (audio.audio - attenuate_db).overlay(filtered + lvl)
+        out = (audio.audio - 0).overlay(audio.audio.low_pass_filter(int(round((3 * np.std(sample_track) / (math.sqrt(2)) - np.mean(sample_track)) * 0.005))) + lvl)
         await go_out(m, audio, out, audio.pref, f"{audio.pref} {lvl}lvl")
 
     async def fvcmd(self, m):
         """.fv [level 2-100 (Default 25)] <reply to audio>
         Distort"""
         args = utils.get_args_raw(m)
-        if not args:
-            lvl = 25.0
+        if not args: lvl = 25.0
         else:
-            if re.match(r'^\d+(\.\d+){0,1}$', args) and (1.0 < float(args) < 100.1):
-                lvl = float(args)
-            else:
-                return await utils.answer(m, self.strings("set_value", m).format('Distort', 2.0, 100.0))
+            if re.match(r'^\d+(\.\d+){0,1}$', args) and (1.0 < float(args) < 100.1): lvl = float(args)
+            else: return await utils.answer(m, self.strings("set_value", m).format('Distort', 2.0, 100.0))
         audio = await get_audio(self, m, "Distort")
-        if not audio:
-            return
+        if not audio: return
         out = audio.audio + lvl
         await go_out(m, audio, out, audio.pref, f"{audio.pref} {lvl}lvl")
 
@@ -197,7 +190,6 @@ class AudioEditorMod(loader.Module):
         if not audio: return
         out = audio.audio[start:end if end else len(audio.audio)-1]
         await go_out(audio.message, audio, out, audio.pref, audio.pref)
-        
 async def get_audio(self, m, pref):
     class audio_ae_class():
         audio = None
@@ -206,13 +198,12 @@ async def get_audio(self, m, pref):
         voice = None
         pref = None
         reply = None
-
     r = await m.get_reply_message()
-    if r and r.file and r.file.mime_type.split("/")[0] == "audio":
+    if r and r.file and r.file.mime_type.split("/")[0] in ["audio", "video"]:
         ae = audio_ae_class()
         ae.pref = pref
         ae.reply = r
-        ae.voice = r.document.attributes[0].voice
+        ae.voice = r.document.attributes[0].voice if r.file.mime_type.split("/")[0] == "audio" else False
         ae.duration = r.document.attributes[0].duration
         ae.message = await utils.answer(m, self.strings("downloading", m).format(pref))
         ae.audio = AudioSegment.from_file(
@@ -222,8 +213,6 @@ async def get_audio(self, m, pref):
     else:
         await utils.answer(m, self.strings("reply", m).format(pref))
         return None
-
-
 async def go_out(m, audio, out, pref, title, fs=None, fmt='mp3'):
     o = io.BytesIO()
     o.name = "audio." + ("ogg" if audio.voice else "mp3")
