@@ -205,13 +205,12 @@ class AudioEditorMod(loader.Module):
         args = utils.get_args_raw(m)
         if not args:
             return await utils.answer(m, self.strings("set_time", m).format('Cut'))
-        else:
-            r = re.compile(r'^(?P<start>\d+){0,1}:(?P<end>\d+){0,1}$')
-            ee = r.match(args)
-            if not ee:
-                return await utils.answer(m, self.strings("set_time", m).format('Cut'))
-            start = int(ee.group('start')) if ee.group('start') else 0
-            end = int(ee.group('end')) if ee.group('end') else 0
+        r = re.compile(r'^(?P<start>\d+){0,1}:(?P<end>\d+){0,1}$')
+        ee = r.match(args)
+        if not ee:
+            return await utils.answer(m, self.strings("set_time", m).format('Cut'))
+        start = int(ee.group('start')) if ee.group('start') else 0
+        end = int(ee.group('end')) if ee.group('end') else 0
         audio = await get_audio(self, m, "Cut")
         if not audio:
             return
