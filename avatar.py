@@ -76,11 +76,11 @@ class GetPPMod(loader.Module):
 			try:
 				reply = await message.get_reply_message()
 				if reply:
-					await message.edit("Скачиваем...")
+					await message.edit("Downloading...")
 					if reply.video:
 						await message.client.download_media(reply.media,
 						                                    "ava.mp4")
-						await message.edit("Конвертируем...")
+						await message.edit("Converting...")
 						os.system(
 							"ffmpeg -i ava.mp4 -c copy -an gifavaa.mp4 -y")
 						os.system(
@@ -88,35 +88,28 @@ class GetPPMod(loader.Module):
 					else:
 						await message.client.download_media(reply.media,
 						                                    "tgs.tgs")
-						await message.edit("Конвертируем...")
+						await message.edit("Converting...")
 						os.system(
 							"lottie_convert.py tgs.tgs tgs.gif; mv tgs.gif gifava.mp4")
 				else:
 					return await message.edit(
 						"Нет реплая на гиф/анимированный стикер/видеосообщение.")
-				await message.edit("Устанавливаем аву...")
+				await message.edit("Uploading avatar...")
 				await message.client(
 					functions.photos.UploadProfilePhotoRequest(
 						video=await message.client.upload_file("gifava.mp4"),
 						video_start_ts=0.0))
-				await message.edit("Ава установлена.")
+				await message.edit("Uploaded.")
 				os.system("rm -rf ava.mp4 gifava.mp4 gifavaa.mp4 tgs*")
 			except:
-				await message.edit(
-					"Блин, какой я дурак, я не отличаю гифку/анимированный стикер/видео от любого другого файла.\n\n"
-					"<b>ЭТОТ ФАЙЛ НЕ ПОДДЕРЖИВАЕТСЯ!!!</b>(либо просто какая-то тех.ошибка c: )")
-				try:
-					os.system("rm -rf ava.mp4 gifava.mp4 gifavaa.mp4 tgs*")
-				except:
-					pass
-				return
+				await message.edit("An unexpected error occurred")
+				return os.system("rm -rf ava.mp4 gifava.mp4 gifavaa.mp4 tgs*")
 		else:
 			reply = await message.get_reply_message()
-			try:
-				reply.media.photo
-			except:
-				await message.edit("ДАЙ МНЕ БЛЯТЬ ФОТО СУКА ТЫ ЕБАНАЯ")
-				return
+			media = reply.photo or reply.sticker if reply else None
+			if not media:
+				return await message.edit("No reply on photo/sticker")
+
 			await message.edit("Downloading...")
 			photo = await message.client.download_media(message=reply.photo)
 			up = await message.client.upload_file(photo)
@@ -128,9 +121,9 @@ class GetPPMod(loader.Module):
 	async def delavacmd(self, message):
 		ava = await message.client.get_profile_photos('me', limit=1)
 		if len(ava) > 0:
-			await message.edit("Удаляем аватарку...")
+			await message.edit("Deliting avatar...")
 			await message.client(functions.photos.DeletePhotosRequest(ava))
-			await message.edit("Текущая аватарка удалена")
+			await message.edit("Current avatar was deleted.")
 		else:
 			await message.edit(
 				"ТЫ ЕБЛАН У ТЯ НЕТ АВАТАРКИ!!! КАКОЙ НАХУЙ УДАЛЯТЬ")
@@ -138,10 +131,10 @@ class GetPPMod(loader.Module):
 	async def delavascmd(self, message):
 		ava = await message.client.get_profile_photos('me')
 		if len(ava) > 0:
-			await message.edit("Удаляем аватарки...")
+			await message.edit("Deliting avatars...")
 			await message.client(functions.photos.DeletePhotosRequest(
 				await message.client.get_profile_photos('me')))
-			await message.edit("Аватарки удалены")
+			await message.edit("All avatars was deleted")
 		else:
 			await message.edit(
 				"ТЫ ЕБЛАН У ТЯ НЕТ АВАТАРКОК!!! КАКОЙ НАХУЙ УДАЛЯТЬ")
@@ -156,24 +149,24 @@ class GetPPMod(loader.Module):
 			lastname = args[1]
 		await message.client(
 			UpdateProfileRequest(first_name=firstname, last_name=lastname))
-		await message.edit('Имя изменено успешно!')
+		await message.edit('Name changed successfully!')
 
 	async def setbiocmd(self, message):
 		args = utils.get_args_raw(message)
 		if not args:
 			return await message.edit('Нет аргументов.')
 		await message.client(UpdateProfileRequest(about=args))
-		await message.edit('Био изменено успешно!')
+		await message.edit('Bio changed successfully!')
 
 	async def setusercmd(self, message):
 		args = utils.get_args_raw(message)
 		if not args:
-			return await message.edit('Нет аргументов.')
+			return await message.edit('No args.')
 		try:
 			await message.client(UpdateUsernameRequest(args))
-			await message.edit('Юзернейм изменен успешно!')
+			await message.edit('Username changed successfully!')
 		except UsernameOccupiedError:
-			await message.edit('Такой юзернейм уже занят!')
+			await message.edit('This username is already occupied!')
 
 
 async def check_mediaa(message):
