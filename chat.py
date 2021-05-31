@@ -54,25 +54,24 @@ class ChatMod(loader.Module):
 
 	async def chatidcmd(self, message):
 		"""Команда .chatid показывает ID чата."""
-		if not message.is_private:
-			args = utils.get_args_raw(message)
-			to_chat = None
+		if message.is_private:
+			return await message.edit("<b>Это не чат!</b>")
+		args = utils.get_args_raw(message)
+		to_chat = None
 
-			try:
-				if args:
-					to_chat = args if not args.isdigit() else int(args)
-				else:
-					to_chat = message.chat_id
-
-			except ValueError:
+		try:
+			if args:
+				to_chat = args if not args.isdigit() else int(args)
+			else:
 				to_chat = message.chat_id
 
-			chat = await message.client.get_entity(to_chat)
+		except ValueError:
+			to_chat = message.chat_id
 
-			await message.edit(f"<b>Название:</b> <code>{chat.title}</code>\n"
-			                   f"<b>ID</b>: <code>{chat.id}</code>")
-		else:
-			return await message.edit("<b>Это не чат!</b>")
+		chat = await message.client.get_entity(to_chat)
+
+		await message.edit(f"<b>Название:</b> <code>{chat.title}</code>\n"
+		                   f"<b>ID</b>: <code>{chat.id}</code>")
 
 	async def invitecmd(self, message):
 		"""Используйте .invite <@ или реплай>, чтобы добавить пользователя в чат."""
@@ -134,135 +133,125 @@ class ChatMod(loader.Module):
 	async def leavecmd(self, message):
 		"""Используйте команду .leave, чтобы кикнуть себя из чата."""
 		args = utils.get_args_raw(message)
-		if not message.is_private:
-			if args:
-				await message.edit(f"<b>До связи.\nПричина: {args}</b>")
-			else:
-				await message.edit("<b>До связи.</b>")
-			await message.client(LeaveChannelRequest(message.chat_id))
-		else:
+		if message.is_private:
 			return await message.edit("<b>Это не чат!</b>")
+		if args:
+			await message.edit(f"<b>До связи.\nПричина: {args}</b>")
+		else:
+			await message.edit("<b>До связи.</b>")
+		await message.client(LeaveChannelRequest(message.chat_id))
 
 	async def userscmd(self, message):
 		"""Команда .users <имя>; ничего выводит список всех пользователей в чате."""
-		if not message.is_private:
-			await message.edit("<b>Считаем...</b>")
-			args = utils.get_args_raw(message)
-			info = await message.client.get_entity(message.chat_id)
-			title = info.title or "этом чате"
-
-			if not args:
-				users = await message.client.get_participants(message.chat_id)
-				mentions = f"<b>Пользователей в \"{title}\": {len(users)}</b> \n"
-			else:
-				users = await message.client.get_participants(message.chat_id,
-				                                              search=f"{args}")
-				mentions = f'<b>В чате "{title}" найдено {len(users)} пользователей с именем {args}:</b> \n'
-
-			for user in users:
-				if not user.deleted:
-					mentions += f"\n• <a href =\"tg://user?id={user.id}\">{user.first_name}</a> | <code>{user.id}</code>"
-				else:
-					mentions += f"\n• Удалённый аккаунт <b>|</b> <code>{user.id}</code>"
-
-			try:
-				await message.edit(mentions)
-			except MessageTooLongError:
-				await message.edit(
-					"<b>Черт, слишком большой чат. Загружаю список пользователей в файл...</b>")
-				file = open("userslist.md", "w+")
-				file.write(mentions)
-				file.close()
-				await message.client.send_file(message.chat_id,
-				                               "userslist.md",
-				                               caption="<b>Пользователей в {}:</b>".format(
-					                               title),
-				                               reply_to=message.id)
-				remove("userslist.md")
-				await message.delete()
-		else:
+		if message.is_private:
 			return await message.edit("<b>Это не чат!</b>")
+		await message.edit("<b>Считаем...</b>")
+		args = utils.get_args_raw(message)
+		info = await message.client.get_entity(message.chat_id)
+		title = info.title or "этом чате"
+
+		if args:
+			users = await message.client.get_participants(message.chat_id,
+			                                              search=f"{args}")
+			mentions = f'<b>В чате "{title}" найдено {len(users)} пользователей с именем {args}:</b> \n'
+
+		else:
+			users = await message.client.get_participants(message.chat_id)
+			mentions = f"<b>Пользователей в \"{title}\": {len(users)}</b> \n"
+		for user in users:
+			if user.deleted:
+				mentions += f"\n• Удалённый аккаунт <b>|</b> <code>{user.id}</code>"
+
+			else:
+				mentions += f"\n• <a href =\"tg://user?id={user.id}\">{user.first_name}</a> | <code>{user.id}</code>"
+		try:
+			await message.edit(mentions)
+		except MessageTooLongError:
+			await message.edit(
+				"<b>Черт, слишком большой чат. Загружаю список пользователей в файл...</b>")
+			with open("userslist.md", "w+") as file:
+				file.write(mentions)
+			await message.client.send_file(message.chat_id,
+			                               "userslist.md",
+			                               caption="<b>Пользователей в {}:</b>".format(
+				                               title),
+			                               reply_to=message.id)
+			remove("userslist.md")
+			await message.delete()
 
 	async def adminscmd(self, message):
 		"""Команда .admins показывает список всех админов в чате."""
-		if not message.is_private:
-			await message.edit("<b>Считаем...</b>")
-			info = await message.client.get_entity(message.chat_id)
-			title = info.title or "this chat"
-
-			admins = await message.client.get_participants(message.chat_id,
-			                                               filter=ChannelParticipantsAdmins)
-			mentions = f"<b>Админов в \"{title}\": {len(admins)}</b>\n"
-
-			for user in admins:
-				admin = admins[admins.index(
-					(await message.client.get_entity(user.id)))].participant
-				if not admin:
-					if type(admin) == ChannelParticipantCreator:
-						rank = "creator"
-					else:
-						rank = "admin"
-				else:
-					rank = admin.rank or "admin"
-
-				if not user.deleted:
-					mentions += f"\n• <a href=\"tg://user?id={user.id}\">{user.first_name}</a> | {rank} | <code>{user.id}</code>"
-				else:
-					mentions += f"\n• Удалённый аккаунт <b>|</b> <code>{user.id}</code>"
-
-			try:
-				await message.edit(mentions)
-			except MessageTooLongError:
-				await message.edit(
-					"Черт, слишком много админов здесь. Загружаю список админов в файл...")
-				file = open("adminlist.md", "w+")
-				file.write(mentions)
-				file.close()
-				await message.client.send_file(message.chat_id,
-				                               "adminlist.md",
-				                               caption="<b>Админов в \"{}\":<b>".format(
-					                               title),
-				                               reply_to=message.id)
-				remove("adminlist.md")
-				await message.delete()
-		else:
+		if message.is_private:
 			return await message.edit("<b>Это не чат!</b>")
+		await message.edit("<b>Считаем...</b>")
+		info = await message.client.get_entity(message.chat_id)
+		title = info.title or "this chat"
+
+		admins = await message.client.get_participants(message.chat_id,
+		                                               filter=ChannelParticipantsAdmins)
+		mentions = f"<b>Админов в \"{title}\": {len(admins)}</b>\n"
+
+		for user in admins:
+			admin = admins[admins.index(
+				(await message.client.get_entity(user.id)))].participant
+			if admin:
+				rank = admin.rank or "admin"
+
+			else:
+				rank = "creator" if type(admin) == ChannelParticipantCreator else "admin"
+			if user.deleted:
+				mentions += f"\n• Удалённый аккаунт <b>|</b> <code>{user.id}</code>"
+
+			else:
+				mentions += f"\n• <a href=\"tg://user?id={user.id}\">{user.first_name}</a> | {rank} | <code>{user.id}</code>"
+		try:
+			await message.edit(mentions)
+		except MessageTooLongError:
+			await message.edit(
+				"Черт, слишком много админов здесь. Загружаю список админов в файл...")
+			with open("adminlist.md", "w+") as file:
+				file.write(mentions)
+			await message.client.send_file(message.chat_id,
+			                               "adminlist.md",
+			                               caption="<b>Админов в \"{}\":<b>".format(
+				                               title),
+			                               reply_to=message.id)
+			remove("adminlist.md")
+			await message.delete()
 
 	async def botscmd(self, message):
 		"""Команда .bots показывает список всех ботов в чате."""
-		if not message.is_private:
-			await message.edit("<b>Считаем...</b>")
-
-			info = await message.client.get_entity(message.chat_id)
-			title = info.title if info.title else "this chat"
-
-			bots = await message.client.get_participants(message.to_id,
-			                                             filter=ChannelParticipantsBots)
-			mentions = f"<b>Ботов в \"{title}\": {len(bots)}</b>\n"
-
-			for user in bots:
-				if not user.deleted:
-					mentions += f"\n• <a href=\"tg://user?id={user.id}\">{user.first_name}</a> | <code>{user.id}</code>"
-				else:
-					mentions += f"\n• Удалённый бот <b>|</b> <code>{user.id}</code> "
-
-			try:
-				await message.edit(mentions, parse_mode="html")
-			except MessageTooLongError:
-				await message.edit("Черт, слишком много ботов здесь. Загружаю "
-				                   "список ботов в файл...")
-				file = open("botlist.md", "w+")
-				file.write(mentions)
-				file.close()
-				await message.client.send_file(message.chat_id,
-				                               "botlist.md",
-				                               caption="<b>Ботов в \"{}\":</b>".format(
-					                               title),
-				                               reply_to=message.id)
-				remove("botlist.md")
-				await message.delete()
-		else:
+		if message.is_private:
 			return await message.edit("<b>Это не чат!</b>")
+		await message.edit("<b>Считаем...</b>")
+
+		info = await message.client.get_entity(message.chat_id)
+		title = info.title or "this chat"
+
+		bots = await message.client.get_participants(message.to_id,
+		                                             filter=ChannelParticipantsBots)
+		mentions = f"<b>Ботов в \"{title}\": {len(bots)}</b>\n"
+
+		for user in bots:
+			if not user.deleted:
+				mentions += f"\n• <a href=\"tg://user?id={user.id}\">{user.first_name}</a> | <code>{user.id}</code>"
+			else:
+				mentions += f"\n• Удалённый бот <b>|</b> <code>{user.id}</code> "
+
+		try:
+			await message.edit(mentions, parse_mode="html")
+		except MessageTooLongError:
+			await message.edit("Черт, слишком много ботов здесь. Загружаю "
+			                   "список ботов в файл...")
+			with open("botlist.md", "w+") as file:
+				file.write(mentions)
+			await message.client.send_file(message.chat_id,
+			                               "botlist.md",
+			                               caption="<b>Ботов в \"{}\":</b>".format(
+				                               title),
+			                               reply_to=message.id)
+			remove("botlist.md")
+			await message.delete()
 
 	async def commoncmd(self, message):
 		"""Используй .common <@ или реплай>, чтобы узнать общие чаты с
@@ -326,12 +315,9 @@ class ChatMod(loader.Module):
 		f.write("FNAME;LNAME;USER;ID;NUMBER\n".encode())
 		me = await message.client.get_me()
 		for i in await message.client.get_participants(message.to_id):
-			if i.id == me.id: continue
-			if num:
-				if i.phone:
-					f.write(
-						f"{str(i.first_name)};{str(i.last_name)};{str(i.username)};{str(i.id)};{str(i.phone)}\n".encode())
-			else:
+			if i.id == me.id:
+				continue
+			if num and i.phone or not num:
 				f.write(
 					f"{str(i.first_name)};{str(i.last_name)};{str(i.username)};{str(i.id)};{str(i.phone)}\n".encode())
 		f.seek(0)
@@ -371,8 +357,6 @@ class ChatMod(loader.Module):
 								functions.channels.InviteToChannelRequest(
 									idschannelgroup, [u.id]))
 							await asyncio.sleep(1)
-						else:
-							pass
 					except:
 						pass
 				except errors.FloodWaitError as e:
@@ -417,8 +401,10 @@ class ChatMod(loader.Module):
 		echos = self.db.get("Echo", "chats", [])
 		chatid = str(message.chat_id)
 
-		if chatid not in str(echos): return
-		if message.sender_id == (await message.client.get_me()).id: return
+		if chatid not in str(echos):
+			return
+		if message.sender_id == (await message.client.get_me()).id:
+			return
 
 		await message.client.send_message(int(chatid), message,
 		                                  reply_to=await message.get_reply_message() or message)

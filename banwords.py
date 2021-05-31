@@ -91,9 +91,7 @@ class BanWordsMod(loader.Module):
 		except KeyError:
 			return await message.edit("<b>[BanWords]</b> В этом чате нет списка слов.")
 
-		word = ""
-		for _ in ls:
-			word += f"• <code>{_}</code>\n"
+		word = "".join(f"• <code>{_}</code>\n" for _ in ls)
 		await message.edit(f"<b>[BanWords]</b> Список слов в этом чате:\n\n{word}")
 
 	async def bwstatscmd(self, message):
@@ -125,12 +123,12 @@ class BanWordsMod(loader.Module):
 		"""Переключить режим "Плохих слов". Используй: .swbw <режим(antimat/kick/ban/mute/none)>, или .swbw limit <кол-во:int>."""
 		if not message.is_private:
 			chat = await message.get_chat()
-			if not chat.admin_rights and not chat.creator:
-				return await message.edit("<b>Я не админ здесь.</b>")
-			else:
+			if chat.admin_rights or chat.creator:
 				if chat.admin_rights.delete_messages == False:
 					return await message.edit("<b>У меня нет нужных прав.</b>")
 
+			else:
+				return await message.edit("<b>Я не админ здесь.</b>")
 		words = self.db.get("BanWords", "bws", {})
 		args = utils.get_args_raw(message)
 		chat_id = str(message.chat_id)
@@ -140,48 +138,47 @@ class BanWordsMod(loader.Module):
 		if "stats" not in words:
 			words.update({"stats": {chat_id: {"action": "none", "antimat": False, "limit": 5}}})
 
-		if args:
-			if "limit" in args:
-				try:
-					limit = int(utils.get_args_raw(message).split(' ', 1)[1])
-					words["stats"][chat_id].update({"limit": limit})
-					self.db.set("BanWords", "bws", words)
-					return await message.edit(
-						f"<b>[BanWords]</b> Лимит спец.слов был установлен на {words['stats'][chat_id]['limit']}.")
-				except (IndexError, ValueError):
-					return await message.edit(
-						f"<b>[BanWords]</b> Лимит спец.слов в этом чате - {words['stats'][chat_id]['limit']}\n"
-						f"Установить новый можно командой .bwsw limit <кол-во:int>.")
-
-			if args == "antimat":
-				if not words["stats"][chat_id]["antimat"]:
-					words["stats"][chat_id]["antimat"] = True
-					self.db.set("BanWords", "bws", words)
-					return await message.edit("<b>[BanWords]</b> Режим \"антимат\" включен.")
-				else:
-					words["stats"][chat_id]["antimat"] = False
-					self.db.set("BanWords", "bws", words)
-					return await message.edit("<b>[BanWords]</b> Режим \"антимат\" выключен.")
-			else:
-				if args == "kick":
-					words["stats"][chat_id].update({"action": "kick"})
-				elif args == "ban":
-					words["stats"][chat_id].update({"action": "ban"})
-				elif args == "mute":
-					words["stats"][chat_id].update({"action": "mute"})
-				elif args == "none":
-					words["stats"][chat_id].update({"action": "none"})
-				else:
-					return await message.edit(
-						f"<b>[BanWords]</b> Такого режима нет в списке. Есть: kick/ban/mute/none.")
-				self.db.set("BanWords", "bws", words)
-				return await message.edit(
-					f"<b>[BanWords]</b> Теперь при достижении лимита спец.слов будет выполняться действие: {words['stats'][chat_id]['action']}.")
-		else:
+		if not args:
 			return await message.edit(f"<b>[BanWords]</b> Настройки чата:\n\n"
 			                          f"<b>Лимит спец.слов:</b> {words['stats'][chat_id]['limit']}\n"
 			                          f"<b>При достижении лимита спец.слов будет выполняться действие:</b> {words['stats'][chat_id]['action']}\n"
 			                          f"<b>Статус режима \"антимат\":</b> {words['stats'][chat_id]['antimat']}")
+		if "limit" in args:
+			try:
+				limit = int(utils.get_args_raw(message).split(' ', 1)[1])
+				words["stats"][chat_id].update({"limit": limit})
+				self.db.set("BanWords", "bws", words)
+				return await message.edit(
+					f"<b>[BanWords]</b> Лимит спец.слов был установлен на {words['stats'][chat_id]['limit']}.")
+			except (IndexError, ValueError):
+				return await message.edit(
+					f"<b>[BanWords]</b> Лимит спец.слов в этом чате - {words['stats'][chat_id]['limit']}\n"
+					f"Установить новый можно командой .bwsw limit <кол-во:int>.")
+
+		if args == "antimat":
+			if words["stats"][chat_id]["antimat"]:
+				words["stats"][chat_id]["antimat"] = False
+				self.db.set("BanWords", "bws", words)
+				return await message.edit("<b>[BanWords]</b> Режим \"антимат\" выключен.")
+			else:
+				words["stats"][chat_id]["antimat"] = True
+				self.db.set("BanWords", "bws", words)
+				return await message.edit("<b>[BanWords]</b> Режим \"антимат\" включен.")
+		else:
+			if args == "kick":
+				words["stats"][chat_id].update({"action": "kick"})
+			elif args == "ban":
+				words["stats"][chat_id].update({"action": "ban"})
+			elif args == "mute":
+				words["stats"][chat_id].update({"action": "mute"})
+			elif args == "none":
+				words["stats"][chat_id].update({"action": "none"})
+			else:
+				return await message.edit(
+					f"<b>[BanWords]</b> Такого режима нет в списке. Есть: kick/ban/mute/none.")
+			self.db.set("BanWords", "bws", words)
+			return await message.edit(
+				f"<b>[BanWords]</b> Теперь при достижении лимита спец.слов будет выполняться действие: {words['stats'][chat_id]['action']}.")
 
 	async def watcher(self, message):
 		"""Обновление от 19.03: Фикс говнокода."""
@@ -217,9 +214,6 @@ class BanWordsMod(loader.Module):
 								await message.client(eb(int(chat_id), user_id, cb(until_date=None, view_messages=True)))
 							elif action == "mute":
 								await message.client(eb(int(chat_id), user.id, cb(until_date=True, send_messages=True)))
-							else:
-								pass
-
 							words["stats"][chat_id].pop(user_id)
 							self.db.set("BanWords", "bws", words)
 							await message.respond(

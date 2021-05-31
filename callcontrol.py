@@ -11,13 +11,14 @@ from .. import loader, utils
 
 @loader.tds
 class VGCallControllerMod(loader.Module):
-	"Control group voice calls"
+	"""Control group voice calls"""
 	strings = {"name": "VGCallController"}
 
 	@loader.owner
 	async def callstartcmd(self, m):
-		"Start call in chat"
-		if not m.chat: return await utils.answer(m, "<b>[VGCallController]</b> It is not a chat!")
+		"""Start call in chat"""
+		if not m.chat:
+			return await utils.answer(m, "<b>[VGCallController]</b> It is not a chat!")
 		call = (await m.client(functions.channels.GetFullChannelRequest(m.chat.id))).full_chat.call
 		if not call:
 			try:
@@ -29,8 +30,9 @@ class VGCallControllerMod(loader.Module):
 			await utils.answer(m, "<b>[VGCallController]</b> There is call now!")
 
 	async def callstopcmd(self, m):
-		"Stop call in chat"
-		if not m.chat: return await utils.answer(m, "<b>[VGCallController]</b> It is not a chat!")
+		"""Stop call in chat"""
+		if not m.chat:
+			return await utils.answer(m, "<b>[VGCallController]</b> It is not a chat!")
 		call = (await m.client(functions.channels.GetFullChannelRequest(m.chat.id))).full_chat.call
 		if call:
 			try:

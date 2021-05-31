@@ -57,12 +57,11 @@ class AFKMod(loader.Module):
 		gone = datetime.fromtimestamp(self._db.get(__name__, "gone")).replace(microsecond=0)
 		diff = now - gone
 		if getattr(message.to_id, "user_id", None) == self._me.id:
-			if self.get_afk():
-				afk_state = self.get_afk()
-				ret = self.strings("afk_reason", message).format(diff, afk_state)
-				await utils.answer(message, ret)
-			else:
+			if not self.get_afk():
 				return
+			afk_state = self.get_afk()
+			ret = self.strings("afk_reason", message).format(diff, afk_state)
+			await utils.answer(message, ret)
 		elif message.mentioned:
 			if self.get_afk():
 				afk_state = self.get_afk()

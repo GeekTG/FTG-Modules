@@ -39,7 +39,7 @@ class GetPPMod(loader.Module):
 					os.remove(i)
 			else:
 				try:
-					if u is True:
+					if u:
 						photo = await self.client.download_profile_photo(
 							user.sender)
 					else:
@@ -75,25 +75,24 @@ class GetPPMod(loader.Module):
 		if not reply:
 			try:
 				reply = await message.get_reply_message()
-				if reply:
-					await message.edit("Downloading...")
-					if reply.video:
-						await message.client.download_media(reply.media,
-						                                    "ava.mp4")
-						await message.edit("Converting...")
-						os.system(
-							"ffmpeg -i ava.mp4 -c copy -an gifavaa.mp4 -y")
-						os.system(
-							"ffmpeg -i gifavaa.mp4 -vf scale=360:360 gifava.mp4 -y")
-					else:
-						await message.client.download_media(reply.media,
-						                                    "tgs.tgs")
-						await message.edit("Converting...")
-						os.system(
-							"lottie_convert.py tgs.tgs tgs.gif; mv tgs.gif gifava.mp4")
-				else:
+				if not reply:
 					return await message.edit(
 						"Нет реплая на гиф/анимированный стикер/видеосообщение.")
+				await message.edit("Downloading...")
+				if reply.video:
+					await message.client.download_media(reply.media,
+					                                    "ava.mp4")
+					await message.edit("Converting...")
+					os.system(
+						"ffmpeg -i ava.mp4 -c copy -an gifavaa.mp4 -y")
+					os.system(
+						"ffmpeg -i gifavaa.mp4 -vf scale=360:360 gifava.mp4 -y")
+				else:
+					await message.client.download_media(reply.media,
+					                                    "tgs.tgs")
+					await message.edit("Converting...")
+					os.system(
+						"lottie_convert.py tgs.tgs tgs.gif; mv tgs.gif gifava.mp4")
 				await message.edit("Uploading avatar...")
 				await message.client(
 					functions.photos.UploadProfilePhotoRequest(
