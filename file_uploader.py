@@ -42,7 +42,7 @@ class FileUploaderMod(loader.Module):
 			file.name = "txt.txt"
 		else:
 			file = io.BytesIO(await self.client.download_file(media))
-			file.name = reply.file.name if reply.file.name else reply.file.id + reply.file.ext
+			file.name = reply.file.name or reply.file.id + reply.file.ext
 		try:
 			x0at = post('https://x0.at', files={'file': file})
 		except ConnectionError as e:
@@ -140,10 +140,9 @@ async def check_mediaa(message, reply):
 		return None
 	if not data or data is None:
 		return None
-	else:
-		data = await message.client.download_file(data, bytes)
-		try:
-			Image.open(io.BytesIO(data))
-			return data
-		except:
-			return None
+	data = await message.client.download_file(data, bytes)
+	try:
+		Image.open(io.BytesIO(data))
+		return data
+	except:
+		return None

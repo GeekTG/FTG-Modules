@@ -116,8 +116,9 @@ async def get_chat_info(chat, message):
 	except Exception:
 		msg_info = None
 
-	first_msg_valid = True if msg_info and msg_info.messages and msg_info.messages[0].id == 1 else False
-	creator_valid = True if first_msg_valid and msg_info.users else False
+	first_msg_valid = bool(msg_info and msg_info.messages
+	                       and msg_info.messages[0].id == 1)
+	creator_valid = bool(first_msg_valid and msg_info.users)
 	creator_id = msg_info.users[0].id if creator_valid else None
 	creator_firstname = msg_info.users[0].first_name if creator_valid and msg_info.users[
 		0].first_name is not None else "УYesлённый аккаунт"
@@ -135,7 +136,7 @@ async def get_chat_info(chat, message):
 	users_online = 0
 	async for i in message.client.iter_participants(message.chat_id):
 		if isinstance(i.status, UserStatusOnline):
-			users_online = users_online + 1
+			users_online += 1
 	group_stickers = chat.full_chat.stickerset.title if hasattr(chat.full_chat,
 	                                                            "stickerset") and chat.full_chat.stickerset else None
 	messages_viewable = msg_info.count if msg_info else None
@@ -161,7 +162,7 @@ async def get_chat_info(chat, message):
 		except Exception:
 			pass
 	if bots_list:
-		for bot in bots_list:
+		for _ in bots_list:
 			bots += 1
 
 	caption = "<b>CHAT INFORMATION:</b>\n\n"

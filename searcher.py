@@ -65,11 +65,13 @@ class SearchMod(loader.Module):
 		if not gresults:
 			await utils.answer(message, self.strings("no_results", message).format(text))
 			return
-		msg = ""
 		results = zip(gresults["titles"], gresults["links"], gresults["descriptions"])
-		for result in results:
-			msg += self.strings("result").format(utils.escape_html(result[0]), utils.escape_html(result[1]),
-			                                     utils.escape_html(result[2]))
+		msg = "".join(
+		    self.strings("result").format(
+		        utils.escape_html(result[0]),
+		        utils.escape_html(result[1]),
+		        utils.escape_html(result[2]),
+		    ) for result in results)
 		await utils.answer(message, self.strings("results", message).format(utils.escape_html(text)) + msg)
 
 
@@ -87,7 +89,5 @@ async def check_media(message, reply):
 		return None
 	if not data or data is None:
 		return None
-	else:
-		data = await message.client.download_file(data, bytes)
-		img = io.BytesIO(data)
-		return img
+	data = await message.client.download_file(data, bytes)
+	return io.BytesIO(data)

@@ -29,21 +29,16 @@ class DownloaderMod(loader.Module):
 			if reply.text:
 				text = reply.text
 				fname = f'{name or message.id + reply.id}.txt'
-				file = open(fname, 'w')
-				file.write(text)
-				file.close()
-				await message.edit(
-					f'FIle saved as: <code>{fname}</code>.\n\nYou '
-					f'can send it with command: '
-					f'<code>.ulf {fname}</code>.')
+				with open(fname, 'w') as file:
+					file.write(text)
 			else:
 				ext = reply.file.ext
 				fname = f'{name or message.id + reply.id}{ext}'
 				await message.client.download_media(reply, fname)
-				await message.edit(
-					f'FIle saved as: <code>{fname}</code>.\n\nYou '
-					f'can send it with command: '
-					f'<code>.ulf {fname}</code>.')
+			await message.edit(
+				f'FIle saved as: <code>{fname}</code>.\n\nYou '
+				f'can send it with command: '
+				f'<code>.ulf {fname}</code>.')
 		else:
 			return await message.edit('There is no reply')
 
@@ -54,27 +49,26 @@ class DownloaderMod(loader.Module):
 		d = False
 		if 'd ' in name:
 			d = True
-		if name:
-			try:
-				name = name.replace('d ', '')
-				await message.edit(f'Sending <code>{name}</code>...')
-				if d == True:
-					await message.client.send_file(message.to_id, f'{name}')
-					await message.edit(
-						f'Sending <code>{name}</code>... Success!\Deleting '
-						f'<code>{name}</code>...')
-					os.remove(name)
-					await message.edit(
-						f'Sending <code>{name}</code>... Deleting!\nУдаляем '
-						f'<code>{name}</code>... Success!')
-					await sleep(0.5)
-				else:
-					await message.client.send_file(message.to_id, name)
-			except:
-				return await message.edit('File does not exist')
-			await message.delete()
-		else:
+		if not name:
 			return await message.edit('No args')
+		try:
+			name = name.replace('d ', '')
+			await message.edit(f'Sending <code>{name}</code>...')
+			if d:
+				await message.client.send_file(message.to_id, f'{name}')
+				await message.edit(
+					f'Sending <code>{name}</code>... Success!\Deleting '
+					f'<code>{name}</code>...')
+				os.remove(name)
+				await message.edit(
+					f'Sending <code>{name}</code>... Deleting!\nУдаляем '
+					f'<code>{name}</code>... Success!')
+				await sleep(0.5)
+			else:
+				await message.client.send_file(message.to_id, name)
+		except:
+			return await message.edit('File does not exist')
+		await message.delete()
 
 	async def dltiktokcmd(self, message):
 		"""TikTok video downloader"""
