@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 
 import asyncio
+import builtins
 import logging
 import os
 import re
 
 import telethon
+from meval import meval
 
 from .. import loader, utils
 
@@ -33,7 +35,26 @@ class TerminalMod(loader.Module):
 	                        "<code>{}</code> <b>to run</b> <code>{}</code>"),
 	           "auth_locked": "<b>Authentication failed, please try again later</b>",
 	           "auth_ongoing": "<b>Authenticating...</b>",
-	           "done": "<b>Done</b>"}
+	           "done": "<b>Done</b>",
+	           "no_args": "<strong>Invalid arguments</strong>",
+	           "not_found": "<strong>Command not found</strong>"}
+
+	exceptions = ["code", "globs", "kwargs"]
+
+	class FakeCommand:
+		def __init__(self, message, name, command):
+			self.context = message
+			self.name = name
+			self.command = command
+
+		async def __call__(self, *args):
+			msg = "." + self.name + " " + " ".join(map(str, args))
+			reply = await self.context.get_reply_message()
+			if reply:
+				event = await reply.reply(msg)
+			else:
+				event = await self.context.respond(msg)
+			await self.command(event)
 
 	def __init__(self):
 		self.config = loader.ModuleConfig("FLOOD_WAIT_PROTECT", 2,
@@ -119,6 +140,27 @@ class TerminalMod(loader.Module):
 		"""Show system uptime"""
 		await self.run_command(message, "uptime", RawMessageEditor(message, "uptime", self.config,
 		                                                           self.strings, message))
+
+	async def plcmd(self, message):
+		"""pl [code]"""
+		arg = utils.get_args_raw(message)
+
+		env = {"message": message, "_": builtins}
+		for name, cmd in self.allmodules.commands.items():
+			if name in self.exceptions:
+				name = "_" + name
+			env[name] = self.FakeCommand(message, name, cmd)
+
+		for name, source in self.allmodules.aliases.items():
+			if name in self.exceptions:
+				name = "_" + name
+			env[name] = self.FakeCommand(message, name, self.allmodules.commands[source])
+
+		await meval(arg, globals(), **env)
+
+	async def printcmd(self, message):
+		"""print [text]"""
+		await utils.answer(message, utils.get_args_raw(message))
 
 
 def hash_msg(message):
@@ -248,8 +290,8 @@ class SudoMessageEditor(MessageEditor):
 			                                         telethon.events.messageedited.MessageEdited(chats=["me"]))
 			logger.debug("registered handler")
 			handled = True
-		if len(lines) > 1 and (re.fullmatch(self.TOO_MANY_TRIES, lastline)
-		                       and (self.state == 1 or self.state == 3 or self.state == 4)):
+		if (len(lines) > 1 and re.fullmatch(self.TOO_MANY_TRIES, lastline)
+				and self.state in [1, 3, 4]):
 			logger.debug("password wrong lots of times")
 			await utils.answer(self.message, self.strings("auth_locked", self.request_message))
 			await self.authmsg.delete()
