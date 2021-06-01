@@ -37,8 +37,7 @@ class TranslatorMod(loader.Module):
 				if len(lang) >= 2:
 					trslreply = False
 				dest = langs[lang[0]]
-				r = tr(args.split(' ', 1)[1] if trslreply is False else text,
-				       dest=dest)
+				r = tr(args.split(' ', 1)[1] if not trslreply else text, dest=dest)
 			except:
 				r = tr(reply.text)
 		else:

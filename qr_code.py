@@ -49,10 +49,10 @@ class QRtoolsMod(loader.Module):
 		if not ok:
 			reply = await message.get_reply_message()
 			ok = await check(reply)
-			if not ok:
-				text = "<b>Это не изображение!</b>" if reply else "<b>Нечего не передано!</b>"
-				await message.edit(text)
-				return
+		if not ok:
+			text = "<b>Это не изображение!</b>" if reply else "<b>Нечего не передано!</b>"
+			await message.edit(text)
+			return
 		file = BytesIO()
 		file.name = "qr.png"
 		data = await message.client.download_file(ok)

@@ -33,7 +33,7 @@ class WeatherMod(loader.Module):
 			r = requests.get(
 				"https://wttr.in/" + city + "?format=%l:+%c+%t,+%w+%m"
 			)
-			await utils.answer(m, r.text)
 		else:
 			r = requests.get("https://wttr.in/?format=%l:+%c+%t,+%w+%m")
-			await utils.answer(m, r.text)
+
+		await utils.answer(m, r.text)

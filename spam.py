@@ -38,10 +38,7 @@ class SpamMod(loader.Module):
 		"""Character spam. Use .cspam <args or reply>."""
 		await message.delete()
 		reply = await message.get_reply_message()
-		if reply:
-			msg = reply.text
-		else:
-			msg = utils.get_args_raw(message)
+		msg = reply.text if reply else utils.get_args_raw(message)
 		msg = msg.replace(' ', '')
 		for m in msg:
 			await message.respond(m)
@@ -50,10 +47,7 @@ class SpamMod(loader.Module):
 		"""Word spam. Use .wspam <args or reply>."""
 		await message.delete()
 		reply = await message.get_reply_message()
-		if reply:
-			msg = reply.text
-		else:
-			msg = utils.get_args_raw(message)
+		msg = reply.text if reply else utils.get_args_raw(message)
 		msg = msg.split()
 		for m in msg:
 			await message.respond(m)
@@ -67,14 +61,12 @@ class SpamMod(loader.Module):
 			time = int(args.split(' ', 2)[0])
 			count = int(args.split(' ', 2)[1])
 			if reply:
-				if reply.media:
-					for _ in range(count):
+				for _ in range(count):
+					if reply.media:
 						await message.client.send_file(message.to_id, reply.media, reply_to=reply.id)
-						await sleep(time)
-				else:
-					for _ in range(count):
+					else:
 						await reply.reply(args.split(' ', 2)[2])
-						await sleep(time)
+					await sleep(time)
 			else:
 				spammsg = args.split(' ', 2)[2]
 				for _ in range(count):

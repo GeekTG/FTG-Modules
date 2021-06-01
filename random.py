@@ -86,8 +86,5 @@ class RandomMod(loader.Module):
 		"""Make a life choice"""
 		yes = self.config["YES_WORDS"]
 		no = self.config["NO_WORDS"]
-		if random.getrandbits(1):
-			response = random.choice(yes)
-		else:
-			response = random.choice(no)
+		response = random.choice(yes) if random.getrandbits(1) else random.choice(no)
 		await utils.answer(message, response)

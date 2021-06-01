@@ -38,10 +38,7 @@ class ExecutorMod(loader.Module):
 			asset = await self._db.fetch_asset(asset_id)
 		else:
 			asset_id = self._db.get("friendly-telegram.modules.notes", "notes", {}).get(args[0].lower(), None)
-			if asset_id is not None:
-				asset = await self._db.fetch_asset(asset_id)
-			else:
-				asset = None
+			asset = await self._db.fetch_asset(asset_id) if asset_id is not None else None
 		if asset is None:
 			await utils.answer(message, self.strings("no_note", message))
 			return

@@ -85,7 +85,7 @@ class ImageManagerMod(loader.Module):
 		im2 = Image.open(im)
 		im2 = im2.resize((x, y))
 		out = io.BytesIO()
-		iswebp = True if reply.file.ext == ".webp" else False
+		iswebp = reply.file.ext == ".webp"
 		if iswebp:
 			im2.thumbnail((512, 512))
 		out.name = "resized." + (".webp" if iswebp else ".png")
@@ -110,7 +110,7 @@ class ImageManagerMod(loader.Module):
 		im2 = Image.open(im)
 		im2 = im2.rotate(c, expand=True)
 		out = io.BytesIO()
-		iswebp = True if reply.file.ext == ".webp" else False
+		iswebp = reply.file.ext == ".webp"
 		if iswebp:
 			im2.thumbnail((512, 512))
 		out.name = "rotate." + (".webp" if iswebp else ".png")
@@ -150,7 +150,7 @@ class ImageManagerMod(loader.Module):
 		if not im:
 			return await utils.answer(m, "Reply to image")
 		im2 = Image.open(im)
-		iswebp = True if reply.file.ext == ".webp" else False
+		iswebp = reply.file.ext == ".webp"
 		out = io.BytesIO()
 		if iswebp:
 			out.name = "conv.png"
@@ -195,15 +195,14 @@ class ImageManagerMod(loader.Module):
 
 
 async def get_img_from_msg(reply):
-	if reply and reply.file:
-		if not reply.file.mime_type == "image":
-			return io.BytesIO(await reply.download_media(bytes))
+	if reply and reply.file and reply.file.mime_type == "image":
+		return io.BytesIO(await reply.download_media(bytes))
 
 
 async def invert_image(im, ext):
 	image = Image.open(im)
 	file = io.BytesIO()
-	iswebp = True if ext == ".webp" else False
+	iswebp = ext == ".webp"
 	file.name = "bw." + (".webp" if iswebp else ".png")
 	if image.mode == 'RGBA':
 		r, g, b, a = image.split()
@@ -226,7 +225,7 @@ async def invert_image(im, ext):
 async def contrast(im, level, ext):
 	image = ImageEnhance.Contrast(Image.open(im)).enhance(level)
 	out = io.BytesIO()
-	iswebp = True if ext == ".webp" else False
+	iswebp = ext == ".webp"
 	if iswebp:
 		image.thumbnail((512, 512))
 	out.name = "contrast." + (".webp" if iswebp else ".png")
@@ -238,7 +237,7 @@ async def contrast(im, level, ext):
 async def blwh(im, ext):
 	image = Image.open(im).convert('L')
 	out = io.BytesIO()
-	iswebp = True if ext == ".webp" else False
+	iswebp = ext == ".webp"
 	if iswebp:
 		image.thumbnail((512, 512))
 	out.name = "bw." + (".webp" if iswebp else ".png")
@@ -248,7 +247,7 @@ async def blwh(im, ext):
 
 
 def setbright(im, level, ext):
-	iswebp = True if ext == ".webp" else False
+	iswebp = ext == ".webp"
 	image = ImageEnhance.Brightness(Image.open(im)).enhance(level)
 	if iswebp:
 		image.thumbnail((512, 512))
@@ -260,7 +259,7 @@ def setbright(im, level, ext):
 
 
 def setsharpness(im, level, ext):
-	iswebp = True if ext == ".webp" else False
+	iswebp = ext == ".webp"
 	image = ImageEnhance.Sharpness(Image.open(im)).enhance(level)
 	if iswebp:
 		image.thumbnail((512, 512))

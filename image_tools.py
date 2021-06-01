@@ -71,11 +71,10 @@ class ImageToolsMod(loader.Module):
 		""".soap <reply to photo>"""
 		soap = 3
 		a = utils.get_args(message)
-		if a:
-			if a[0].isdigit():
-				soap = int(a[0])
-				if soap <= 0:
-					soap = 3
+		if a and a[0].isdigit():
+			soap = int(a[0])
+			if soap <= 0:
+				soap = 3
 
 		if message.is_reply:
 			reply_message = await message.get_reply_message()
@@ -107,10 +106,9 @@ class ImageToolsMod(loader.Module):
 			await message.edit("<b>Packname</b>❓")
 			return
 		chat = '@Stickers'
-		name = "".join([random.choice(
+		name = "".join(random.choice(
 			list(string.ascii_lowercase + string.ascii_uppercase)) for _ in
-			range(16)])
-		emoji = "▫️"
+				range(16))
 		image = io.BytesIO()
 		await message.client.download_file(reply, image)
 		image = Image.open(image)
@@ -127,6 +125,7 @@ class ImageToolsMod(loader.Module):
 		fface.seek(0)
 		await message.edit("<b>📤Uploading...</b>")
 		async with message.client.conversation(chat) as conv:
+			emoji = "▫️"
 			try:
 				x = await message.client.send_message(chat, "/cancel")
 				await (await conv.wait_event(
@@ -353,19 +352,16 @@ async def CM(R):
 	D = False
 	C = None
 	A = R
-	if A and A.media:
-		if A.photo:
-			B = A.photo
-			E = _C
-		elif A.document:
-			if DAF(
-					file_name='AnimatedSticker.tgs') in A.media.document.attributes: return D, C
-			if A.gif or A.video or A.audio or A.voice: return D, C
-			B = A.media.document
-			if _A not in B.mime_type: return D, C
-			E = B.mime_type.split('/')[1]
-		else:
-			return D, C
+	if A and A.media and A.photo:
+		B = A.photo
+		E = _C
+	elif A and A.media and A.document:
+		if DAF(
+				file_name='AnimatedSticker.tgs') in A.media.document.attributes: return D, C
+		if A.gif or A.video or A.audio or A.voice: return D, C
+		B = A.media.document
+		if _A not in B.mime_type: return D, C
+		E = B.mime_type.split('/')[1]
 	else:
 		return D, C
 	if not B or B is C:
@@ -384,7 +380,7 @@ async def cropping(img):
 		img = img.resize((sx * cx, sy * cy))
 	(lx, ly) = (0, 0)
 	media = []
-	for i in range(1, cy + 1):
+	for _ in range(1, cy + 1):
 		for o in range(1, cx + 1):
 			mimg = img.crop((lx, ly, lx + sx, ly + sy))
 			mimg = mimg.resize((512, 512))
@@ -392,9 +388,9 @@ async def cropping(img):
 			bio.name = 'image.png'
 			mimg.save(bio, 'PNG')
 			media.append(bio.getvalue())
-			lx = lx + sx
+			lx += sx
 		lx = 0
-		ly = ly + sy
+		ly += sy
 	return media
 
 

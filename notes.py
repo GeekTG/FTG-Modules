@@ -32,10 +32,7 @@ class NotesMod(loader.Module):
 			return
 		asset_id = self._db.get("friendly-telegram.modules.notes", "notes", {}).get(args[0], None)
 		logger.debug(asset_id)
-		if asset_id is not None:
-			asset = await self._db.fetch_asset(asset_id)
-		else:
-			asset = None
+		asset = await self._db.fetch_asset(asset_id) if asset_id is not None else None
 		if asset is None:
 			self.del_note(args[0])
 			await utils.answer(message, self.strings("no_note", message))
@@ -51,10 +48,7 @@ class NotesMod(loader.Module):
 			return
 		asset_id = self._db.get("friendly-telegram.modules.notes", "notes", {}).get(args[0], None)
 		logger.debug(asset_id)
-		if asset_id is not None:
-			asset = await self._db.fetch_asset(asset_id)
-		else:
-			asset = None
+		asset = await self._db.fetch_asset(asset_id) if asset_id is not None else None
 		if asset is None:
 			self.del_note(args[0])
 			await utils.answer(message, self.strings("no_note", message))
