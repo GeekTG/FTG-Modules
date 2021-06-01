@@ -50,10 +50,7 @@ class TerminalMod(loader.Module):
 		async def __call__(self, *args):
 			msg = "." + self.name + " " + " ".join(map(str, args))
 			reply = await self.context.get_reply_message()
-			if reply:
-				event = await reply.reply(msg)
-			else:
-				event = await self.context.respond(msg)
+			event = await reply.reply(msg) if reply else await self.context.respond(msg)
 			await self.command(event)
 
 	def __init__(self):
