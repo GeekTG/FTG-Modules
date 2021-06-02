@@ -284,18 +284,17 @@ async def check_media(message):
 	return reply, is_reply
 
 
-async def textwrap(text, length=50, splitter="&&"):
+async def textwrap(text, length=50, splitter="\n\n"):
 	out = []
-
 	lines = text.rsplit(splitter, 1)
-	for txt in lines:
+	for text in lines:
 		txt = []
-		parts = txt.split("&&")
+		parts = text.split("&&")
 		for part in parts:
 			part = "\n".join(wrap(part, length))
 			txt.append(part)
-		txt = "\n".join(txt)
-		out.append(txt)
+		text = "\n".join(txt)
+		out.append(text)
 	return out
 
 
