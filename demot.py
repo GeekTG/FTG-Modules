@@ -284,7 +284,7 @@ async def check_media(message):
 	return reply, is_reply
 
 
-async def textwrap(text, length=50, splitter="\n\n"):
+async def textwrap(text, length=50, splitter="&&"):
 	out = []
 	lines = text.rsplit(splitter, 1)
 	for text in lines:
