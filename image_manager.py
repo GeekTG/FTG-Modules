@@ -195,7 +195,7 @@ class ImageManagerMod(loader.Module):
 
 
 async def get_img_from_msg(reply):
-	if reply and reply.file and reply.file.mime_type == "image":
+	if reply and reply.file and "image" in reply.file.mime_type:
 		return io.BytesIO(await reply.download_media(bytes))
 
 
