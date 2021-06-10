@@ -108,7 +108,7 @@ class ImageToolsMod(loader.Module):
 		chat = '@Stickers'
 		name = "".join(random.choice(
 			list(string.ascii_lowercase + string.ascii_uppercase)) for _ in
-				range(16))
+		               range(16))
 		image = io.BytesIO()
 		await message.client.download_file(reply, image)
 		image = Image.open(image)

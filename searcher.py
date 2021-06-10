@@ -67,11 +67,11 @@ class SearchMod(loader.Module):
 			return
 		results = zip(gresults["titles"], gresults["links"], gresults["descriptions"])
 		msg = "".join(
-		    self.strings("result").format(
-		        utils.escape_html(result[0]),
-		        utils.escape_html(result[1]),
-		        utils.escape_html(result[2]),
-		    ) for result in results)
+			self.strings("result").format(
+				utils.escape_html(result[0]),
+				utils.escape_html(result[1]),
+				utils.escape_html(result[2]),
+			) for result in results)
 		await utils.answer(message, self.strings("results", message).format(utils.escape_html(text)) + msg)
 
 

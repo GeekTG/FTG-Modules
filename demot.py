@@ -156,8 +156,8 @@ async def cmds(message, type_):
 
 		reply = await message.get_reply_message()
 		if (not reply or not reply.media
-		    or not any(True for _ in ('sticker', 'photo', 'video', 'video_note')
-		               if getattr(reply, _, None) is not None)):
+				or not any(True for _ in ('sticker', 'photo', 'video', 'video_note')
+				           if getattr(reply, _, None) is not None)):
 			return await message.edit(
 				"<b>Reply to photo/video/sticker</b>")
 		if reply.file.size > 4194304:

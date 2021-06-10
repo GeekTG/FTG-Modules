@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import os
 import platform
 import shutil
 import sys
@@ -25,7 +26,8 @@ class InfoMod(loader.Module):
 	           "android_patch": "<b>Android Security Patch:</b> <code>{}</code>",
 	           "unknown_distro": "<b>Could not determine Linux distribution.</b>",
 	           "python_version": "<b>Python version:</b> <code>{}</code>",
-	           "telethon_version": "<b>Telethon version:</b> <code>{}</code>"}
+	           "telethon_version": "<b>Telethon version:</b> <code>{}</code>",
+	           "git_version": "<b>Git version:</b> <code>{}</code>"}
 
 	async def infocmd(self, message):
 		"""Shows system information"""
@@ -38,9 +40,7 @@ class InfoMod(loader.Module):
 			done = False
 			try:
 				a = open("/etc/os-release").readlines()
-				b = {}
-				for line in a:
-					b[line.split("=")[0]] = line.split("=")[1].strip().strip("\"")
+				b = {line.split("=")[0]: line.split("=")[1].strip().strip("\"") for line in a}
 				reply += "\n" + self.strings("distro", message).format(utils.escape_html(b["PRETTY_NAME"]))
 				done = True
 			except FileNotFoundError:
@@ -64,4 +64,6 @@ class InfoMod(loader.Module):
 				reply += "\n" + self.strings("unknown_distro", message)
 		reply += "\n" + self.strings("python_version", message).format(utils.escape_html(sys.version))
 		reply += "\n" + self.strings("telethon_version", message).format(utils.escape_html(telethon.__version__))
+		reply += "\n" + self.strings("git_version", message).format(
+			os.popen(f"cd {utils.get_base_dir()[:-17]} && git show -s --format=\"%h %cd\"").read()[:-7])
 		await utils.answer(message, reply)

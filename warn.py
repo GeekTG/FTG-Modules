@@ -88,7 +88,7 @@ class WarnsMod(loader.Module):
 			f"<b><a href=\"tg://user?id={user.id}\">{user.first_name}</a> получил {count}/{warns[chatid]['limit']} предупреждений.</b>" + (
 				f"\nПричина: {reason}.</b>" if reason != "Необоснованно" else ""))
 
-	async def warnslimitcmd(self, message):	# sourcery skip: last-if-guard
+	async def warnslimitcmd(self, message):  # sourcery skip: last-if-guard
 		"""Установить лимит предупреждений. Используй: .warnslimit <кол-во:int>."""
 		if message.is_private:
 			return await message.edit("<b>Это не чат!</b>")
