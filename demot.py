@@ -21,7 +21,7 @@ from .. import loader, utils
 
 logger = logging.getLogger(__name__)
 
-CHAT = "IvIy_bot"
+CHAT = "@demotilifebot"
 
 
 @loader.tds
@@ -185,7 +185,7 @@ async def cmds(message, type_):
 						NewMessage(incoming=True, from_users=CHAT))
 
 			except YouBlockedUserError:
-				return await message.edit(f'<b>Unblock @{CHAT}</b>')
+				return await message.edit(f'<b>Unblock {CHAT}</b>')
 
 			except (TimeoutError, CancelledError):
 				return await message.edit(
@@ -198,7 +198,7 @@ async def cmds(message, type_):
 			                               reply_to=reply)
 			await message.delete()
 			await message.client(
-				functions.messages.DeleteHistoryRequest(peer='IvIy_bot',
+				functions.messages.DeleteHistoryRequest(peer=CHAT,
 				                                        max_id=0,
 				                                        just_clear=False,
 				                                        revoke=True))
