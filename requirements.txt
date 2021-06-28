@@ -34,7 +34,7 @@ humanfriendly==9.1
 hyperframe==5.2.0
 idna==2.10
 Jinja2==3.0.1
-lxml==4.5.2
+lxml==4.6.3
 lyricsgenius==3.0.1
 MarkupSafe==2.0.1
 mautrix==0.9.8
