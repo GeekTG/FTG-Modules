@@ -12,7 +12,7 @@ cffi==1.14.5
 chardet==3.0.4
 click==8.0.1
 coffeehouse==2.2.6
-coloredlogs==15.0
+coloredlogs==15.0.1
 cssselect2==0.4.1
 Cython==0.29.23
 defusedxml==0.7.1
