@@ -32,7 +32,7 @@ httpcore==0.9.1
 httpx==0.13.3
 humanfriendly==9.1
 hyperframe==5.2.0
-idna==2.10
+idna==3.2
 Jinja2==3.0.1
 lxml==4.6.3
 lyricsgenius==3.0.1
