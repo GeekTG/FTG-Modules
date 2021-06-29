@@ -28,7 +28,7 @@ hachoir==3.1.2
 heroku3==4.2.3
 hpack==4.0.0
 hstspreload==2020.12.22
-httpcore==0.9.1
+httpcore==0.13.6
 httpx==0.18.2
 humanfriendly==9.2
 hyperframe==6.0.1
