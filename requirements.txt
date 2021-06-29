@@ -31,7 +31,7 @@ hstspreload==2020.12.22
 httpcore==0.9.1
 httpx==0.18.2
 humanfriendly==9.2
-hyperframe==5.2.0
+hyperframe==6.0.1
 idna==3.2
 Jinja2==3.0.1
 lxml==4.6.3
