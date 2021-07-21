@@ -1,4 +1,4 @@
-aiohttp.post
+aiohttp
 aiohttp-jinja2
 appdirs
 async-timeout
