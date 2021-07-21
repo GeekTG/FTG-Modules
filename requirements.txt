@@ -17,10 +17,10 @@ cssselect2
 Cython
 defusedxml
 distlib
-filelock2
+filelock
 gitdb
-GitPython8
-googletransrc1
+GitPython
+googletrans
 gTTS
 h11
 h2
