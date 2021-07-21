@@ -1,4 +1,4 @@
-aiohttp.post0
+aiohttp.post
 aiohttp-jinja2
 appdirs
 async-timeout
@@ -22,7 +22,7 @@ gitdb
 GitPython8
 googletransrc1
 gTTS
-h11==0.12.0
+h11
 h2
 hachoir
 heroku3
