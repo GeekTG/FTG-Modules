@@ -66,7 +66,7 @@ class InfoMod(loader.Module):
 		reply += "\n" + self.strings("python_version", message).format(utils.escape_html(sys.version))
 		reply += "\n" + self.strings("telethon_version", message).format(utils.escape_html(telethon.__version__))
 		if 'DYNO' in os.environ:
-			reply += "\n" + self.strins("heroku", message)
+			reply += "\n" + self.strings("heroku", message)
 		else:
 			reply += "\n" + self.strings("git_version", message).format(
 				os.popen(f"cd {utils.get_base_dir()[:-17]} && git show -s --format=\"%h %cd\"").read()[:-7])
