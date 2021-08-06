@@ -20,6 +20,7 @@ class InfoMod(loader.Module):
 	           "kernel": "<b>Kernel:</b> <code>{}</code>",
 	           "arch": "<b>Arch:</b> <code>{}</code>",
 	           "os": "<b>OS:</b> <code>{}</code>",
+	           "heroku": "FTG Installed on <b>Heroku</b>",
 	           "distro": "<b>Linux Distribution:</b> <code>{}</code>",
 	           "android_sdk": "<b>Android SDK:</b> <code>{}</code>",
 	           "android_ver": "<b>Android Version:</b> <code>{}</code>",
@@ -64,6 +65,9 @@ class InfoMod(loader.Module):
 				reply += "\n" + self.strings("unknown_distro", message)
 		reply += "\n" + self.strings("python_version", message).format(utils.escape_html(sys.version))
 		reply += "\n" + self.strings("telethon_version", message).format(utils.escape_html(telethon.__version__))
-		reply += "\n" + self.strings("git_version", message).format(
-			os.popen(f"cd {utils.get_base_dir()[:-17]} && git show -s --format=\"%h %cd\"").read()[:-7])
+		if 'DYNO' in os.environ:
+			reply += "\n" + self.strins("heroku", message)
+		else:
+			reply += "\n" + self.strings("git_version", message).format(
+				os.popen(f"cd {utils.get_base_dir()[:-17]} && git show -s --format=\"%h %cd\"").read()[:-7])
 		await utils.answer(message, reply)
