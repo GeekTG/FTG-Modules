@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import asyncio
-import builtins
 import logging
 import os
 import re
 
 import telethon
-from meval import meval
 
 from .. import loader, utils
 
@@ -121,6 +119,7 @@ class TerminalMod(loader.Module):
 		"""Show system uptime"""
 		await self.run_command(message, "uptime", RawMessageEditor(message, "uptime", self.config,
 		                                                           self.strings, message))
+
 
 def hash_msg(message):
 	return str(utils.get_chat_id(message)) + "/" + str(message.id)
