@@ -28,10 +28,12 @@ class InfoMod(loader.Module):
 	           "unknown_distro": "<b>Could not determine Linux distribution.</b>",
 	           "python_version": "<b>Python version:</b> <code>{}</code>",
 	           "telethon_version": "<b>Telethon version:</b> <code>{}</code>",
-	           "git_version": "<b>Git version:</b> <code>{}</code>"}
+	           "git_version": "<b>Git version:</b> <code>{}</code>",
+	           "ftg_type": "<b>FTG Type:</b> <code>{}</code>"}
 
 	async def infocmd(self, message):
 		"""Shows system information"""
+		ftg_type = "PC/Server"
 		reply = self.strings("info_title", message)
 		reply += "\n" + self.strings("kernel", message).format(utils.escape_html(platform.release()))
 		reply += "\n" + self.strings("arch", message).format(utils.escape_html(platform.architecture()[0]))
@@ -45,6 +47,7 @@ class InfoMod(loader.Module):
 				reply += "\n" + self.strings("distro", message).format(utils.escape_html(b["PRETTY_NAME"]))
 				done = True
 			except FileNotFoundError:
+				ftg_type = "Android (Termux)"
 				getprop = shutil.which("getprop")
 				if getprop is not None:
 					sdk = await asyncio.create_subprocess_exec(getprop, "ro.build.version.sdk",
@@ -66,8 +69,9 @@ class InfoMod(loader.Module):
 		reply += "\n" + self.strings("python_version", message).format(utils.escape_html(sys.version))
 		reply += "\n" + self.strings("telethon_version", message).format(utils.escape_html(telethon.__version__))
 		if 'DYNO' in os.environ:
-			reply += "\n" + self.strings("heroku", message)
+			ftg_type = "Heroku"
 		else:
 			reply += "\n" + self.strings("git_version", message).format(
 				os.popen(f"cd {utils.get_base_dir()[:-17]} && git show -s --format=\"%h %cd\"").read()[:-7])
+		reply += "\n" + self.strings("ftg_type", message).format(ftg_type)
 		await utils.answer(message, reply)
