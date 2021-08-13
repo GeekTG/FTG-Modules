@@ -24,6 +24,8 @@ class BigRatMod(loader.Module):
 
     @staticmethod
     async def get_target(message):
+        if message.chat_id > 0:
+            return await message.client.get_entity(message.chat_id)
         args = utils.get_args_raw(message)
         if args:
             args = args.split()[0]
