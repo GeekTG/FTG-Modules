@@ -50,3 +50,4 @@ warn
 weather
 welcome
 ytdl
+rat
