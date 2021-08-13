@@ -14,12 +14,25 @@ class BigRatMod(loader.Module):
 
     async def ratcmd(self, message):
         """Usage: .rat (user)"""
-        args = utils.get_args_raw(message)
-
-        if not args:
+        target = await self.get_target(message)
+        if not target:
             return await message.edit("<b>Please specify who to rat.</b>")
-        user = await message.client.get_entity(args if not args.isnumeric() else int(args))
 
         msg = await utils.answer(message, "<b>Sending big rat...</b>")
-        await message.client.send_file(user, big_rat_url)
-        await utils.answer(msg, f"<b>Sent big rat to {args} successfully!</b>")
+        await message.client.send_file(target, big_rat_url)
+        await utils.answer(msg, "<b>Sent big rat successfully!</b>")
+
+    @staticmethod
+    async def get_target(message):
+        args = utils.get_args_raw(message)
+        if args:
+            args = args.split()[0]
+        reply = await message.get_reply_message()
+
+        if not args and not reply:
+            return None
+        if reply and reply.from_id:
+            return reply.from_id
+
+        user = args if not args.isnumeric() else int(args)
+        return await message.client.get_entity(user)
