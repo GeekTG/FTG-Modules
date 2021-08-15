@@ -30,6 +30,7 @@ qr_code
 quotes
 random
 range
+rat
 recent_actions
 rpmod
 screenshot
@@ -50,4 +51,3 @@ warn
 weather
 welcome
 ytdl
-rat
