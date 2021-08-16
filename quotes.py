@@ -38,7 +38,7 @@ class dict(dict):
         self[attr] = value
 
 
-BUILD_ID = "1eeba200-388b-4a6e-9c28-56cd329a6901"  # null to disable autoupdates
+BUILD_ID = "4aa6bc09-47fd-42f7-a125-d4bb00637fdd" # null to disable autoupdates
 MODULE_PATH = "https://quotes.mishase.dev/f/module.py"
 
 
@@ -80,7 +80,7 @@ class mQuotesMod(loader.Module):
             await messagePacker.add(reply)
         if count > 1:
             it = self.client.iter_messages(
-                reply.peer_id, offset_id=reply.id, reverse=true, limit=count)
+                reply.peer_id, offset_id=reply.id, reverse=true, add_offset=1, limit=count)
 
             async for message in it:
                 await msg.edit(f"<b>Processing {i}/{count}</b>")
