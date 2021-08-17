@@ -5,11 +5,9 @@
 import logging
 import hashlib
 import json
-import os
 import requests
 import io
 import PIL
-from uuid import uuid4 as uuid
 from telethon import utils
 from telethon.tl.types import (
     Message, MessageEntityBold, MessageEntityItalic,
@@ -42,7 +40,7 @@ class dict(dict):
         self[attr] = value
 
 
-BUILD_ID = "07cced35-532f-4b3c-ade6-fff86b7b7987"  # null to disable autoupdates
+BUILD_ID = "77d0307e-1ffb-4d13-bdd5-ad793a746854"  # null to disable autoupdates
 MODULE_PATH = "https://quotes.mishase.dev/f/module.py"
 
 
@@ -84,7 +82,7 @@ class mQuotesMod(loader.Module):
         count = 1
         forceDocument = false
 
-        if args is not null and not isinstance(args, bool):
+        if args:
             args = args.split()
             forceDocument = "file" in args
             try:
@@ -93,10 +91,7 @@ class mQuotesMod(loader.Module):
             except StopIteration:
                 pass
 
-        directory = str(uuid())
-        os.mkdir(directory)
-
-        messagePacker = MessagePacker(self.client, directory)
+        messagePacker = MessagePacker(self.client)
 
         if count == 1:
             await msg.edit("<b>Processing...</b>")
@@ -115,14 +110,14 @@ class mQuotesMod(loader.Module):
 
         messages = messagePacker.messages
 
-        if len(messages) == 0:
+        if not messages:
             return await msg.edit("No messages to quote")
 
         files = []
         for f in messagePacker.files.values():
-            files.append(("files", open(f, "rb")))
+            files.append(("files", f))
 
-        if len(files) == 0:
+        if not files:
             files.append(("files", bytearray()))
 
         await msg.edit("<b>API Processing...</b>")
@@ -149,12 +144,6 @@ class mQuotesMod(loader.Module):
             files=files,
             timeout=99
         )
-
-        for root, dirs, files in os.walk(directory):
-            for name in files:
-                os.remove(os.path.join(root, name))
-
-        os.rmdir(directory)
 
         if resp.status_code == 418:
             if await update(self.allmodules.modules, msg):
@@ -207,32 +196,31 @@ class mQuotesMod(loader.Module):
 
 
 class MessagePacker:
-    def __init__(self, client, directory):
+    def __init__(self, client):
         self.files = dict()
         self.messages = []
         self.client = client
-        self.directory = directory
 
     async def add(self, msg):
         packed = await self.packMessage(msg)
-        if packed is not null:
+        if packed:
             self.messages.append(packed)
 
     async def packMessage(self, msg):
         obj = dict()
 
         text = msg.message
-        if text is not null and len(text) > 0:
+        if text:
             obj.text = text
 
         entities = MessagePacker.encodeEntities(msg.entities or [])
-        if len(entities) > 0:
+        if entities:
             obj.entities = entities
 
         media = msg.media
-        if media is not null:
+        if media:
             file = await self.downloadMedia(media)
-            if file is not null:
+            if file:
                 obj.picture = {
                     "file": file
                 }
@@ -243,7 +231,7 @@ class MessagePacker:
         obj.author = await self.encodeAuthor(msg)
 
         reply = await msg.get_reply_message()
-        if reply is not null:
+        if reply:
             obj.reply = await self.encodeReply(reply)
 
         return obj
@@ -252,7 +240,7 @@ class MessagePacker:
         encEntities = []
         for entity in entities:
             entityType = MessagePacker.getEntityType(entity)
-            if entityType is not null:
+            if entityType:
                 encEntities.append({
                     "type": entityType,
                     "offset": entity.offset,
@@ -281,14 +269,20 @@ class MessagePacker:
 
     async def downloadMedia(self, inMedia, thumb=null):
         media = MessagePacker.getMedia(inMedia)
-        if media is null:
+        if not media:
             return null
         mid = str(media.id)
-        if thumb is not null:
+        if thumb:
             mid += "." + str(thumb)
         if mid not in self.files:
-            self.files[mid] = await self.client.download_media(media, self.directory, thumb=thumb)
-        return os.path.basename(self.files[mid])
+            try:
+                mime = media.mime_type
+            except AttributeError:
+                mime = "image/jpg"
+            ext = utils.mimetypes.guess_extension(mime) or ".jpg"
+            dl = await self.client.download_media(media, bytes, thumb=thumb)
+            self.files[mid] = (str(len(self.files)) + ext, dl, mime)
+        return self.files[mid][0]
 
     def getMedia(media):
         t = type(media)
@@ -305,12 +299,13 @@ class MessagePacker:
 
     async def downloadProfilePicture(self, entity):
         media = entity.photo
-        if media is null or isinstance(media, ChatPhotoEmpty):
+        if not media or isinstance(media, ChatPhotoEmpty):
             return null
         mid = str(media.photo_id)
         if mid not in self.files:
-            self.files[mid] = await self.client.download_profile_photo(entity, self.directory)
-        return os.path.basename(self.files[mid])
+            dl = await self.client.download_profile_photo(entity, bytes)
+            self.files[mid] = (str(len(self.files)) + ".jpg", dl, "image/jpg")
+        return self.files[mid][0]
 
     async def encodeAuthor(self, msg):
         obj = dict()
@@ -319,11 +314,11 @@ class MessagePacker:
 
         obj.id = uid
         obj.name = name
-        if picture is not null:
+        if picture:
             obj.picture = {
                 "file": picture
             }
-        if adminTitle is not null:
+        if adminTitle:
             obj.adminTitle = adminTitle
 
         return obj
@@ -337,7 +332,7 @@ class MessagePacker:
         chat = msg.peer_id
         peer = msg.from_id or chat
         fwd = msg.fwd_from
-        if fwd is not null:
+        if fwd:
             peer = fwd.from_id
             name = fwd.post_author or fwd.from_name
 
@@ -352,11 +347,11 @@ class MessagePacker:
             uid = peer.chat_id
         elif t is PeerBlocked:
             uid = peer.peer_id
-        elif peer is null:
+        elif not peer:
             uid = int(hashlib.shake_256(
                 name.encode("utf-8")).hexdigest(6), 16)
 
-        if name is null:
+        if not name:
             entity = null
             try:
                 entity = await self.client.get_entity(peer)
@@ -374,7 +369,7 @@ class MessagePacker:
                         participant = admin.participant
                         if participant.user_id == uid:
                             adminTitle = participant.rank
-                            if adminTitle is null:
+                            if not adminTitle:
                                 if isinstance(participant, ChannelParticipantCreator):
                                     adminTitle = "owner"
                                 else:
@@ -387,11 +382,11 @@ class MessagePacker:
         obj = dict()
 
         text = reply.message
-        if text is not null and len(text) > 0:
+        if text:
             obj.text = text
         else:
             media = reply.media
-            if media is not null:
+            if media:
                 t = type(media)
                 if t is MessageMediaPhoto:
                     obj.text = "📷 Photo"
@@ -403,9 +398,9 @@ class MessagePacker:
         obj.author = name
 
         media = reply.media
-        if media is not null:
+        if media:
             file = await self.downloadMedia(media, -1)
-            if file is not null:
+            if file:
                 obj.thumbnail = {
                     "file": file
                 }
@@ -423,5 +418,5 @@ async def update(modules, message, url=MODULE_PATH):
             return true
         else:
             return false
-    except Exception as e:
+    except Exception:
         return false
