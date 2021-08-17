@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
-
 # API & module author: @mishase
 
-# requires: requests Pillow cryptg 
+# requires: requests Pillow cryptg
 
+import logging
 import hashlib
 import json
 import os
@@ -12,25 +11,30 @@ import io
 import PIL
 from uuid import uuid4 as uuid
 from telethon import utils
-from telethon.tl.types import (Message, MessageEntityBold, MessageEntityItalic,
-                               MessageEntityMention, MessageEntityTextUrl,
-                               MessageEntityCode, MessageEntityMentionName,
-                               MessageEntityHashtag, MessageEntityCashtag,
-                               MessageEntityBotCommand, MessageEntityUrl,
-                               MessageEntityStrike, MessageEntityUnderline,
-                               MessageEntityPhone,
-                               ChatPhotoEmpty,
-                               MessageMediaPhoto, MessageMediaDocument, MessageMediaWebPage,
-                               Channel, User,
-                               PeerUser, PeerBlocked, PeerChannel, PeerChat,
-                               DocumentAttributeSticker,
-                               ChannelParticipantsAdmins,
-                               ChannelParticipantCreator)
+from telethon.tl.types import (
+    Message, MessageEntityBold, MessageEntityItalic,
+    MessageEntityMention, MessageEntityTextUrl,
+    MessageEntityCode, MessageEntityMentionName,
+    MessageEntityHashtag, MessageEntityCashtag,
+    MessageEntityBotCommand, MessageEntityUrl,
+    MessageEntityStrike, MessageEntityUnderline,
+    MessageEntityPhone,
+    ChatPhotoEmpty,
+    MessageMediaPhoto, MessageMediaDocument, MessageMediaWebPage,
+    PeerUser, PeerBlocked, PeerChannel, PeerChat,
+    DocumentAttributeSticker,
+    ChannelParticipantsAdmins,
+    ChannelParticipantCreator
+)
 from .. import loader, utils as ftgUtils
+
+logger = logging.getLogger(__name__)
 
 null = None
 false = False
 true = True
+
+PIL.Image.MAX_IMAGE_PIXELS = null
 
 
 class dict(dict):
@@ -38,16 +42,31 @@ class dict(dict):
         self[attr] = value
 
 
-BUILD_ID = "4aa6bc09-47fd-42f7-a125-d4bb00637fdd" # null to disable autoupdates
+BUILD_ID = "07cced35-532f-4b3c-ade6-fff86b7b7987"  # null to disable autoupdates
 MODULE_PATH = "https://quotes.mishase.dev/f/module.py"
 
 
 @loader.tds
 class mQuotesMod(loader.Module):
-    """Quote message using Mishase Quotes API"""
+    """Quote a message using Mishase Quotes API"""
     strings = {
-        "name": "mQuotes",
+        "name": "Quotes"
     }
+
+    def __init__(self):
+        self.config = loader.ModuleConfig(
+            "QUOTE_MESSAGES_LIMIT", 50, "Messages limit",
+            "MAX_WIDTH", 384, "Max width (px)",
+            "SCALE_FACTOR", 5, "Scale factor",
+            "SQUARE_AVATAR", false, "Square avatar",
+            "TEXT_COLOR", "white", "Text color",
+            "REPLY_LINE_COLOR", "white", "Reply line color",
+            "REPLY_THUMB_BORDER_RADIUS", 2, "Reply thumbnail radius (px)",
+            "ADMINTITLE_COLOR", "#969ba0", "Admin title color",
+            "MESSAGE_BORDER_RADIUS", 10, "Message radius (px)",
+            "PICTURE_BORDER_RADIUS", 8, "Picture radius (px)",
+            "BACKGROUND_COLOR", "#162330", "Background color"
+        )
 
     async def client_ready(self, client, db):
         self.client = client
@@ -55,7 +74,7 @@ class mQuotesMod(loader.Module):
     @loader.unrestricted
     @loader.ratelimit
     async def quotecmd(self, msg):
-        """.quote <count> - quote a message"""
+        """Quote a message. Args: ?<count> ?file"""
         args = ftgUtils.get_args_raw(msg)
         reply = await msg.get_reply_message()
 
@@ -63,25 +82,32 @@ class mQuotesMod(loader.Module):
             return await msg.edit("No reply message")
 
         count = 1
+        forceDocument = false
 
-        if args is not null and args.isdigit():
-            count = int(args.strip())
-            count = max(1, min(50, count))
+        if args is not null and not isinstance(args, bool):
+            args = args.split()
+            forceDocument = "file" in args
+            try:
+                count = next(int(arg) for arg in args if arg.isdigit())
+                count = max(1, min(self.config["QUOTE_MESSAGES_LIMIT"], count))
+            except StopIteration:
+                pass
 
         directory = str(uuid())
         os.mkdir(directory)
 
         messagePacker = MessagePacker(self.client, directory)
 
-        i = 1
-
         if count == 1:
-            await msg.edit(f"<b>Processing...</b>")
+            await msg.edit("<b>Processing...</b>")
             await messagePacker.add(reply)
         if count > 1:
             it = self.client.iter_messages(
-                reply.peer_id, offset_id=reply.id, reverse=true, add_offset=1, limit=count)
+                reply.peer_id, offset_id=reply.id,
+                reverse=true, add_offset=1, limit=count
+            )
 
+            i = 1
             async for message in it:
                 await msg.edit(f"<b>Processing {i}/{count}</b>")
                 i += 1
@@ -99,13 +125,25 @@ class mQuotesMod(loader.Module):
         if len(files) == 0:
             files.append(("files", bytearray()))
 
-        await msg.edit(f"<b>API Processing...</b>")
+        await msg.edit("<b>API Processing...</b>")
 
         resp = await ftgUtils.run_sync(
             requests.post,
             "https://quotes.mishase.dev/create",
             data={
-                "data": json.dumps({"messages": messages}),
+                "data": json.dumps({
+                    "messages": messages,
+                    "maxWidth": self.config["MAX_WIDTH"],
+                    "scaleFactor": self.config["SCALE_FACTOR"],
+                    "squareAvatar": self.config["SQUARE_AVATAR"],
+                    "textColor": self.config["TEXT_COLOR"],
+                    "replyLineColor": self.config["REPLY_LINE_COLOR"],
+                    "adminTitleColor": self.config["ADMINTITLE_COLOR"],
+                    "messageBorderRadius": self.config["MESSAGE_BORDER_RADIUS"],
+                    "replyThumbnailBorderRadius": self.config["REPLY_THUMB_BORDER_RADIUS"],
+                    "pictureBorderRadius": self.config["PICTURE_BORDER_RADIUS"],
+                    "backgroundColor": self.config["BACKGROUND_COLOR"]
+                }),
                 "moduleBuild": BUILD_ID
             },
             files=files,
@@ -125,7 +163,7 @@ class mQuotesMod(loader.Module):
                 await msg.edit("<b>Update error</b>")
             return
 
-        await msg.edit(f"<b>Sending...</b>")
+        await msg.edit("<b>Sending...</b>")
 
         image = io.BytesIO()
         image.name = "quote.webp"
@@ -133,20 +171,20 @@ class mQuotesMod(loader.Module):
         PIL.Image.open(io.BytesIO(resp.content)).save(image, "WEBP")
         image.seek(0)
 
-        await msg.reply(file=image)
+        await self.client.send_message(msg.peer_id, file=image, force_document=forceDocument)
 
         await msg.delete()
 
     @loader.unrestricted
     @loader.ratelimit
     async def fquotecmd(self, msg):
-        """.fquote @username/id/<reply> text"""
+        """Fake message quote. Args: @<username>/<id>/<reply> <text>"""
         args = ftgUtils.get_args_raw(msg)
         reply = await msg.get_reply_message()
         splitArgs = args.split(maxsplit=1)
-        if len(splitArgs) == 2 and (splitArgs[0].startswith('@') or splitArgs[0].isdigit()):
+        if len(splitArgs) == 2 and (splitArgs[0].startswith("@") or splitArgs[0].isdigit()):
             user = splitArgs[0][1:] if splitArgs[0].startswith(
-                '@') else int(splitArgs[0])
+                "@") else int(splitArgs[0])
             text = splitArgs[1]
         elif reply:
             user = reply.sender_id
@@ -154,15 +192,15 @@ class mQuotesMod(loader.Module):
         else:
             return await msg.edit("Incorrect args")
 
-        directory = str(uuid())
-        os.mkdir(directory)
-
-        messagePacker = MessagePacker(self.client, directory)
+        try:
+            uid = (await self.client.get_entity(user)).id
+        except Exception:
+            return await msg.edit("User not found")
 
         async def getMessage():
-            entity = await self.client.get_entity(user)
-            return Message(0, entity.id, message=text)
+            return Message(0, uid, message=text)
 
+        msg.message = ""
         msg.get_reply_message = getMessage
 
         await self.quotecmd(msg)
@@ -236,8 +274,8 @@ class MessagePacker:
             return "strikethrough"
         if t is MessageEntityUnderline:
             return "underline"
-        if t in [MessageEntityMention, MessageEntityTextUrl, MessageEntityMentionName, MessageEntityHashtag,
-                 MessageEntityCashtag, MessageEntityBotCommand]:
+        if t in [MessageEntityMention, MessageEntityTextUrl, MessageEntityMentionName,
+                 MessageEntityHashtag, MessageEntityCashtag, MessageEntityBotCommand]:
             return "bluetext"
         return null
 
@@ -306,11 +344,11 @@ class MessagePacker:
         t = type(peer)
         if t is int:
             uid = peer
-        elif t in PeerUser:
+        elif t is PeerUser:
             uid = peer.user_id
-        elif t in PeerChannel:
+        elif t is PeerChannel:
             uid = peer.channel_id
-        elif t in PeerChat:
+        elif t is PeerChat:
             uid = peer.chat_id
         elif t is PeerBlocked:
             uid = peer.peer_id
@@ -322,7 +360,7 @@ class MessagePacker:
             entity = null
             try:
                 entity = await self.client.get_entity(peer)
-            except:
+            except Exception:
                 entity = await msg.get_chat()
 
             name = utils.get_display_name(entity)
@@ -351,6 +389,14 @@ class MessagePacker:
         text = reply.message
         if text is not null and len(text) > 0:
             obj.text = text
+        else:
+            media = reply.media
+            if media is not null:
+                t = type(media)
+                if t is MessageMediaPhoto:
+                    obj.text = "📷 Photo"
+                else:
+                    obj.text = "💾 File"
 
         name = (await self.getAuthor(reply, full=false))[1]
 
@@ -374,8 +420,8 @@ async def update(modules, message, url=MODULE_PATH):
         if await loader.download_and_install(url, message):
             loader._db.set(__name__, "loaded_modules",
                            list(set(loader._db.get(__name__, "loaded_modules", [])).union([url])))
-            return True
+            return true
         else:
-            return False
+            return false
     except Exception as e:
-        return False
+        return false
