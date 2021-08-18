@@ -40,7 +40,7 @@ class dict(dict):
         self[attr] = value
 
 
-BUILD_ID = "77d0307e-1ffb-4d13-bdd5-ad793a746854"  # null to disable autoupdates
+BUILD_ID = "a6abb838-fb08-4031-8976-1a0e5c9e1a56"  # null to disable autoupdates
 MODULE_PATH = "https://quotes.mishase.dev/f/module.py"
 
 
@@ -279,9 +279,8 @@ class MessagePacker:
                 mime = media.mime_type
             except AttributeError:
                 mime = "image/jpg"
-            ext = utils.mimetypes.guess_extension(mime) or ".jpg"
             dl = await self.client.download_media(media, bytes, thumb=thumb)
-            self.files[mid] = (str(len(self.files)) + ext, dl, mime)
+            self.files[mid] = (str(len(self.files)), dl, mime)
         return self.files[mid][0]
 
     def getMedia(media):
@@ -304,7 +303,7 @@ class MessagePacker:
         mid = str(media.photo_id)
         if mid not in self.files:
             dl = await self.client.download_profile_photo(entity, bytes)
-            self.files[mid] = (str(len(self.files)) + ".jpg", dl, "image/jpg")
+            self.files[mid] = (str(len(self.files)), dl, "image/jpg")
         return self.files[mid][0]
 
     async def encodeAuthor(self, msg):
