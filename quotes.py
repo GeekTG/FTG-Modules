@@ -40,7 +40,7 @@ class dict(dict):
         self[attr] = value
 
 
-BUILD_ID = "a6abb838-fb08-4031-8976-1a0e5c9e1a56"  # null to disable autoupdates
+BUILD_ID = "9d6714be-efe6-43a3-9559-a821791db82e"  # null to disable autoupdates
 MODULE_PATH = "https://quotes.mishase.dev/f/module.py"
 
 
@@ -78,6 +78,9 @@ class mQuotesMod(loader.Module):
 
         if not reply:
             return await msg.edit("No reply message")
+
+        if not msg.out:
+            msg = await msg.reply("_")
 
         count = 1
         forceDocument = false
