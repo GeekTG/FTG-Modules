@@ -19,6 +19,7 @@ from telethon.tl.types import (
     MessageEntityPhone,
     ChatPhotoEmpty,
     MessageMediaPhoto, MessageMediaDocument, MessageMediaWebPage,
+    User,
     PeerUser, PeerBlocked, PeerChannel, PeerChat,
     DocumentAttributeSticker,
     ChannelParticipantsAdmins,
@@ -40,7 +41,7 @@ class dict(dict):
         self[attr] = value
 
 
-BUILD_ID = "9d6714be-efe6-43a3-9559-a821791db82e"  # null to disable autoupdates
+BUILD_ID = "132c96b5-dc02-4365-ba7d-b19104bd891b"  # null to disable autoupdates
 MODULE_PATH = "https://quotes.mishase.dev/f/module.py"
 
 
@@ -360,7 +361,10 @@ class MessagePacker:
             except Exception:
                 entity = await msg.get_chat()
 
-            name = utils.get_display_name(entity)
+            if isinstance(entity, User) and entity.deleted:
+                name = "Deleted Account"
+            else:
+                name = utils.get_display_name(entity)
 
             if full:
                 picture = await self.downloadProfilePicture(entity)
