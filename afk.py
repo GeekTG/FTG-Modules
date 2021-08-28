@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
 
-import logging
 import time
 from datetime import datetime
 
 from telethon import types
 
 from .. import loader, utils
-
-logger = logging.getLogger(__name__)
 
 
 @loader.tds

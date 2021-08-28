@@ -1,8 +1,4 @@
-import logging
-
 from .. import loader, utils
-
-logger = logging.getLogger(__name__)
 
 big_rat_url = "https://bigrat.monster/media/bigrat.png"
 

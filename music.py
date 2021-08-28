@@ -5,14 +5,11 @@
 # requires: lyricsgenius ShazamAPI
 
 import io
-import logging
 
 import lyricsgenius
 from ShazamAPI import Shazam
 
 from .. import loader, utils
-
-logger = logging.getLogger(__name__)
 
 
 @loader.tds
@@ -44,10 +41,8 @@ class LyricsMod(loader.Module):
 			await utils.answer(message, self.strings("missing_token", message))
 		args = utils.get_args_split_by(message, ",")
 		if len(args) != 2:
-			logger.debug(args)
 			await utils.answer(message, self.strings("invalid_syntax", message))
 			return
-		logger.debug("getting song lyrics for " + args[0] + ", " + args[1])
 		try:
 			song = await utils.run_sync(self.genius.search_song, args[0], args[1])
 		except TypeError:
@@ -56,8 +51,6 @@ class LyricsMod(loader.Module):
 		if song is None:
 			await utils.answer(message, self.strings("song_not_found", message))
 			return
-		logger.debug(song)
-		logger.debug(song.lyrics)
 		await utils.answer(message, utils.escape_html(song.lyrics))
 
 	async def shazamcmd(self, message):

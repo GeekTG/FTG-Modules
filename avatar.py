@@ -2,14 +2,12 @@
 
 # Module author: @ftgmodulesbyfl1yd, @dekftgmodules
 
-import logging
 import os
 
 from telethon import functions
 
 from .. import loader, utils
 
-logger = logging.getLogger(__name__)
 from telethon.errors.rpcerrorlist import UsernameOccupiedError
 from telethon.tl.functions.account import UpdateProfileRequest, \
 	UpdateUsernameRequest

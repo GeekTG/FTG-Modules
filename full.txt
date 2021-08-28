@@ -46,6 +46,7 @@ translate
 tts
 url
 user
+video_editor
 vizjener
 voice_recognition
 warn

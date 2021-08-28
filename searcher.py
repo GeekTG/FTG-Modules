@@ -6,15 +6,11 @@
 
 import io
 import json
-import logging
 
 import requests
 from search_engine_parser import GoogleSearch
 
 from .. import loader, utils
-
-logger = logging.getLogger(__name__)
-
 
 @loader.tds
 class SearchMod(loader.Module):
@@ -76,15 +72,14 @@ class SearchMod(loader.Module):
 
 
 async def check_media(message, reply):
-	if reply and reply.media:
-		if reply.photo:
-			data = reply.photo
-		elif reply.document:
-			if reply.gif or reply.video or reply.audio or reply.voice:
-				return None
-			data = reply.media.document
-		else:
+	if not reply or not reply.media:
+		return None
+	if reply.photo:
+		data = reply.photo
+	elif reply.document:
+		if reply.gif or reply.video or reply.audio or reply.voice:
 			return None
+		data = reply.media.document
 	else:
 		return None
 	if not data or data is None:

@@ -1,12 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import logging
-
 from telethon import functions, types
 
 from .. import loader, utils
-
-logger = logging.getLogger(__name__)
 
 
 @loader.tds
@@ -112,7 +108,6 @@ class AntiPMMod(loader.Module):
 		if not isinstance(message, types.Message):
 			return
 		if getattr(message.to_id, "user_id", None) == self._me.user_id:
-			logger.debug("pm'd!")
 			if message.sender_id in self._ratelimit:
 				self._ratelimit.remove(message.sender_id)
 				return
@@ -120,25 +115,21 @@ class AntiPMMod(loader.Module):
 				self._ratelimit += [message.sender_id]
 			user = await utils.get_user(message)
 			if user.is_self or user.bot or user.verified:
-				logger.debug("User is self, bot or verified.")
 				return
-			if self.get_allowed(message.sender_id):
-				logger.debug("Authorised pm detected")
-			else:
-				await utils.answer(message, self.strings("go_away", message))
-				if isinstance(self.config["PM_BLOCK_LIMIT"], int):
-					limit = self._db.get(__name__, "limit", {})
-					if limit.get(message.sender_id, 0) >= self.config["PM_BLOCK_LIMIT"]:
-						await utils.answer(message, self.strings("triggered", message))
-						await message.client(functions.contacts.BlockRequest(message.sender_id))
-						await message.client(functions.messages.ReportSpamRequest(peer=message.sender_id))
-						del limit[message.sender_id]
-						self._db.set(__name__, "limit", limit)
-					else:
-						self._db.set(__name__, "limit",
-						             {**limit, message.sender_id: limit.get(message.sender_id, 0) + 1})
-				if self._db.get(__name__, "notif", False):
-					await message.client.send_read_acknowledge(message.chat_id)
+			await utils.answer(message, self.strings("go_away", message))
+			if isinstance(self.config["PM_BLOCK_LIMIT"], int):
+				limit = self._db.get(__name__, "limit", {})
+				if limit.get(message.sender_id, 0) >= self.config["PM_BLOCK_LIMIT"]:
+					await utils.answer(message, self.strings("triggered", message))
+					await message.client(functions.contacts.BlockRequest(message.sender_id))
+					await message.client(functions.messages.ReportSpamRequest(peer=message.sender_id))
+					del limit[message.sender_id]
+					self._db.set(__name__, "limit", limit)
+				else:
+					self._db.set(__name__, "limit",
+					             {**limit, message.sender_id: limit.get(message.sender_id, 0) + 1})
+			if self._db.get(__name__, "notif", False):
+				await message.client.send_read_acknowledge(message.chat_id)
 
 	def get_allowed(self, id):
 		return id in self._db.get(__name__, "allow", [])

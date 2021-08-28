@@ -2,15 +2,12 @@
 
 import ast
 import asyncio
-import logging
 import time
 from io import BytesIO
 
 from telethon.tl import functions
 
 from .. import loader, utils
-
-logger = logging.getLogger(__name__)
 
 try:
 	from PIL import Image
