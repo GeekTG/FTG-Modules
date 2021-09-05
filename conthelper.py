@@ -70,7 +70,7 @@ class ConthelperMod(loader.Module):
 		"""Use: .unblock to unblock this user."""
 		args = utils.get_args_raw(message)
 		reply = await message.get_reply_message()
-		if message.chat_id != (await message.client.get_me()).id and message.is_privat:
+		if message.chat_id != (await message.client.get_me()).id and message.is_private:
 			user = await message.client.get_entity(message.chat_id)
 		else:
 			if reply:
