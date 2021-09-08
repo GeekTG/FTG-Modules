@@ -17,11 +17,9 @@ class ConthelperMod(loader.Module):
 
 	           "blocked": "<b>{} was blacklisted.</b>",
 	           "unblocked": "<b>{} removed from the blacklist.</b>",
-	           "addcontact": "<b>{} was added to contacts.</b>",
 	           "delcontact": "<b>{} was removed from contacts.</b>",
 	           "who_to_block": "<b>Indicate, who to block.</b>",
 	           "who_to_unblock": "<b>Indicate, who to unblock.</b>",
-	           "who_to_contact": "<b>Indicate, who to add to contact.</b>",
 	           "who_to_delcontact": "<b>Indicate, who to remove from contacts.</b>"}
 
 	def __init__(self):
@@ -83,25 +81,6 @@ class ConthelperMod(loader.Module):
 		await message.client(functions.contacts.UnblockRequest(user))
 		await utils.answer(message, self.strings["unblocked"].format(user.first_name))
 
-	async def addcontcmd(self, message):
-		"""Use: .addcont to add a user to contacts."""
-		args = utils.get_args(message)
-		reply = await message.get_reply_message()
-		if message.chat_id != (await message.client.get_me()).id and message.is_private:
-			user = await message.client.get_entity(message.chat_id)
-		else:
-			if reply:
-				user = await message.client.get_entity(reply.sender_id)
-			else:
-				user = await message.client.get_entity(int(args) if args.isnumeric() else args)
-			if not user:
-				await utils.answer(message, self.strings["who_to_contact"])
-				return
-		await message.client(
-			functions.contacts.AddContactRequest(id=user.id, first_name=" ".join(args[0:]), last_name=' ', phone='',
-			                                     add_phone_privacy_exception=False))
-		await utils.answer(message, self.strings["addcontact"].format(user.first_name))
-
 	async def delcontcmd(self, message):
 		"""Use: .delcont to remove a user from contacts."""
 		args = utils.get_args(message)
@@ -119,8 +98,8 @@ class ConthelperMod(loader.Module):
 		await message.client(functions.contacts.DeleteContactsRequest(id=[user.id]))
 		await utils.answer(message, self.strings["delcontact"].format(user.first_name))
 
-	async def renamecmd(self, message):
-		"""Use: .rename to Rename somebody in contacts."""
+	async def addcontcmd(self, message):
+		"""Use: .addcont to add somebody in contacts."""
 		args = utils.get_args_raw(message)
 		reply = await message.get_reply_message()
 		if not args:
@@ -135,6 +114,6 @@ class ConthelperMod(loader.Module):
 			                                                          last_name=' ',
 			                                                          phone='phone',
 			                                                          add_phone_privacy_exception=False))
-			await message.edit(f"<code>{user.id}</code> renamed <code>{args}</code>")
+			await message.edit(f"<code>{user.id}</code> added to contacts <code>{args}</code>")
 		except:
 			return await message.edit("<b>Something went wrong (come up with different reasons).</b>")
