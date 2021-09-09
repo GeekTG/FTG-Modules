@@ -2,30 +2,30 @@
 
 # requires: requests Pillow cryptg
 
-import hashlib
-import io
-import json
 import logging
-
-import PIL
+import hashlib
+import json
 import requests
+import io
+import PIL
 from telethon import utils
-from telethon.tl.types import (ChannelParticipantCreator,
-                               ChannelParticipantsAdmins, ChatPhotoEmpty,
-                               DocumentAttributeSticker, Message,
-                               MessageEntityBold, MessageEntityBotCommand,
-                               MessageEntityCashtag, MessageEntityCode,
-                               MessageEntityHashtag, MessageEntityItalic,
-                               MessageEntityMention, MessageEntityMentionName,
-                               MessageEntityPhone, MessageEntityStrike,
-                               MessageEntityTextUrl, MessageEntityUnderline,
-                               MessageEntityUrl, MessageMediaDocument,
-                               MessageMediaPhoto, MessageMediaWebPage,
-                               PeerBlocked, PeerChannel, PeerChat, PeerUser,
-                               User)
-
-from .. import loader
-from .. import utils as ftgUtils
+from telethon.tl.types import (
+    Message, MessageEntityBold, MessageEntityItalic,
+    MessageEntityMention, MessageEntityTextUrl,
+    MessageEntityCode, MessageEntityMentionName,
+    MessageEntityHashtag, MessageEntityCashtag,
+    MessageEntityBotCommand, MessageEntityUrl,
+    MessageEntityStrike, MessageEntityUnderline,
+    MessageEntityPhone,
+    ChatPhotoEmpty,
+    MessageMediaPhoto, MessageMediaDocument, MessageMediaWebPage,
+    User,
+    PeerUser, PeerBlocked, PeerChannel, PeerChat,
+    DocumentAttributeSticker,
+    ChannelParticipantsAdmins,
+    ChannelParticipantCreator
+)
+from .. import loader, utils as ftgUtils
 
 logger = logging.getLogger(__name__)
 
@@ -385,7 +385,7 @@ class MessagePacker:
         return uid, name, picture, adminTitle
 
     async def encodeReply(self, reply):
-        obj = {}
+        obj = dict()
 
         text = reply.message
         if text:
@@ -394,7 +394,11 @@ class MessagePacker:
             media = reply.media
             if media:
                 t = type(media)
-                obj.text = "📷 Photo" if t is MessageMediaPhoto else "💾 File"
+                if t is MessageMediaPhoto:
+                    obj.text = "📷 Photo"
+                else:
+                    obj.text = "💾 File"
+
         name = (await self.getAuthor(reply, full=false))[1]
 
         obj.author = name
@@ -411,8 +415,8 @@ class MessagePacker:
 
 
 async def update(modules, message, url=MODULE_PATH):
-    loader = next(
-        filter(lambda x: x.__class__.__name__ == "LoaderMod", modules))
+    loader = next(filter(lambda x: "LoaderMod" ==
+                  x.__class__.__name__, modules))
     try:
         if await loader.download_and_install(url, message):
             loader._db.set(__name__, "loaded_modules",
