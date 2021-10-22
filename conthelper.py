@@ -13,15 +13,6 @@ class ConthelperMod(loader.Module):
 	Commands:
 	"""
 
-	strings = {"name": "Conthelper",
-
-	           "blocked": "<b>{} was blacklisted.</b>",
-	           "unblocked": "<b>{} removed from the blacklist.</b>",
-	           "delcontact": "<b>{} was removed from contacts.</b>",
-	           "who_to_block": "<b>Indicate, who to block.</b>",
-	           "who_to_unblock": "<b>Indicate, who to unblock.</b>",
-	           "who_to_delcontact": "<b>Indicate, who to remove from contacts.</b>"}
-
 	def __init__(self):
 		self.me = None
 
@@ -31,79 +22,54 @@ class ConthelperMod(loader.Module):
 		self.me = await client.get_me(True)
 
 	async def reportcmd(self, message):
-		""" User report for spam. """
-		args = utils.get_args_raw(message)
+		"""Use: .report to report somebody."""
 		reply = await message.get_reply_message()
-		if message.chat_id != (await message.client.get_me()).id and message.is_private:
-			user = await message.client.get_entity(message.chat_id)
-		else:
-			if args:
-				user = await message.client.get_entity(args if not args.isnumeric() else int(args))
-			if reply:
-				user = await message.client.get_entity(reply.sender_id)
-			else:
-				return await message.edit("<b>Who I must report?</b>")
-
-		await message.client(functions.messages.ReportSpamRequest(peer=user.id))
-		await message.edit("<b>You get report for spam!</b>")
-
+		user = await message.client.get_entity(reply.sender_id)
+		try: 
+			user = await message.client.get_entity(reply.sender_id)
+			await message.client(functions.messages.ReportSpamRequest(peer=user.id))
+			await message.edit(f"<b><code>{user.first_name}</code> get report for spam!</b>")
+		except:
+			await message.edit("<b>no reply.</b>")
+		
 	async def blockcmd(self, message):
-		"""Use: .block to block this user."""
-		args = utils.get_args_raw(message)
+		"""Use: .block to block somebody."""
 		reply = await message.get_reply_message()
-		if message.chat_id != (await message.client.get_me()).id and message.is_private:
-			user = await message.client.get_entity(message.chat_id)
-		else:
-			if reply:
-				user = await message.client.get_entity(reply.sender_id)
-			else:
-				user = await message.client.get_entity(int(args) if args.isnumeric() else args)
-			if not user:
-				await utils.answer(message, self.strings["who_to_block"])
-				return
-		await message.client(functions.contacts.BlockRequest(user))
-		await utils.answer(message, self.strings["blocked"].format(user.first_name))
+		user = await message.client.get_entity(reply.sender_id)
+		try: 
+			user = await message.client.get_entity(reply.sender_id)
+			await message.client(functions.contacts.BlockRequest(id=[user.id]))
+			await message.edit(f"<code>{user.first_name}</code> added to the blacklist. ")
+		except:
+			await message.edit("<b>no reply.</b>")
 
 	async def unblockcmd(self, message):
-		"""Use: .unblock to unblock this user."""
-		args = utils.get_args_raw(message)
+		"""Use: .unblock to unblock somebody."""
 		reply = await message.get_reply_message()
-		if message.chat_id != (await message.client.get_me()).id and message.is_private:
-			user = await message.client.get_entity(message.chat_id)
-		else:
-			if reply:
-				user = await message.client.get_entity(reply.sender_id)
-			else:
-				user = await message.client.get_entity(int(args) if args.isnumeric() else args)
-			if not user:
-				await utils.answer(message, self.strings["who_to_unblock"])
-				return
-		await message.client(functions.contacts.UnblockRequest(user))
-		await utils.answer(message, self.strings["unblocked"].format(user.first_name))
+		user = await message.client.get_entity(reply.sender_id)
+		try: 
+			user = await message.client.get_entity(reply.sender_id)
+			await message.client(functions.contacts.UnblockRequest(id=[user.id]))
+			await message.edit(f"<code>{user.first_name}</code> removed from the blacklist. ")
+		except:
+			await message.edit("<b>no reply.</b>")
 
 	async def delcontcmd(self, message):
-		"""Use: .delcont to remove a user from contacts."""
-		args = utils.get_args(message)
+		"""Use: .delcont to delete somebody from contacts."""
 		reply = await message.get_reply_message()
-		if message.chat_id != (await message.client.get_me()).id and message.is_private:
-			user = await message.client.get_entity(message.chat_id)
-		else:
-			if reply:
-				user = await message.client.get_entity(reply.sender_id)
-			else:
-				user = await message.client.get_entity(int(args) if args.isnumeric() else args)
-			if not user:
-				await utils.answer(message, self.strings["who_to_delcontact"])
-				return
-		await message.client(functions.contacts.DeleteContactsRequest(id=[user.id]))
-		await utils.answer(message, self.strings["delcontact"].format(user.first_name))
-
+		user = await message.client.get_entity(reply.sender_id)
+		try: 
+			user = await message.client.get_entity(reply.sender_id)
+			await message.client(functions.contacts.DeleteContactsRequest(id=[user.id]))
+			await message.edit(f"<code>{user.first_name}</code> deleted from contacts ")
+		except:
+			await message.edit("<b>no reply.</b>")
+		
+			
 	async def addcontcmd(self, message):
 		"""Use: .addcont to add somebody in contacts."""
 		args = utils.get_args_raw(message)
 		reply = await message.get_reply_message()
-		if not args:
-			return await message.edit("<b>Where args?.</b>")
 		if not reply:
 			return await message.edit("<b>Where reply?</b>")
 		else:
@@ -114,6 +80,6 @@ class ConthelperMod(loader.Module):
 			                                                          last_name=' ',
 			                                                          phone='phone',
 			                                                          add_phone_privacy_exception=False))
-			await message.edit(f"<code>{user.id}</code> added to contacts <code>{args}</code>")
+			await message.edit(f"<code>{user.first_name}</code> added to contacts as <code>{args}.</code>")
 		except:
-			return await message.edit("<b>Something went wrong (come up with different reasons).</b>")
+			await message.edit("<b>no reply.</b>")
