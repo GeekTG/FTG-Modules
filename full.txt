@@ -37,6 +37,7 @@ rpmod
 screenshot
 searcher
 spam
+squotes
 stickers
 tags
 terminal
