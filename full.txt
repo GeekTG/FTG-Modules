@@ -13,7 +13,7 @@ downloader
 fake_actions
 file_uploader
 filter
-image_manager
+image_editor
 image_tools
 info
 information
