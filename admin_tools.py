@@ -262,13 +262,13 @@ class AdminToolsMod(loader.Module):
                     elif len(args) >= 2:
                         reason = utils.get_args_raw(message).split(' ', 1)[1]
 
-            await utils.answer(message, self.strings('kicking', message))
+            await utils.answer(message, self.strings('Мне кажется этот клоун импостер, кикаю....', message))
             try:
                 await message.client.kick_participant(message.chat_id, user.id)
             except UserAdminInvalidError:
                 return await utils.answer(message, self.strings('no_rights', message))
             if not reason:
-                return await utils.answer(message, self.strings('kicked', message).format(user.first_name))
+                return await utils.answer(message, self.strings('Импостер кикнут, пруфы никому не нужны', message).format(user.first_name))
             if reason:
                 return await utils.answer(message,
                                           self.strings('kicked_for_reason', message).format(user.first_name,
@@ -309,13 +309,13 @@ class AdminToolsMod(loader.Module):
                     elif len(args) >= 2:
                         reason = utils.get_args_raw(message).split(' ', 1)[1]
             try:
-                await utils.answer(message, self.strings('banning', message))
+                await utils.answer(message, self.strings(' <b> Ща баню клоуна, подожди.... </b> ', message))
                 await message.client(EditBannedRequest(message.chat_id, user.id,
                                                        ChatBannedRights(until_date=None, view_messages=True)))
             except UserAdminInvalidError:
                 return await utils.answer(message, self.strings('no_rights', message))
             if not reason:
-                return await utils.answer(message, self.strings('banned', message).format(user.first_name))
+                return await utils.answer(message, self.strings('Забанил клоуна', message).format(user.first_name))
             if reason:
                 return await utils.answer(message,
                                           self.strings('banned_for_reason', message).format(user.first_name,
@@ -348,7 +348,7 @@ class AdminToolsMod(loader.Module):
             await message.client(
                 EditBannedRequest(message.chat_id, user.id, ChatBannedRights(until_date=None, view_messages=False)))
 
-            return await utils.answer(message, self.strings('unbanned', message).format(user.first_name))
+            return await utils.answer(message, self.strings(' <b> розбанили клоуна </b>', message).format(user.first_name))
         except ValueError:
             return await utils.answer(message, self.strings('no_args', message))
 
@@ -403,20 +403,20 @@ class AdminToolsMod(loader.Module):
                     text += " дн.</b>"
 
                 else:
-                    return await utils.answer(message, self.strings('no_args', message))
+                    return await utils.answer(message, self.strings('Научись команды писать ', message))
 
                 try:
                     tm = ChatBannedRights(
                         until_date=time.time() + int(n), send_messages=True)
                     await message.client(EditBannedRequest(message.chat_id, user.id, tm))
-                    return await utils.answer(message, self.strings('muted', message).format(user.first_name) + text)
+                    return await utils.answer(message, self.strings('<b> Челл... ( {} ) ты в муте, клоун. </b>', message).format(user.first_name) + text)
                 except UserAdminInvalidError:
-                    return await utils.answer(message, self.strings('no_rights', message))
+                    return await utils.answer(message, self.strings('<b> Дохуя гений? У тебя прав нету </b> ', message))
             else:
                 try:
                     tm = ChatBannedRights(until_date=True, send_messages=True)
                     await message.client(EditBannedRequest(message.chat_id, user.id, tm))
-                    return await message.edit('<b>{} теперь в муте.</b>'.format(user.first_name))
+                    return await message.edit('<b> Челл...( {} ) ты в муте, клоун. </b>'.format(user.first_name))
                 except UserAdminInvalidError:
                     return await utils.answer(message, self.strings('no_rights', message))
         else:
@@ -431,10 +431,10 @@ class AdminToolsMod(loader.Module):
 
             chat = await message.get_chat()
             if not chat.admin_rights and not chat.creator:
-                return await utils.answer(message, self.strings('not_admin', message))
+                return await utils.answer(message, self.strings(' <b> Дохуя гений? У тебя админки нету </b> ', message))
 
             if not chat.admin_rights.ban_users:
-                return await utils.answer(message, self.strings('no_rights', message))
+                return await utils.answer(message, self.strings('<b> Дохуя гений? У тебя прав нету </b> ', message))
 
             if reply:
                 user = await message.client.get_entity(reply.sender_id)
@@ -445,9 +445,9 @@ class AdminToolsMod(loader.Module):
                 user = await message.client.get_entity(args if not args.isnumeric() else int(args))
             await message.client(EditBannedRequest(message.chat_id, user.id, UNMUTE_RIGHTS))
 
-            return await utils.answer(message, self.strings('unmuted', message).format(user.first_name))
+            return await utils.answer(message, self.strings(' {} ну давай, пизди дальше', message).format(user.first_name))
         except ValueError:
-            return await utils.answer(message, self.strings('no_args', message))
+            return await utils.answer(message, self.strings(' <b> научись команды писать, далбаеб </b>', message))
 
     async def deluserscmd(self, message):
         """Command .delusers shows a list of all deleted accounts in the chat.\nUse: .delusers <clean>."""
@@ -455,7 +455,7 @@ class AdminToolsMod(loader.Module):
             return await utils.answer(message, self.strings('this_isn`t_a_chat', message))
 
         con = utils.get_args_raw(message)
-        del_status = '<b>Нет удалённых аккаунтов, чат очищен.</b>'
+        del_status = '<b>Здесь нету суецидников, чат очищен.</b>'
 
         if con != "clean":
             await utils.answer(message, self.strings('del_u_search', message))
