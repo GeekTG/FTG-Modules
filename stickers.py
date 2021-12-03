@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# requires: git+https://gitlab.com/mattia.basaglia/python-lottie@master cairosvg Pillow>=6.1.0
+# requires: lottie cairosvg Pillow
 
 import asyncio
 import io

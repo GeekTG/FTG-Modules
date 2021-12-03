@@ -41,7 +41,7 @@ class dict(dict):
         self[attr] = value
 
 
-BUILD_ID = "132c96b5-dc02-4365-ba7d-b19104bd891b"  # null to disable autoupdates
+BUILD_ID = "96b0cc3e-dca7-4b79-8db2-43a478b00f9a"  # null to disable autoupdates
 MODULE_PATH = "https://quotes.mishase.dev/f/module.py"
 
 
@@ -374,7 +374,10 @@ class MessagePacker:
                     for admin in admins:
                         participant = admin.participant
                         if participant.user_id == uid:
-                            adminTitle = participant.rank
+                            try:
+                                adminTitle = participant.rank
+                            except AttributeError:
+                                adminTitle = null
                             if not adminTitle:
                                 if isinstance(participant, ChannelParticipantCreator):
                                     adminTitle = "owner"
