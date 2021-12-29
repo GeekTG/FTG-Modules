@@ -75,8 +75,6 @@ class InfoMod(loader.Module):
 				os.popen(f"cd {utils.get_base_dir()[:-17]} && git show -s --format=\"%h %cd\"").read()[:-7])
 		if 'LAVHOST' in os.environ:
 			reply += "\n" + "<b>FTG Type:</b> " + f"<code>lavHost {os.getenv('LAVHOST')}</code> (@lavHost)"
-			reply += "\n" + "<b>lavHost User:</b> " + f"<code>{os.getenv('USER')}</code>"
-			reply += "\n" + "<b>lavHost Server:</b> " + f"<code>{os.getenv('SERVER')}</code>"
 		else:
 			reply += "\n" + self.strings("ftg_type", message).format(ftg_type)
 		await utils.answer(message, reply)
