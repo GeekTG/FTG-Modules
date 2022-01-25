@@ -3,6 +3,7 @@ afk
 audio_editor
 autoprofile
 avatar
+banwords
 calculator
 callcontrol
 chat
@@ -17,6 +18,7 @@ image_editor
 image_tools
 info
 information
+imgtfy
 lydia
 lyrics
 morze
