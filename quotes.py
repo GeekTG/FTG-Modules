@@ -10,20 +10,32 @@ import io
 import PIL
 from telethon import utils
 from telethon.tl.types import (
-    Message, MessageEntityBold, MessageEntityItalic,
-    MessageEntityMention, MessageEntityTextUrl,
-    MessageEntityCode, MessageEntityMentionName,
-    MessageEntityHashtag, MessageEntityCashtag,
-    MessageEntityBotCommand, MessageEntityUrl,
-    MessageEntityStrike, MessageEntityUnderline,
+    Message,
+    MessageEntityBold,
+    MessageEntityItalic,
+    MessageEntityMention,
+    MessageEntityTextUrl,
+    MessageEntityCode,
+    MessageEntityMentionName,
+    MessageEntityHashtag,
+    MessageEntityCashtag,
+    MessageEntityBotCommand,
+    MessageEntityUrl,
+    MessageEntityStrike,
+    MessageEntityUnderline,
     MessageEntityPhone,
     ChatPhotoEmpty,
-    MessageMediaPhoto, MessageMediaDocument, MessageMediaWebPage,
+    MessageMediaPhoto,
+    MessageMediaDocument,
+    MessageMediaWebPage,
     User,
-    PeerUser, PeerBlocked, PeerChannel, PeerChat,
+    PeerUser,
+    PeerBlocked,
+    PeerChannel,
+    PeerChat,
     DocumentAttributeSticker,
     ChannelParticipantsAdmins,
-    ChannelParticipantCreator
+    ChannelParticipantCreator,
 )
 from .. import loader, utils as ftgUtils
 
@@ -48,23 +60,44 @@ MODULE_PATH = "https://quotes.mishase.dev/f/module.py"
 @loader.tds
 class mQuotesMod(loader.Module):
     """Quote a message using Mishase Quotes API"""
-    strings = {
-        "name": "Quotes"
-    }
+
+    strings = {"name": "Quotes"}
 
     def __init__(self):
         self.config = loader.ModuleConfig(
-            "QUOTE_MESSAGES_LIMIT", 50, "Messages limit",
-            "MAX_WIDTH", 384, "Max width (px)",
-            "SCALE_FACTOR", 5, "Scale factor",
-            "SQUARE_AVATAR", false, "Square avatar",
-            "TEXT_COLOR", "white", "Text color",
-            "REPLY_LINE_COLOR", "white", "Reply line color",
-            "REPLY_THUMB_BORDER_RADIUS", 2, "Reply thumbnail radius (px)",
-            "ADMINTITLE_COLOR", "#969ba0", "Admin title color",
-            "MESSAGE_BORDER_RADIUS", 10, "Message radius (px)",
-            "PICTURE_BORDER_RADIUS", 8, "Picture radius (px)",
-            "BACKGROUND_COLOR", "#162330", "Background color"
+            "QUOTE_MESSAGES_LIMIT",
+            50,
+            "Messages limit",
+            "MAX_WIDTH",
+            384,
+            "Max width (px)",
+            "SCALE_FACTOR",
+            5,
+            "Scale factor",
+            "SQUARE_AVATAR",
+            false,
+            "Square avatar",
+            "TEXT_COLOR",
+            "white",
+            "Text color",
+            "REPLY_LINE_COLOR",
+            "white",
+            "Reply line color",
+            "REPLY_THUMB_BORDER_RADIUS",
+            2,
+            "Reply thumbnail radius (px)",
+            "ADMINTITLE_COLOR",
+            "#969ba0",
+            "Admin title color",
+            "MESSAGE_BORDER_RADIUS",
+            10,
+            "Message radius (px)",
+            "PICTURE_BORDER_RADIUS",
+            8,
+            "Picture radius (px)",
+            "BACKGROUND_COLOR",
+            "#162330",
+            "Background color",
         )
 
     async def client_ready(self, client, db):
@@ -102,8 +135,11 @@ class mQuotesMod(loader.Module):
             await messagePacker.add(reply)
         if count > 1:
             it = self.client.iter_messages(
-                reply.peer_id, offset_id=reply.id,
-                reverse=true, add_offset=1, limit=count
+                reply.peer_id,
+                offset_id=reply.id,
+                reverse=true,
+                add_offset=1,
+                limit=count,
             )
 
             i = 1
@@ -130,23 +166,27 @@ class mQuotesMod(loader.Module):
             requests.post,
             "https://quotes.mishase.dev/create",
             data={
-                "data": json.dumps({
-                    "messages": messages,
-                    "maxWidth": self.config["MAX_WIDTH"],
-                    "scaleFactor": self.config["SCALE_FACTOR"],
-                    "squareAvatar": self.config["SQUARE_AVATAR"],
-                    "textColor": self.config["TEXT_COLOR"],
-                    "replyLineColor": self.config["REPLY_LINE_COLOR"],
-                    "adminTitleColor": self.config["ADMINTITLE_COLOR"],
-                    "messageBorderRadius": self.config["MESSAGE_BORDER_RADIUS"],
-                    "replyThumbnailBorderRadius": self.config["REPLY_THUMB_BORDER_RADIUS"],
-                    "pictureBorderRadius": self.config["PICTURE_BORDER_RADIUS"],
-                    "backgroundColor": self.config["BACKGROUND_COLOR"]
-                }),
-                "moduleBuild": BUILD_ID
+                "data": json.dumps(
+                    {
+                        "messages": messages,
+                        "maxWidth": self.config["MAX_WIDTH"],
+                        "scaleFactor": self.config["SCALE_FACTOR"],
+                        "squareAvatar": self.config["SQUARE_AVATAR"],
+                        "textColor": self.config["TEXT_COLOR"],
+                        "replyLineColor": self.config["REPLY_LINE_COLOR"],
+                        "adminTitleColor": self.config["ADMINTITLE_COLOR"],
+                        "messageBorderRadius": self.config["MESSAGE_BORDER_RADIUS"],
+                        "replyThumbnailBorderRadius": self.config[
+                            "REPLY_THUMB_BORDER_RADIUS"
+                        ],
+                        "pictureBorderRadius": self.config["PICTURE_BORDER_RADIUS"],
+                        "backgroundColor": self.config["BACKGROUND_COLOR"],
+                    }
+                ),
+                "moduleBuild": BUILD_ID,
             },
             files=files,
-            timeout=99
+            timeout=99,
         )
 
         if resp.status_code == 418:
@@ -164,7 +204,9 @@ class mQuotesMod(loader.Module):
         PIL.Image.open(io.BytesIO(resp.content)).save(image, "WEBP")
         image.seek(0)
 
-        await self.client.send_message(msg.peer_id, file=image, force_document=forceDocument)
+        await self.client.send_message(
+            msg.peer_id, file=image, force_document=forceDocument
+        )
 
         await msg.delete()
 
@@ -175,9 +217,12 @@ class mQuotesMod(loader.Module):
         args = ftgUtils.get_args_raw(msg)
         reply = await msg.get_reply_message()
         splitArgs = args.split(maxsplit=1)
-        if len(splitArgs) == 2 and (splitArgs[0].startswith("@") or splitArgs[0].isdigit()):
-            user = splitArgs[0][1:] if splitArgs[0].startswith(
-                "@") else int(splitArgs[0])
+        if len(splitArgs) == 2 and (
+            splitArgs[0].startswith("@") or splitArgs[0].isdigit()
+        ):
+            user = (
+                splitArgs[0][1:] if splitArgs[0].startswith("@") else int(splitArgs[0])
+            )
             text = splitArgs[1]
         elif reply:
             user = reply.sender_id
@@ -225,9 +270,7 @@ class MessagePacker:
         if media:
             file = await self.downloadMedia(media)
             if file:
-                obj.picture = {
-                    "file": file
-                }
+                obj.picture = {"file": file}
 
         if "text" not in obj and "picture" not in obj:
             return null
@@ -245,11 +288,13 @@ class MessagePacker:
         for entity in entities:
             entityType = MessagePacker.getEntityType(entity)
             if entityType:
-                encEntities.append({
-                    "type": entityType,
-                    "offset": entity.offset,
-                    "length": entity.length
-                })
+                encEntities.append(
+                    {
+                        "type": entityType,
+                        "offset": entity.offset,
+                        "length": entity.length,
+                    }
+                )
         return encEntities
 
     def getEntityType(entity):
@@ -266,8 +311,14 @@ class MessagePacker:
             return "strikethrough"
         if t is MessageEntityUnderline:
             return "underline"
-        if t in [MessageEntityMention, MessageEntityTextUrl, MessageEntityMentionName,
-                 MessageEntityHashtag, MessageEntityCashtag, MessageEntityBotCommand]:
+        if t in [
+            MessageEntityMention,
+            MessageEntityTextUrl,
+            MessageEntityMentionName,
+            MessageEntityHashtag,
+            MessageEntityCashtag,
+            MessageEntityBotCommand,
+        ]:
             return "bluetext"
         return null
 
@@ -318,9 +369,7 @@ class MessagePacker:
         obj.id = uid
         obj.name = name
         if picture:
-            obj.picture = {
-                "file": picture
-            }
+            obj.picture = {"file": picture}
         if adminTitle:
             obj.adminTitle = adminTitle
 
@@ -351,8 +400,7 @@ class MessagePacker:
         elif t is PeerBlocked:
             uid = peer.peer_id
         elif not peer:
-            uid = int(hashlib.shake_256(
-                name.encode("utf-8")).hexdigest(6), 16)
+            uid = int(hashlib.shake_256(name.encode("utf-8")).hexdigest(6), 16)
 
         if not name:
             entity = null
@@ -370,7 +418,9 @@ class MessagePacker:
                 picture = await self.downloadProfilePicture(entity)
 
                 if isinstance(chat, (PeerChannel, PeerChat)):
-                    admins = await self.client.get_participants(chat, filter=ChannelParticipantsAdmins)
+                    admins = await self.client.get_participants(
+                        chat, filter=ChannelParticipantsAdmins
+                    )
                     for admin in admins:
                         participant = admin.participant
                         if participant.user_id == uid:
@@ -410,20 +460,20 @@ class MessagePacker:
         if media:
             file = await self.downloadMedia(media, -1)
             if file:
-                obj.thumbnail = {
-                    "file": file
-                }
+                obj.thumbnail = {"file": file}
 
         return obj
 
 
 async def update(modules, message, url=MODULE_PATH):
-    loader = next(filter(lambda x: "LoaderMod" ==
-                  x.__class__.__name__, modules))
+    loader = next(filter(lambda x: "LoaderMod" == x.__class__.__name__, modules))
     try:
         if await loader.download_and_install(url, message):
-            loader._db.set(__name__, "loaded_modules",
-                           list(set(loader._db.get(__name__, "loaded_modules", [])).union([url])))
+            loader._db.set(
+                __name__,
+                "loaded_modules",
+                list(set(loader._db.get(__name__, "loaded_modules", [])).union([url])),
+            )
             return true
         else:
             return false

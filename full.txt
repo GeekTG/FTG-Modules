@@ -1,5 +1,4 @@
 admin_tools
-afk
 audio_editor
 autoprofile
 avatar
@@ -19,7 +18,6 @@ image_tools
 info
 information
 imgtfy
-lydia
 lyrics
 morze
 music
@@ -38,12 +36,10 @@ recent_actions
 rpmod
 screenshot
 searcher
-spam
 squotes
 stickers
 tags
 terminal
-text_editor
 text_generator
 translate
 tts

@@ -33,10 +33,10 @@ class ImageEditorMod(loader.Module):
 
     @loader.owner
     async def resizeicmd(self, m: types.Message):
-        '.resizei <w> <h> - Resize image'
-        _pref = 'Resize'
+        ".resizei <w> <h> - Resize image"
+        _pref = "Resize"
         args = utils.get_args_raw(m)
-        r = re.compile(r'^(\d+)\s+(\d+)$')
+        r = re.compile(r"^(\d+)\s+(\d+)$")
         if not args or not r.match(args):
             return await utils.answer(m, self.strings("set_size", m).format(_pref))
         w, h = [int(i) for i in r.match(args).groups()]
@@ -48,37 +48,44 @@ class ImageEditorMod(loader.Module):
 
     @loader.owner
     async def rmbgicmd(self, m: types.Message):
-        '.rmbgi - Remove background via AI [Powered by Indian\'s AI]'
-        _pref = 'RemoveBg'
+        ".rmbgi - Remove background via AI [Powered by Indian's AI]"
+        _pref = "RemoveBg"
         im = await get_image(self, m, _pref)
         if not im:
             return
         b = io.BytesIO()
-        b.name = 'i.png'
-        im.image.save(b, 'PNG')
+        b.name = "i.png"
+        im.image.save(b, "PNG")
         b.seek(0)
         out = None
-        async with aiohttp.ClientSession(headers={'User-Agent':UserAgent().chrome}) as s:
+        async with aiohttp.ClientSession(
+            headers={"User-Agent": UserAgent().chrome}
+        ) as s:
             form = aiohttp.FormData()
-            form.add_field('file', b)
-            form.add_field('filenameOverride', 'true')
+            form.add_field("file", b)
+            form.add_field("filenameOverride", "true")
             form.add_field(
-                'path', f"__editor/{date.year}-{date.month}-{date.day}/{hashlib.md5(b.read()).hexdigest()}")
+                "path",
+                f"__editor/{date.year}-{date.month}-{date.day}/{hashlib.md5(b.read()).hexdigest()}",
+            )
             b.seek(0)
             async with s.post(
-                'https://api.erase.bg/service/panel/assets/v1.0/upload/direct',
-                    data=form) as r:
-                _url = (await r.json())['url']
-            async with s.get(_url.replace('dummy-cloudname/original', 'dummy-cloudname/erase.bg()')) as r:
+                "https://api.erase.bg/service/panel/assets/v1.0/upload/direct",
+                data=form,
+            ) as r:
+                _url = (await r.json())["url"]
+            async with s.get(
+                _url.replace("dummy-cloudname/original", "dummy-cloudname/erase.bg()")
+            ) as r:
                 i = io.BytesIO(await r.read())
-                i.name = 'ImageEditor.jpeg'
+                i.name = "ImageEditor.jpeg"
                 out = Image.open(i)
         await go_out(self, m, im, out, _pref, True)
 
     @loader.owner
     async def inverticmd(self, m: types.Message):
-        '.inverti - Invert colors'
-        _pref = 'Invert'
+        ".inverti - Invert colors"
+        _pref = "Invert"
         im = await get_image(self, m, _pref)
         if not im:
             return
@@ -87,18 +94,18 @@ class ImageEditorMod(loader.Module):
 
     @loader.owner
     async def bwicmd(self, m: types.Message):
-        '.bwi - BlackWhite'
-        _pref = 'BlackWhite'
+        ".bwi - BlackWhite"
+        _pref = "BlackWhite"
         im = await get_image(self, m, _pref)
         if not im:
             return
-        out = im.image.convert('L')
+        out = im.image.convert("L")
         await go_out(self, m, im, out, _pref)
 
     @loader.owner
     async def convicmd(self, m: types.Message):
-        '.convi - Sticker to image | Image to sticker'
-        _pref = 'Converter'
+        ".convi - Sticker to image | Image to sticker"
+        _pref = "Converter"
         im = await get_image(self, m, _pref)
         if not im:
             return
@@ -107,10 +114,10 @@ class ImageEditorMod(loader.Module):
 
     @loader.owner
     async def rotateicmd(self, m: types.Message):
-        '.rotatei <degrees> - Rotate image'
-        _pref = 'Rotate'
+        ".rotatei <degrees> - Rotate image"
+        _pref = "Rotate"
         args = utils.get_args_raw(m)
-        r = re.compile(r'^(\d+)$')
+        r = re.compile(r"^(\d+)$")
         if not args or not r.match(args):
             return await utils.answer(m, self.strings("set_value", m).format(_pref))
         degrees = int(r.match(args).groups()[0])
@@ -122,10 +129,10 @@ class ImageEditorMod(loader.Module):
 
     @loader.owner
     async def contrasticmd(self, m: types.Message):
-        '.contrasti <float> - Change contrast'
-        _pref = 'Contrast'
+        ".contrasti <float> - Change contrast"
+        _pref = "Contrast"
         args = utils.get_args_raw(m)
-        r = re.compile(r'^(\d*\.?\d*)$')
+        r = re.compile(r"^(\d*\.?\d*)$")
         if not args or not r.match(args):
             return await utils.answer(m, self.strings("set_value", m).format(_pref))
         level = float(r.match(args).groups()[0])
@@ -137,10 +144,10 @@ class ImageEditorMod(loader.Module):
 
     @loader.owner
     async def sharpnessicmd(self, m: types.Message):
-        '.sharpnessi <float> - Change sharpness'
-        _pref = 'Sharpness'
+        ".sharpnessi <float> - Change sharpness"
+        _pref = "Sharpness"
         args = utils.get_args_raw(m)
-        r = re.compile(r'^(\d*\.?\d*)$')
+        r = re.compile(r"^(\d*\.?\d*)$")
         if not args or not r.match(args):
             return await utils.answer(m, self.strings("set_value", m).format(_pref))
         level = float(r.match(args).groups()[0])
@@ -152,10 +159,10 @@ class ImageEditorMod(loader.Module):
 
     @loader.owner
     async def brighticmd(self, m: types.Message):
-        '.brighti <float> - Change bright'
-        _pref = 'Color'
+        ".brighti <float> - Change bright"
+        _pref = "Color"
         args = utils.get_args_raw(m)
-        r = re.compile(r'^(\d*\.?\d*)$')
+        r = re.compile(r"^(\d*\.?\d*)$")
         if not args or not r.match(args):
             return await utils.answer(m, self.strings("set_value", m).format(_pref))
         level = float(r.match(args).groups()[0])
@@ -167,10 +174,10 @@ class ImageEditorMod(loader.Module):
 
     @loader.owner
     async def coloricmd(self, m: types.Message):
-        '.colori <float> - Change color factor'
-        _pref = 'Color'
+        ".colori <float> - Change color factor"
+        _pref = "Color"
         args = utils.get_args_raw(m)
-        r = re.compile(r'^(\d*\.?\d*)$')
+        r = re.compile(r"^(\d*\.?\d*)$")
         if not args or not r.match(args):
             return await utils.answer(m, self.strings("set_value", m).format(_pref))
         level = float(r.match(args).groups()[0])
@@ -181,7 +188,7 @@ class ImageEditorMod(loader.Module):
         await go_out(self, m, im, out, _pref)
 
 
-class ImageEditorClass():
+class ImageEditorClass:
     image: Image.Image = None
     message = None
     is_webp: bool = None
@@ -203,18 +210,20 @@ async def get_image(self, m, pref: str) -> ImageEditorClass:
     await utils.answer(m, self.strings("reply", m).format(pref))
 
 
-async def go_out(self, m, im: ImageEditorClass, out: Image.Image, pref, force_document=False):
+async def go_out(
+    self, m, im: ImageEditorClass, out: Image.Image, pref, force_document=False
+):
     m = await utils.answer(m, self.strings("exporting", m).format(pref))
     iba = io.BytesIO()
     if im.is_webp:
         out.thumbnail((512, 512))
-    out.save(iba, format='WEBP' if im.is_webp else 'PNG')
-    iba.name = 'ImageEditor.'+('webp' if im.is_webp else 'png')
+    out.save(iba, format="WEBP" if im.is_webp else "PNG")
+    iba.name = "ImageEditor." + ("webp" if im.is_webp else "png")
     iba.seek(0)
     await utils.answer(
         m,
         iba,
         reply_to=im.reply.id,
         supports_streaming=True,
-        force_document=force_document if not im.is_webp else False
+        force_document=force_document if not im.is_webp else False,
     )

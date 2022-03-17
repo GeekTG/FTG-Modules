@@ -23,9 +23,8 @@ CHAT = "@demotilifebot"
 @loader.tds
 class DemotivatorMod(loader.Module):
     """Deotivators"""
-    strings = {
-        "name": "Demotivator"
-    }
+
+    strings = {"name": "Demotivator"}
 
     async def client_ready(self, client, db):
         self.client = client
@@ -72,7 +71,8 @@ class DemotivatorMod(loader.Module):
             if text:
                 try:
                     response = conv.wait_event(
-                        events.NewMessage(incoming=True, from_users=1389323591))
+                        events.NewMessage(incoming=True, from_users=1389323591)
+                    )
                     await message.client.send_message(chat, text)
                     response = await response
                 except YouBlockedUserError:
@@ -81,25 +81,27 @@ class DemotivatorMod(loader.Module):
                 try:
                     user = await utils.get_user(reply)
                     response = conv.wait_event(
-                        events.NewMessage(incoming=True, from_users=1389323591))
-                    await message.client.send_message(chat,
-                                                      f"{reply.raw_text} (с) {user.first_name}")
+                        events.NewMessage(incoming=True, from_users=1389323591)
+                    )
+                    await message.client.send_message(
+                        chat, f"{reply.raw_text} (с) {user.first_name}"
+                    )
                     response = await response
                 except YouBlockedUserError:
                     return await message.edit("<b>Unblock @ShittyQuoteBot</b>")
         if response.text:
-            await message.client.send_message(message.to_id,
-                                              f"<b> {response.text}</b>")
+            await message.client.send_message(message.to_id, f"<b> {response.text}</b>")
             await message.delete()
         if response.media:
-            await message.client.send_file(message.to_id, response.media,
-                                           reply_to=reply.id if reply else None)
+            await message.client.send_file(
+                message.to_id, response.media, reply_to=reply.id if reply else None
+            )
             await message.delete()
         await message.client(
-            functions.messages.DeleteHistoryRequest(peer='ShittyQuoteBot',
-                                                    max_id=0,
-                                                    just_clear=False,
-                                                    revoke=True))
+            functions.messages.DeleteHistoryRequest(
+                peer="ShittyQuoteBot", max_id=0, just_clear=False, revoke=True
+            )
+        )
 
     async def mqcmd(self, message):
         """Quotes from the message 2"""
@@ -117,11 +119,12 @@ class DemotivatorMod(loader.Module):
         pfp = await message.client.download_profile_photo(sender, bytes)
         await message.edit("<b>Demotivating...</b>")
         if not pfp:
-            pfp = b'BM:\x00\x00\x00\x00\x00\x00\x006\x00\x00\x00(\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01\x00\x18\x00\x00\x00\x00\x00\x04\x00\x00\x00\xc4\x0e\x00\x00\xc4\x0e\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xff\xff\xff\x00'
+            pfp = b"BM:\x00\x00\x00\x00\x00\x00\x006\x00\x00\x00(\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x01\x00\x18\x00\x00\x00\x00\x00\x04\x00\x00\x00\xc4\x0e\x00\x00\xc4\x0e\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xff\xff\xff\x00"
         text = "\n".join(wrap(reply.raw_text, 30))
         text = "“" + text + "„"
         bf = requests.get(
-            "https://raw.githubusercontent.com/KeyZenD/l/master/times.ttf").content
+            "https://raw.githubusercontent.com/KeyZenD/l/master/times.ttf"
+        ).content
         font = ImageFont.truetype(io.BytesIO(bf), 50)
         im = Image.open(io.BytesIO(pfp))
         if bw:
@@ -147,57 +150,59 @@ async def cmds(message, type_):
     event, is_reply = await check_media(message)
     if not event:
         if message.client._conversations.get(1376531590) is not None:
-            return await message.edit(
-                "<b>Please wait.</b>")
+            return await message.edit("<b>Please wait.</b>")
 
         reply = await message.get_reply_message()
-        if (not reply or not reply.media
-            or not any(True for _ in ('sticker', 'photo', 'video', 'video_note')
-                       if getattr(reply, _, None) is not None)):
-            return await message.edit(
-                "<b>Reply to photo/video/sticker</b>")
+        if (
+            not reply
+            or not reply.media
+            or not any(
+                True
+                for _ in ("sticker", "photo", "video", "video_note")
+                if getattr(reply, _, None) is not None
+            )
+        ):
+            return await message.edit("<b>Reply to photo/video/sticker</b>")
         if reply.file.size > 4194304:
             return await message.edit("<b>Video only up to 4mb</b>")
         args = utils.get_args_raw(message) or reply.message
         if not args:
-            return await message.edit('<b>No text</b>')
+            return await message.edit("<b>No text</b>")
         if len(args) > 500:
-            return await message.edit(
-                "<b>Text only up to 500 symbols</b>")
+            return await message.edit("<b>Text only up to 500 symbols</b>")
 
         await message.edit("<b>Demotivating...</b>")
         async with message.client.conversation(CHAT, timeout=160) as conv:
             try:
-                response = conv.wait_event(
-                    NewMessage(incoming=True, from_users=CHAT))
+                response = conv.wait_event(NewMessage(incoming=True, from_users=CHAT))
                 msg = await reply.forward_to(CHAT)
                 await msg.reply(f"/demoti {args}")
                 response = await response
                 if not response.media:
                     if response.raw_text.startswith("[400]"):
-                        return await message.edit(
-                            "<b>Please wait 10 sec</b>")
+                        return await message.edit("<b>Please wait 10 sec</b>")
                     response = await conv.wait_event(
-                        NewMessage(incoming=True, from_users=CHAT))
+                        NewMessage(incoming=True, from_users=CHAT)
+                    )
 
             except YouBlockedUserError:
-                return await message.edit(f'<b>Unblock {CHAT}</b>')
+                return await message.edit(f"<b>Unblock {CHAT}</b>")
 
             except (TimeoutError, CancelledError):
-                return await message.edit(
-                    "<b>Bot isn`t responding</b>")
+                return await message.edit("<b>Bot isn`t responding</b>")
 
             if response.media is None:
                 return await message.edit("<b>Error</b>")
 
-            await message.client.send_file(message.to_id, response.media,
-                                           reply_to=reply)
+            await message.client.send_file(
+                message.to_id, response.media, reply_to=reply
+            )
             await message.delete()
             await message.client(
-                functions.messages.DeleteHistoryRequest(peer=CHAT,
-                                                        max_id=0,
-                                                        just_clear=False,
-                                                        revoke=True))
+                functions.messages.DeleteHistoryRequest(
+                    peer=CHAT, max_id=0, just_clear=False, revoke=True
+                )
+            )
             return
     text = utils.get_args_raw(message)
 
@@ -227,30 +232,35 @@ async def cmdrands(message, type_):
         except Exception:
             return await message.edit("<b>Only media</b>")
 
-        chat = '@super_rjaka_demotivator_bot'
-        await message.edit('<b>Demotivating...</b>')
+        chat = "@super_rjaka_demotivator_bot"
+        await message.edit("<b>Demotivating...</b>")
         async with message.client.conversation(chat) as conv:
             try:
                 response = conv.wait_event(
-                    events.NewMessage(incoming=True, from_users=1016409811))
+                    events.NewMessage(incoming=True, from_users=1016409811)
+                )
                 mm = await message.client.send_file(chat, media, caption=args)
                 response = await response
                 await mm.delete()
             except YouBlockedUserError:
-                await message.reply(
-                    '<b>Разблокируй @super_rjaka_demotivator_bot</b>')
+                await message.reply("<b>Разблокируй @super_rjaka_demotivator_bot</b>")
                 return
-            await message.edit('<b>Sending...</b>')
+            await message.edit("<b>Sending...</b>")
             await message.delete()
             await response.delete()
-            await message.client.send_file(message.to_id, response.media,
-                                           reply_to=await message.get_reply_message())
-            await message.client(functions.messages.DeleteHistoryRequest(
-                peer='super_rjaka_demotivator_bot',
-                max_id=0,
-                just_clear=False,
-                revoke=True
-            ))
+            await message.client.send_file(
+                message.to_id,
+                response.media,
+                reply_to=await message.get_reply_message(),
+            )
+            await message.client(
+                functions.messages.DeleteHistoryRequest(
+                    peer="super_rjaka_demotivator_bot",
+                    max_id=0,
+                    just_clear=False,
+                    revoke=True,
+                )
+            )
     text = utils.get_args_raw(message)
 
     if not text:
@@ -302,7 +312,7 @@ async def draw_main(
     frame_width_2=3,
     frame_fill_2=(255, 255, 255),
     expand_proc=10,
-    main_fill=(0, 0, 0)
+    main_fill=(0, 0, 0),
 ):
     main_ = Image.open(io.BytesIO(bytes_image))
     main = Image.new("RGB", main_.size, "black")
@@ -325,14 +335,16 @@ async def _draw_text(
     font_add=30,
     main_fill=(0, 0, 0),
     text_fill=(255, 255, 255),
-    text_align="center"
+    text_align="center",
 ):
     font = ImageFont.truetype(io.BytesIO(font_bytes), font_size)
     w_txt, h_txt = ImageDraw.Draw(Image.new("RGB", (1, 1))).multiline_textsize(
-        text=text, font=font)
+        text=text, font=font
+    )
     txt = Image.new("RGB", (w_txt, h_txt + font_add), main_fill)
-    ImageDraw.Draw(txt).text((0, 0), text=text, font=font, fill=text_fill,
-                             align=text_align)
+    ImageDraw.Draw(txt).text(
+        (0, 0), text=text, font=font, fill=text_fill, align=text_align
+    )
     return txt
 
 
@@ -363,8 +375,7 @@ async def text_finaller(text, main, expand_width_proc=25, main_fill=(0, 0, 0)):
     w_txt, h_txt = text.size
     w_proc = expand_width_proc * (w_txt // 100)
     h_proc = expand_width_proc * (h_txt // 100)
-    back = Image.new("RGB", (w_txt + (w_proc * 2), h_txt + (h_proc * 2)),
-                     main_fill)
+    back = Image.new("RGB", (w_txt + (w_proc * 2), h_txt + (h_proc * 2)), main_fill)
     back.paste(text, (w_proc, h_proc))
     back.thumbnail((x, x))
     return back
@@ -401,80 +412,138 @@ async def demotionrand(font_bytes, bytes_image, text, type):
     return output
 
 
-tttxxx = ['А че', 'заставляет задуматься', 'Жалко пацана', 'ты че сука??',
-          'ААХАХАХАХХАХА\n\nААХАХААХАХА',
-          'ГИГАНТ МЫСЛИ\n\nотец русской демократии', 'Он', 'ЧТО БЛЯТЬ?',
-          'охуенная тема', 'ВОТ ОНИ\n\nтипичные комедиклабовские шутки',
-          'НУ НЕ БЛЯДИНА?', 'Узнали?', 'Согласны?', 'Вот это мужик',
-          'ЕГО ИДЕИ\n\nбудут актуальны всегда', '\n\nПРИ СТАЛИНЕ ОН БЫ СИДЕЛ',
-          'о вадим', '2 месяца на дваче\n\nи это, блядь, нихуя не смешно',
-          'Что дальше?\n\nЧайник с функцией жопа?',
-          '\n\nИ нахуя мне эта информация?', 'Верхний текст', 'нижний текст',
-          'Показалось', 'Суды при анкапе',
-          'Хуйло с района\n\n\n\nтакая шелупонь с одной тычки ляжет', 'Брух',
-          'Расскажи им\n\nкак ты устал в офисе',
-          'Окурок блять\n\nесть 2 рубля?', 'Аниме ставшее легендой',
-          'СМИРИСЬ\n\n\n\nты никогда не станешь настолько же крутым',
-          'а ведь это идея', '\n\nЕсли не лайкнешь у тебя нет сердца',
-          'Вместо тысячи слов', 'ШАХ И МАТ!!!',
-          'Самый большой член в мире\n\nУ этой девушки',
-          'Немного\n\nперфекционизма', 'кто', '\n\nэта сука уводит чужих мужей',
-          'Кто он???', '\n\nВы тоже хотели насрать туда в детстве?',
-          '\n\nВся суть современного общества\n\nв одном фото',
-          'Он обязательно выживет!', '\n\nВы тоже хотите подрочить ему?',
-          '\n\nИ вот этой хуйне поклоняются русские?',
-          'Вот она суть\n\n\n\nчеловеческого общества в одной картинке',
-          'Вы думали это рофл?\n\nНет это жопа',
-          '\n\nПри сталине такой хуйни не было\n\nА у вас было?',
-          'Он грыз провода', 'Назло старухам\n\nна радость онанистам',
-          'Где-то в Челябинске', 'Агитация за Порошенко', 'ИДЕАЛЬНО', 'Грыз?',
-          'Ну давай расскажи им\n\nкакая у тебя тяжелая работа',
-          '\n\nЖелаю в каждом доме такого гостя', 'Шкура на вырост',
-          'НИКОГДА\n\nне сдавайся',
-          'Оппа гангнам стайл\n\nуууу сэкси лейди оп оп',
-          'Они сделали это\n\nсукины дети, они справились',
-          'Эта сука\n\nхочет денег', 'Это говно, а ты?',
-          '\n\nВот она нынешняя молодежь', 'Погладь кота\n\nпогладь кота сука',
-          'Я обязательно выживу',
-          '\n\nВот она, настоящая мужская дружба\n\nбез политики и лицимерия',
-          '\n\nОБИДНО ЧТО Я ЖИВУ В СТРАНЕ\n\nгде гантели стоят в 20 раз '
-          'дороже чем бутылка водки',
-          'Царь, просто царь',
-          '\n\nНахуй вы это в учебники вставили?\n\nИ ещё ебаную контрольную '
-          'устроили',
-          '\n\nЭТО НАСТОЯЩАЯ КРАСОТА\n\nа не ваши голые бляди',
-          '\n\nТема раскрыта ПОЛНОСТЬЮ', '\n\nРОССИЯ, КОТОРУЮ МЫ ПОТЕРЯЛИ',
-          'ЭТО - Я\n\nПОДУМАЙ МОЖЕТ ЭТО ТЫ', 'почему\n\nчто почему',
-          'КУПИТЬ БЫ ДЖЫП\n\nБЛЯТЬ ДА НАХУЙ НАДО',
-          '\n\n\n\nмы не продаём бомбастер лицам старше 12 лет', 'МРАЗЬ',
-          'Правильная аэрография', 'Вот она русская\n\nСМЕКАЛОЧКА',
-          'Он взял рехстаг!\n\nА чего добился ты?', 'На аватарку',
-          'Фотошоп по-деревенски', 'Инструкция в самолете', 'Цирк дю Солей',
-          'Вкус детства\n\nшколоте не понять', 'Вот оно - СЧАСТЬЕ',
-          'Он за тебя воевал\n\nа ты даже не знаешь его имени',
-          'Зато не за компьютером', '\n\nНе трогай это на новый год',
-          'Мой первый рисунок\n\nмочой на снегу',
-          '\n\nМайские праздники на даче', 'Ваш пиздюк?',
-          'Тест драйв подгузников', 'Не понимаю\n\nкак это вообще выросло?',
-          'Супермен в СССР', 'Единственный\n\nкто тебе рад',
-          'Макдональдс отдыхает', 'Ну че\n\n как дела на работе пацаны?',
-          'Вся суть отношений', 'Беларусы, спасибо!',
-          '\n\nУ дверей узбекского военкомата', 'Вместо 1000 слов',
-          'Один вопрос\n\nнахуя?', 'Ответ на санкции\n\nЕВРОПЫ',
-          'ЦЫГАНСКИЕ ФОКУСЫ', 'Блять!\n\nда он гений!',
-          '\n\nУкраина ищет новые источники газа',
-          'ВОТ ЭТО\n\nНАСТОЯЩИЕ КАЗАКИ а не ряженные',
-          'Нового года не будет\n\nСанта принял Ислам',
-          '\n\nОн был против наркотиков\n\nа ты и дальше убивай себя',
-          'Всем похуй!\n\nВсем похуй!',
-          'БРАТЬЯ СЛАВЯНЕ\n\nпомните друг о друге',
-          '\n\nОН ПРИДУМАЛ ГОВНО\n\nа ты даже не знаешь его имени',
-          '\n\nкраткий курс истории нацболов', 'Эпоха ренессанса']
+tttxxx = [
+    "А че",
+    "заставляет задуматься",
+    "Жалко пацана",
+    "ты че сука??",
+    "ААХАХАХАХХАХА\n\nААХАХААХАХА",
+    "ГИГАНТ МЫСЛИ\n\nотец русской демократии",
+    "Он",
+    "ЧТО БЛЯТЬ?",
+    "охуенная тема",
+    "ВОТ ОНИ\n\nтипичные комедиклабовские шутки",
+    "НУ НЕ БЛЯДИНА?",
+    "Узнали?",
+    "Согласны?",
+    "Вот это мужик",
+    "ЕГО ИДЕИ\n\nбудут актуальны всегда",
+    "\n\nПРИ СТАЛИНЕ ОН БЫ СИДЕЛ",
+    "о вадим",
+    "2 месяца на дваче\n\nи это, блядь, нихуя не смешно",
+    "Что дальше?\n\nЧайник с функцией жопа?",
+    "\n\nИ нахуя мне эта информация?",
+    "Верхний текст",
+    "нижний текст",
+    "Показалось",
+    "Суды при анкапе",
+    "Хуйло с района\n\n\n\nтакая шелупонь с одной тычки ляжет",
+    "Брух",
+    "Расскажи им\n\nкак ты устал в офисе",
+    "Окурок блять\n\nесть 2 рубля?",
+    "Аниме ставшее легендой",
+    "СМИРИСЬ\n\n\n\nты никогда не станешь настолько же крутым",
+    "а ведь это идея",
+    "\n\nЕсли не лайкнешь у тебя нет сердца",
+    "Вместо тысячи слов",
+    "ШАХ И МАТ!!!",
+    "Самый большой член в мире\n\nУ этой девушки",
+    "Немного\n\nперфекционизма",
+    "кто",
+    "\n\nэта сука уводит чужих мужей",
+    "Кто он???",
+    "\n\nВы тоже хотели насрать туда в детстве?",
+    "\n\nВся суть современного общества\n\nв одном фото",
+    "Он обязательно выживет!",
+    "\n\nВы тоже хотите подрочить ему?",
+    "\n\nИ вот этой хуйне поклоняются русские?",
+    "Вот она суть\n\n\n\nчеловеческого общества в одной картинке",
+    "Вы думали это рофл?\n\nНет это жопа",
+    "\n\nПри сталине такой хуйни не было\n\nА у вас было?",
+    "Он грыз провода",
+    "Назло старухам\n\nна радость онанистам",
+    "Где-то в Челябинске",
+    "Агитация за Порошенко",
+    "ИДЕАЛЬНО",
+    "Грыз?",
+    "Ну давай расскажи им\n\nкакая у тебя тяжелая работа",
+    "\n\nЖелаю в каждом доме такого гостя",
+    "Шкура на вырост",
+    "НИКОГДА\n\nне сдавайся",
+    "Оппа гангнам стайл\n\nуууу сэкси лейди оп оп",
+    "Они сделали это\n\nсукины дети, они справились",
+    "Эта сука\n\nхочет денег",
+    "Это говно, а ты?",
+    "\n\nВот она нынешняя молодежь",
+    "Погладь кота\n\nпогладь кота сука",
+    "Я обязательно выживу",
+    "\n\nВот она, настоящая мужская дружба\n\nбез политики и лицимерия",
+    "\n\nОБИДНО ЧТО Я ЖИВУ В СТРАНЕ\n\nгде гантели стоят в 20 раз "
+    "дороже чем бутылка водки",
+    "Царь, просто царь",
+    "\n\nНахуй вы это в учебники вставили?\n\nИ ещё ебаную контрольную " "устроили",
+    "\n\nЭТО НАСТОЯЩАЯ КРАСОТА\n\nа не ваши голые бляди",
+    "\n\nТема раскрыта ПОЛНОСТЬЮ",
+    "\n\nРОССИЯ, КОТОРУЮ МЫ ПОТЕРЯЛИ",
+    "ЭТО - Я\n\nПОДУМАЙ МОЖЕТ ЭТО ТЫ",
+    "почему\n\nчто почему",
+    "КУПИТЬ БЫ ДЖЫП\n\nБЛЯТЬ ДА НАХУЙ НАДО",
+    "\n\n\n\nмы не продаём бомбастер лицам старше 12 лет",
+    "МРАЗЬ",
+    "Правильная аэрография",
+    "Вот она русская\n\nСМЕКАЛОЧКА",
+    "Он взял рехстаг!\n\nА чего добился ты?",
+    "На аватарку",
+    "Фотошоп по-деревенски",
+    "Инструкция в самолете",
+    "Цирк дю Солей",
+    "Вкус детства\n\nшколоте не понять",
+    "Вот оно - СЧАСТЬЕ",
+    "Он за тебя воевал\n\nа ты даже не знаешь его имени",
+    "Зато не за компьютером",
+    "\n\nНе трогай это на новый год",
+    "Мой первый рисунок\n\nмочой на снегу",
+    "\n\nМайские праздники на даче",
+    "Ваш пиздюк?",
+    "Тест драйв подгузников",
+    "Не понимаю\n\nкак это вообще выросло?",
+    "Супермен в СССР",
+    "Единственный\n\nкто тебе рад",
+    "Макдональдс отдыхает",
+    "Ну че\n\n как дела на работе пацаны?",
+    "Вся суть отношений",
+    "Беларусы, спасибо!",
+    "\n\nУ дверей узбекского военкомата",
+    "Вместо 1000 слов",
+    "Один вопрос\n\nнахуя?",
+    "Ответ на санкции\n\nЕВРОПЫ",
+    "ЦЫГАНСКИЕ ФОКУСЫ",
+    "Блять!\n\nда он гений!",
+    "\n\nУкраина ищет новые источники газа",
+    "ВОТ ЭТО\n\nНАСТОЯЩИЕ КАЗАКИ а не ряженные",
+    "Нового года не будет\n\nСанта принял Ислам",
+    "\n\nОн был против наркотиков\n\nа ты и дальше убивай себя",
+    "Всем похуй!\n\nВсем похуй!",
+    "БРАТЬЯ СЛАВЯНЕ\n\nпомните друг о друге",
+    "\n\nОН ПРИДУМАЛ ГОВНО\n\nа ты даже не знаешь его имени",
+    "\n\nкраткий курс истории нацболов",
+    "Эпоха ренессанса",
+]
 
 
 async def procces_img(message, way):
-    cols = {'white': 1, 'whit': 1, 'whi': 1, 'wh': 1, 'w': 1,
-            'black': 2, 'blac': 2, 'bla': 2, 'bl': 2, 'b': 2}
+    cols = {
+        "white": 1,
+        "whit": 1,
+        "whi": 1,
+        "wh": 1,
+        "w": 1,
+        "black": 2,
+        "blac": 2,
+        "bla": 2,
+        "bl": 2,
+        "b": 2,
+    }
     col = 1
     reply = await message.get_reply_message()
     txt = utils.get_args_raw(message)
@@ -493,7 +562,8 @@ async def procces_img(message, way):
         txt = " ".join(txt.split(" ")[1:])
 
     bytes_font = requests.get(
-        "https://github.com/Fl1yd/FTG-modules/blob/master/stuff/font3.ttf?raw=true").content
+        "https://github.com/Fl1yd/FTG-modules/blob/master/stuff/font3.ttf?raw=true"
+    ).content
     bytes_back = await reply.download_media(bytes)
     font = io.BytesIO(bytes_font)
     font = ImageFont.truetype(font, 72)
@@ -511,10 +581,9 @@ async def procces_img(message, way):
     draw = ImageDraw.Draw(imtext)
 
     if col == 2:
-        draw.multiline_text((10, 10), t, (0, 0, 0), font=font, align='center')
+        draw.multiline_text((10, 10), t, (0, 0, 0), font=font, align="center")
     else:
-        draw.multiline_text((10, 10), t, (255, 255, 255), font=font,
-                            align='center')
+        draw.multiline_text((10, 10), t, (255, 255, 255), font=font, align="center")
     imtext.thumbnail((W, H))
     w, h = imtext.size
 
@@ -534,5 +603,6 @@ async def procces_img(message, way):
 
 
 font_bytes = requests.get(
-    "https://raw.githubusercontent.com/KeyZenD/l/master/times.ttf").content
+    "https://raw.githubusercontent.com/KeyZenD/l/master/times.ttf"
+).content
 #######################

@@ -1,10 +1,7 @@
-afk
-filter
 info
 information
 notes
 purge
 quotes
-stickers
 terminal
 translate
