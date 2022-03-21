@@ -268,7 +268,7 @@ class BotLoggerMod(loader.Module):
             (
                 await self.client(
                     CreateChannelRequest(
-                        f"{ver_.lower()}-logs",
+                        f"gtg-logs",
                         f"👩‍🎤 Your {ver_} logs will appear in this chat",
                         megagroup=True,
                     )
