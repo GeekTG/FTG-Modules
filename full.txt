@@ -3,6 +3,7 @@ audio_editor
 autoprofile
 avatar
 banwords
+botlogger
 calculator
 callcontrol
 chat
