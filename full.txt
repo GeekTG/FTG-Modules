@@ -13,6 +13,7 @@ downloader
 fake_actions
 file_uploader
 filter
+gitupl
 image_editor
 image_tools
 imgtfy
