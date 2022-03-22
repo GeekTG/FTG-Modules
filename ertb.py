@@ -7,7 +7,7 @@ def register(cb):
     cb(ValuteMod())
 class ValuteMod(loader.Module):
     """Конвертер Валют"""
-    strings = {'name': 'Конвертер Валют💶'}
+    strings = {'name': 'ERTB Converter'}
     async def ertbcmd(self, message):
         """.ertb + количество + валюта"""
         state = utils.get_args_raw(message)
