@@ -1,4 +1,3 @@
-ml
 admin_tools
 audio_editor
 autoprofile
@@ -21,7 +20,8 @@ image_tools
 imgtfy
 info
 information
-lyrics
+lyric
+ml
 morze
 music
 noterminal
