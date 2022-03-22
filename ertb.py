@@ -9,7 +9,7 @@ class ValuteMod(loader.Module):
     """Конвертер Валют"""
     strings = {'name': 'Конвертер Валют💶'}
     async def ertbcmd(self, message):
-        """.val + количество + валюта"""
+        """.ertb + количество + валюта"""
         state = utils.get_args_raw(message)
         await message.edit("<b>Данные получены</b>")
         chat = '@exchange_rates_vsk_bot'
