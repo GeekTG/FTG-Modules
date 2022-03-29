@@ -265,17 +265,14 @@ class BotLoggerMod(loader.Module):
                 return (d.entity, False)
 
         return (
-            (
-                await self.client(
-                    CreateChannelRequest(
-                        f"gtg-logs",
-                        f"👩‍🎤 Your {ver_} logs will appear in this chat",
-                        megagroup=True,
-                    )
+            await self.client(
+                CreateChannelRequest(
+                    "gtg-logs",
+                    f"👩‍🎤 Your {ver_} logs will appear in this chat",
+                    megagroup=True,
                 )
-            ).chats[0],
-            True,
-        )
+            )
+        ).chats[0], True
 
     async def client_ready(self, client, db) -> None:
         self.client = client

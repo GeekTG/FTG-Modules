@@ -37,9 +37,7 @@ def StringBuilder(Hentai):
     link = Hentai.url
     total_pages = Hentai.num_pages
     total_favorites = Hentai.num_favorites
-    tags = ""
-    for tag in Hentai.tag:
-        tags += f"{tag.name} "
+    tags = "".join(f"{tag.name} " for tag in Hentai.tag)
     text = f"{hlink(eng_name, link)} [{id_nh}]\n\n"
     text += f"{tags} \n"
     text += f"❤️ {total_favorites} | 📄 {total_pages}"
@@ -48,8 +46,7 @@ def StringBuilder(Hentai):
 
 def ListHentaiBuilder(Hentais):
     text = ""
-    i = 1
-    for Hentai in Hentais:
+    for i, Hentai in enumerate(Hentais, start=1):
         id_nh = Hentai.id
         eng_name = Hentai.title()
         link = Hentai.url
@@ -58,7 +55,6 @@ def ListHentaiBuilder(Hentais):
 
         text += f"{i}: <a href={link}>{eng_name}</a> [{id_nh}] / "
         text += f"❤️ {total_favorites} | 📄 {total_pages} \n"
-        i += 1
     return text
 
 
@@ -88,8 +84,7 @@ class InlineNHentaiMod(loader.Module):
     @loader.ratelimit
     async def nhtagcmd(self, message):
         """Search hentai manga by tag"""
-        args = utils.get_args(message)
-        if args:
+        if args := utils.get_args(message):
             hentai_info = Utils.search_by_query(args)
             text = ListHentaiBuilder(hentai_info)
 
@@ -126,9 +121,19 @@ class InlineNHentaiMod(loader.Module):
         Search hentai manga by tag (Inline)
         @allow: all
         """
-        text = query.args
-
-        if not text:
+        if text := query.args:
+            hentais = Utils.search_by_query(text)
+            inline_query = [InlineQueryResultPhoto(
+                    id=rand(20),
+                    title=hentai.title(),
+                    description="Description",
+                    caption=StringBuilder(hentai),
+                    thumb_url=hentai.cover,  
+                    photo_url=hentai.cover,
+                    parse_mode="html",
+                ) for hentai in hentais]
+            await query.answer(inline_query, cache_time=0)
+        else:
             await query.answer(
                 [
                     InlineQueryResultArticle(
@@ -146,22 +151,4 @@ class InlineNHentaiMod(loader.Module):
                 cache_time=0,
             )
             return
-        
-        else:
-            inline_query = []
-            hentais = Utils.search_by_query(text)
-            for hentai in hentais:
-                inline_query.append(
-                InlineQueryResultPhoto(
-                    id=rand(20),
-                    title=hentai.title(),
-                    description="Description",
-                    caption=StringBuilder(hentai),
-                    thumb_url=hentai.cover,  
-                    photo_url=hentai.cover,
-                    parse_mode="html",
-                )
-            )
-
-            await query.answer(inline_query, cache_time=0)
 

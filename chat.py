@@ -50,9 +50,7 @@ class ChatMod(loader.Module):
 
         try:
             if args:
-                user = await message.client.get_entity(
-                    args if not args.isdigit() else int(args)
-                )
+                user = await message.client.get_entity(int(args) if args.isdigit() else args)
             else:
                 user = await message.client.get_entity(reply.sender_id)
         except ValueError:
@@ -72,7 +70,7 @@ class ChatMod(loader.Module):
 
         try:
             if args:
-                to_chat = args if not args.isdigit() else int(args)
+                to_chat = int(args) if args.isdigit() else args
             else:
                 to_chat = message.chat_id
 
@@ -99,7 +97,7 @@ class ChatMod(loader.Module):
 
         try:
             if args:
-                user = args if not args.isdigit() else int(args)
+                user = int(args) if args.isdigit() else args
             else:
                 user = reply.sender_id
 
@@ -191,9 +189,10 @@ class ChatMod(loader.Module):
             await message.client.send_file(
                 message.chat_id,
                 "userslist.md",
-                caption="<b>Пользователей в {}:</b>".format(title),
+                caption=f"<b>Пользователей в {title}:</b>",
                 reply_to=message.id,
             )
+
             remove("userslist.md")
             await message.delete()
 
@@ -237,9 +236,10 @@ class ChatMod(loader.Module):
             await message.client.send_file(
                 message.chat_id,
                 "adminlist.md",
-                caption='<b>Админов в "{}":<b>'.format(title),
+                caption=f'<b>Админов в "{title}":<b>',
                 reply_to=message.id,
             )
+
             remove("adminlist.md")
             await message.delete()
 
@@ -258,10 +258,11 @@ class ChatMod(loader.Module):
         mentions = f'<b>Ботов в "{title}": {len(bots)}</b>\n'
 
         for user in bots:
-            if not user.deleted:
-                mentions += f'\n• <a href="tg://user?id={user.id}">{user.first_name}</a> | <code>{user.id}</code>'
-            else:
-                mentions += f"\n• Удалённый бот <b>|</b> <code>{user.id}</code> "
+            mentions += (
+                f"\n• Удалённый бот <b>|</b> <code>{user.id}</code> "
+                if user.deleted
+                else f'\n• <a href="tg://user?id={user.id}">{user.first_name}</a> | <code>{user.id}</code>'
+            )
 
         try:
             await message.edit(mentions, parse_mode="html")
@@ -274,9 +275,10 @@ class ChatMod(loader.Module):
             await message.client.send_file(
                 message.chat_id,
                 "botlist.md",
-                caption='<b>Ботов в "{}":</b>'.format(title),
+                caption=f'<b>Ботов в "{title}":</b>',
                 reply_to=message.id,
             )
+
             remove("botlist.md")
             await message.delete()
 
@@ -354,8 +356,9 @@ class ChatMod(loader.Module):
             await message.client.send_file("me", f, caption="Дамп чата " + str(chat.id))
         else:
             await message.client.send_file(
-                message.to_id, f, caption="Дамп " "чата " + str(chat.id)
+                message.to_id, f, caption=f"Дамп чата {str(chat.id)}"
             )
+
         if not silent:
             if tome:
                 if num:
@@ -394,16 +397,14 @@ class ChatMod(loader.Module):
                 except errors.FloodWaitError as e:
                     print("Flood for", e.seconds)
         else:
-            await event.edit(f"<b>Куда приглашать будем?</b>")
+            await event.edit("<b>Куда приглашать будем?</b>")
 
     async def reportcmd(self, message):
         """Репорт пользователя за спам."""
         args = utils.get_args_raw(message)
         reply = await message.get_reply_message()
         if args:
-            user = await message.client.get_entity(
-                args if not args.isnumeric() else int(args)
-            )
+            user = await message.client.get_entity(int(args) if args.isnumeric() else args)
         if reply:
             user = await message.client.get_entity(reply.sender_id)
         else:
