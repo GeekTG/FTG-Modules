@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 # Module author: @ftgmodulesbyfl1yd, @dekftgmodules, @memeframe
 
 import asyncio
