@@ -20,7 +20,7 @@ class ValuteMod(loader.Module):
                 bot_send_message = await message.client.send_message(chat, format(state))
                 bot_response = response = await response
             except YouBlockedUserError:
-                await message.edit('<b>Убери из ЧС:</b> ' + chat)
+                await message.edit(f'<b>Убери из ЧС:</b> {chat}')
                 return
             await bot_send_message.delete()
             await message.edit(response.text)
