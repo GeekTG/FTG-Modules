@@ -6,6 +6,7 @@ banwords
 calculator
 callcontrol
 chat
+chatvoicemod
 conthelper
 demot
 distort
