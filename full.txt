@@ -6,6 +6,10 @@ banwords
 calculator
 callcontrol
 chat
+<<<<<<< HEAD
+=======
+chatvoicemod
+>>>>>>> dfd95e3... upd full.txt
 conthelper
 demot
 distort
