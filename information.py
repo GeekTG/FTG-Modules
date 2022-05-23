@@ -25,7 +25,7 @@ class WhoIsMod(loader.Module):
     strings = {"name": "Information"}
 
     async def userinfocmd(self, message):
-        """.whois <@ or reply or id>; Northing"""
+        """<@ or reply or id> - info about user"""
         args = utils.get_args_raw(message)
         reply = await message.get_reply_message()
 
@@ -55,7 +55,7 @@ class WhoIsMod(loader.Module):
         await message.delete()
 
     async def chatinfocmd(self, message):
-        """.message <@ or id>; Northing"""
+        """<@ or id> - info about chat"""
         args = utils.get_args_raw(message)
 
         try:
@@ -87,7 +87,8 @@ class WhoIsMod(loader.Module):
 
 async def get_user_info(user, message):
     """Detailed information about the user."""
-    uuser = user.user
+    uuser = user.users[0]
+    fulluser = user.full_user
 
     user_photos = await message.client(
         GetUserPhotosRequest(user_id=uuser.id, offset=42, max_id=0, limit=100)
@@ -102,8 +103,8 @@ async def get_user_info(user, message):
     first_name = uuser.first_name or "null"
     last_name = uuser.last_name or "null"
     username = uuser.username or "null"
-    user_bio = user.about or "null"
-    common_chat = user.common_chats_count
+    user_bio = fulluser.about or "null"
+    common_chat = fulluser.common_chats_count
     is_bot = "Yes" if uuser.bot else "No"
     restricted = "Yes" if uuser.restricted else "No"
     verified = "Yes" if uuser.verified else "No"
