@@ -17,7 +17,6 @@ filter
 image_editor
 image_tools
 imgtfy
-info
 information
 lyrics
 morze
