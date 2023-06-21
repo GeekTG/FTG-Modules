@@ -2,42 +2,45 @@
 
 # requires: requests Pillow cryptg
 
-import logging
 import hashlib
-import json
-import requests
 import io
+import json
+import logging
+
 import PIL
+import requests
 from telethon import utils
 from telethon.tl.types import (
+    ChannelParticipantCreator,
+    ChannelParticipantsAdmins,
+    ChatPhotoEmpty,
+    DocumentAttributeSticker,
     Message,
     MessageEntityBold,
+    MessageEntityBotCommand,
+    MessageEntityCashtag,
+    MessageEntityCode,
+    MessageEntityHashtag,
     MessageEntityItalic,
     MessageEntityMention,
-    MessageEntityTextUrl,
-    MessageEntityCode,
     MessageEntityMentionName,
-    MessageEntityHashtag,
-    MessageEntityCashtag,
-    MessageEntityBotCommand,
-    MessageEntityUrl,
-    MessageEntityStrike,
-    MessageEntityUnderline,
     MessageEntityPhone,
-    ChatPhotoEmpty,
-    MessageMediaPhoto,
+    MessageEntityStrike,
+    MessageEntityTextUrl,
+    MessageEntityUnderline,
+    MessageEntityUrl,
     MessageMediaDocument,
+    MessageMediaPhoto,
     MessageMediaWebPage,
-    User,
-    PeerUser,
     PeerBlocked,
     PeerChannel,
     PeerChat,
-    DocumentAttributeSticker,
-    ChannelParticipantsAdmins,
-    ChannelParticipantCreator,
+    PeerUser,
+    User,
 )
-from .. import loader, utils as ftgUtils
+
+from .. import loader
+from .. import utils as ftgUtils
 
 logger = logging.getLogger(__name__)
 

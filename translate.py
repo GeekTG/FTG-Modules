@@ -5,8 +5,7 @@
 # requires: googletrans==4.0.0rc1
 
 from googletrans import LANGUAGES, Translator
-from telethon import events
-from telethon import functions
+from telethon import events, functions
 from telethon.errors.rpcerrorlist import YouBlockedUserError
 
 from .. import loader, utils

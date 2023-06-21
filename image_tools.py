@@ -4,11 +4,12 @@
 
 import io
 import logging
+import random
 import string
 from io import BytesIO as ist
+from random import randint, uniform
 
-from PIL import Image, ImageDraw
-from PIL import ImageEnhance
+from PIL import Image, ImageDraw, ImageEnhance
 from PIL import ImageOps
 from PIL import ImageOps as IO
 from telethon import events
@@ -16,9 +17,8 @@ from telethon.errors.rpcerrorlist import YouBlockedUserError
 from telethon.tl.types import DocumentAttributeFilename
 from telethon.tl.types import DocumentAttributeFilename as DAF
 
-import random
-from random import randint, uniform
-from .. import loader, utils
+from .. import loader
+from .. import utils
 from .. import utils as U
 
 logger = logging.getLogger(__name__)
@@ -263,7 +263,7 @@ async def dotify(message, reply, pix, mode):
     [_.thumbnail((pix, pix)) for _ in [im, im_]]
     w, h = im.size
     img = Image.new(im_.mode, (w * count + (count // 2), h * count + (count // 2)), 0)
-    draw = ImageDraw.Draw(img)
+    ImageDraw.Draw(img)
 
     def cirsle(im, x, y, r, fill):
         x += r // 2

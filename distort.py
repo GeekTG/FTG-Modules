@@ -146,7 +146,7 @@ async def distort(file, rescale_rate):
     img.liquid_rescale(popx, popy, delta_x=1, rigidity=0)
     img.resize(x, y)
     out = io.BytesIO()
-    out.name = f"output.png"
+    out.name = "output.png"
     img.save(file=out)
     return io.BytesIO(out.getvalue())
 

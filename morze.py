@@ -94,7 +94,6 @@ class MorzeMod(loader.Module):
             )
         x = ""
         for word in text.split():
-
             for letter in word.upper():
                 x += de[letter]
             x += " "
@@ -177,7 +176,6 @@ class MorzeMod(loader.Module):
             )
         x = ""
         for word in text.split("  "):
-
             for letter in word.split():
                 x += en[letter].lower()
             x += " "

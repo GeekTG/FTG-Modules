@@ -10,8 +10,8 @@ from telethon.tl.functions.messages import GetHistoryRequest
 from telethon.tl.functions.photos import GetUserPhotosRequest
 from telethon.tl.functions.users import GetFullUserRequest
 from telethon.tl.types import (
-    MessageActionChannelMigrateFrom,
     ChannelParticipantsAdmins,
+    MessageActionChannelMigrateFrom,
     UserStatusOnline,
 )
 
@@ -256,10 +256,10 @@ async def get_chat_info(chat, message):
     if former_title is not None:
         caption += f"<b>Previous name:</b> {former_title}\n"
     if username is not None:
-        caption += f"<b>Group Type:</b> Public\n"
+        caption += "<b>Group Type:</b> Public\n"
         caption += f"<b>Link:</b> {username}\n"
     else:
-        caption += f"<b>Group Type:</b> Private\n"
+        caption += "<b>Group Type:</b> Private\n"
     if creator_username is not None:
         caption += f"<b>The Creator:</b> <code>{creator_username}</code>\n"
     elif creator_valid:

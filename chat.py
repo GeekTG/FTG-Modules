@@ -51,7 +51,9 @@ class ChatMod(loader.Module):
 
         try:
             if args:
-                user = await message.client.get_entity(int(args) if args.isdigit() else args)
+                user = await message.client.get_entity(
+                    int(args) if args.isdigit() else args
+                )
             else:
                 user = await message.client.get_entity(reply.sender_id)
         except ValueError:
@@ -405,7 +407,9 @@ class ChatMod(loader.Module):
         args = utils.get_args_raw(message)
         reply = await message.get_reply_message()
         if args:
-            user = await message.client.get_entity(int(args) if args.isnumeric() else args)
+            user = await message.client.get_entity(
+                int(args) if args.isnumeric() else args
+            )
         if reply:
             user = await message.client.get_entity(reply.sender_id)
         else:

@@ -44,7 +44,7 @@ class FileUploaderMod(loader.Module):
             file.name = reply.file.name or reply.file.id + reply.file.ext
         try:
             x0at = post("https://x0.at", files={"file": file})
-        except ConnectionError as e:
+        except ConnectionError:
             await message.edit("<b>Error</b>")
             return
         url = x0at.text
@@ -78,7 +78,6 @@ class FileUploaderMod(loader.Module):
         chat = "@ImgUploadBot"
         reply = await message.get_reply_message()
         async with message.client.conversation(chat) as conv:
-
             if not reply:
                 await message.edit("<b>Reply to photo</b>")
                 return

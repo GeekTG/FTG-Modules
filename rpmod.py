@@ -10,8 +10,10 @@ except:
     mod_inst = subprocess.Popen("pip install emoji", shell=True)
     mod_inst.wait()
     import emoji
-from .. import loader, utils
+
 import string
+
+from .. import loader, utils
 
 
 @loader.tds
@@ -91,20 +93,20 @@ class RPMod(loader.Module):
                         or x in string.punctuation
                     ):
                         await message.edit(
-                            f"<b>Были введены не только эмодзи(пробел тоже символ). </b>"
+                            "<b>Были введены не только эмодзи(пробел тоже символ). </b>"
                         )
                         return
                 if len(lst) > 3:
-                    await message.edit(f"<b>Было введено более 3 эмодзи. </b>")
+                    await message.edit("<b>Было введено более 3 эмодзи. </b>")
                     return
                 if not emoji_rp or not emoji_rp.strip():
                     await message.edit(
-                        f"<b>Разделитель для эмодзи есть, а их нет? хм.</b>"
+                        "<b>Разделитель для эмодзи есть, а их нет? хм.</b>"
                     )
                     return
                 if len(lst) == 0:
                     await message.edit(
-                        f"<b>В 3 секции были введены не эмодзи. Если были введены эмодзи, но всё равно выходит ошибка, обратись к: </b>@trololo_1"
+                        "<b>В 3 секции были введены не эмодзи. Если были введены эмодзи, но всё равно выходит ошибка, обратись к: </b>@trololo_1"
                     )
                     return
 
@@ -253,7 +255,7 @@ class RPMod(loader.Module):
         else:
             if len(lst) + len(nick) >= 45:
                 await message.edit(
-                    f"<b>Ник превышает лимит в 45 символов(возможно эмодзи имеют длину более 1 символа).</b>"
+                    "<b>Ник превышает лимит в 45 символов(возможно эмодзи имеют длину более 1 символа).</b>"
                 )
             else:
                 self.db.set("RPMod", "rpnick", r)
@@ -298,7 +300,7 @@ class RPMod(loader.Module):
                                 lst.append(x)
                             if not x or not x.strip():
                                 await message.edit(
-                                    f"<b>Пустое значение в словаре для эмодзи? Да ты гений.</b>"
+                                    "<b>Пустое значение в словаре для эмодзи? Да ты гений.</b>"
                                 )
                                 return
                             if (
@@ -308,12 +310,12 @@ class RPMod(loader.Module):
                                 or x in string.punctuation
                             ):
                                 await message.edit(
-                                    f"<b>Были введены не только эмодзи в словаре для эмодзи(пробел тоже символ). </b>"
+                                    "<b>Были введены не только эмодзи в словаре для эмодзи(пробел тоже символ). </b>"
                                 )
                                 return
                             if len(lst) > 3:
                                 await message.edit(
-                                    f"<b>Было введено более 3 эмодзи в словаре для эмодзи. </b>"
+                                    "<b>Было введено более 3 эмодзи в словаре для эмодзи. </b>"
                                 )
                                 return
 
@@ -326,7 +328,7 @@ class RPMod(loader.Module):
                                 return
                             if not x or not x.strip():
                                 await message.edit(
-                                    f"<b>Пустой ключ в словаре для эмодзи? Да ты умничка.</b>"
+                                    "<b>Пустой ключ в словаре для эмодзи? Да ты умничка.</b>"
                                 )
                                 return
                 com = eval(comands)
@@ -343,13 +345,13 @@ class RPMod(loader.Module):
                             return
                         if not x or not x.strip():
                             await message.edit(
-                                f"<b>Пустой ключ в словаре для команд? Мой хороший, так дела не делаются.</b>"
+                                "<b>Пустой ключ в словаре для команд? Мой хороший, так дела не делаются.</b>"
                             )
                             return
                     for x in com.values():
                         if not x or not x.strip():
                             await message.edit(
-                                f"<b>Пустое значение в словаре для команд? Не сегодня, мой золотой.</b>"
+                                "<b>Пустое значение в словаре для команд? Не сегодня, мой золотой.</b>"
                             )
                             return
                     if count_emoji == 1:
@@ -360,22 +362,22 @@ class RPMod(loader.Module):
                         self.db.set("RPMod", "rpcomands", merge_com)
                         self.db.set("RPMod", "rpemoji", merge_emj)
                         await message.edit(
-                            f"<b>Успешное обновлени словаря команд и эмодзи! Вы можете просмотреть их благодаря команде '<code>.rplist</code>'.</b>"
+                            "<b>Успешное обновлени словаря команд и эмодзи! Вы можете просмотреть их благодаря команде '<code>.rplist</code>'.</b>"
                         )
                     else:
                         comand_copy = comand.copy()
                         merge_com = {**comand_copy, **com}
                         self.db.set("RPMod", "rpcomands", merge_com)
                         await message.edit(
-                            f"<b>Успешное обновлени словаря команд! Вы можете просмотреть его благодаря команде '<code>.rplist</code>'.</b>"
+                            "<b>Успешное обновлени словаря команд! Вы можете просмотреть его благодаря команде '<code>.rplist</code>'.</b>"
                         )
                 else:
                     await message.edit(
-                        f"<b>Синтаксис секции команд не является корректным(словарём в питоне).</b>"
+                        "<b>Синтаксис секции команд не является корректным(словарём в питоне).</b>"
                     )
             except:
                 await message.edit(
-                    f"<b>Что то не так с разделителями /.\nЛибо не корректный словарь.(либо вообще пусто)</b>"
+                    "<b>Что то не так с разделителями /.\nЛибо не корректный словарь.(либо вообще пусто)</b>"
                 )
 
     async def rpblockcmd(self, message):
@@ -420,11 +422,11 @@ class RPMod(loader.Module):
                     f"<i>Чат <b><u>{name}</u></b>(<code>{args}</code>) удален из исключений.</i>"
                 )
             else:
-                await message.edit(f"<b>Неверный ид.</b>")
+                await message.edit("<b>Неверный ид.</b>")
         elif args == "list":
             ex_len = len(ex_copy)
             if ex_len == 0:
-                await message.edit(f"<b>Список исключений пуст.</b>")
+                await message.edit("<b>Список исключений пуст.</b>")
                 return
             sms = f"<i> Чаты, которые есть в исключениях({ex_len}):</i>"
             for i in ex_copy:

@@ -72,7 +72,9 @@ class noTerminalMod(loader.Module):
             asset_id = self.db.get("friendly-telegram.modules.notes", "notes", {}).get(
                 args[0].lower(), None
             )
-            asset = await self.db.fetch_asset(asset_id) if asset_id is not None else None
+            asset = (
+                await self.db.fetch_asset(asset_id) if asset_id is not None else None
+            )
         if asset is None:
             await utils.answer(message, self.strings("no_note", message))
             return
@@ -149,7 +151,7 @@ class noTerminalMod(loader.Module):
 
 
 def hash_msg(message):
-    return f'{utils.get_chat_id(message)}/{message.id}'
+    return f"{utils.get_chat_id(message)}/{message.id}"
 
 
 async def read_stream(func, stream, delay):

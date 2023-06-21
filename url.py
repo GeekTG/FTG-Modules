@@ -7,8 +7,7 @@ import os
 import urllib
 
 from requests import post
-from telethon import events
-from telethon import functions
+from telethon import events, functions
 from telethon.errors.rpcerrorlist import YouBlockedUserError
 
 from .. import loader, utils

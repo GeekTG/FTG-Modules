@@ -7,10 +7,9 @@ import os
 from asyncio import sleep
 
 from requests import get
-from telethon import events
-from telethon import functions
+from telethon import events, functions
 from telethon.errors.rpcerrorlist import YouBlockedUserError
-from telethon.tl.types import MessageEntityUrl, MessageEntityTextUrl
+from telethon.tl.types import MessageEntityTextUrl, MessageEntityUrl
 
 from .. import loader, utils
 

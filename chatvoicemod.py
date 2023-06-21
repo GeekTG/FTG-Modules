@@ -27,8 +27,7 @@ import pytgcalls
 import youtube_dl
 from pytgcalls import PyTgCalls, StreamType
 from pytgcalls.types.input_stream import AudioPiped, AudioVideoPiped
-from pytgcalls.types.input_stream.quality import (HighQualityAudio,
-                                                  HighQualityVideo)
+from pytgcalls.types.input_stream.quality import HighQualityAudio, HighQualityVideo
 from telethon import types
 
 from .. import loader, utils
@@ -37,6 +36,7 @@ from .. import loader, utils
 @loader.tds
 class ChatVoiceMod(loader.Module):
     """Module for working with voicechat"""
+
     strings = {
         "name": "ChatVoiceMod",
         "downloading": "<b>[ChatVoiceMod]</b> Downloading...",
@@ -55,21 +55,25 @@ class ChatVoiceMod(loader.Module):
     async def client_ready(self, client, _):
         self.client = client
         self.call = PyTgCalls(client)
+
         @self.call.on_stream_end()
         async def _h(_, update):
             try:
                 await self.call.leave_group_call(update.chat_id)
             except:
                 pass
+
         await self.call.start()
 
     async def parse_args(self, args):
-        if not args or not re.match(r'http(?:s?):\/\/(?:www\.)?youtu(?:be\.com\/watch\?v=|\.be\/)([\w\-\_]*)(&(amp;)?‌​[\w\?‌​=]*)?', args):
+        if not args or not re.match(
+            r"http(?:s?):\/\/(?:www\.)?youtu(?:be\.com\/watch\?v=|\.be\/)([\w\-\_]*)(&(amp;)?‌​[\w\?‌​=]*)?",
+            args,
+        ):
             return args
-        with youtube_dl.YoutubeDL({'format': 'best'}) as ydl:
-            info = ydl.extract_info(
-                args, download=False)
-            return info['formats'][0]['url']
+        with youtube_dl.YoutubeDL({"format": "best"}) as ydl:
+            info = ydl.extract_info(args, download=False)
+            return info["formats"][0]["url"]
 
     async def cplayvcmd(self, m: types.Message):
         "<link/path/reply_to_video> - Play video in voice chat"
@@ -94,7 +98,7 @@ class ChatVoiceMod(loader.Module):
                     HighQualityAudio(),
                     HighQualityVideo(),
                 ),
-                stream_type=StreamType().pulse_stream
+                stream_type=StreamType().pulse_stream,
             )
             await utils.answer(m, self.strings("playing"))
         except Exception as e:
@@ -122,7 +126,7 @@ class ChatVoiceMod(loader.Module):
                     path,
                     HighQualityAudio(),
                 ),
-                stream_type=StreamType().pulse_stream
+                stream_type=StreamType().pulse_stream,
             )
             await utils.answer(m, self.strings("playing"))
         except Exception as e:

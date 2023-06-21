@@ -3,10 +3,10 @@
 # Module author: @ftgmodulesbyfl1yd, @GovnoCodules
 
 from asyncio import sleep
+from random import randint
 
 from telethon import functions
 
-from random import randint
 from .. import loader, utils
 
 

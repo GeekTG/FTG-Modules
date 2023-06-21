@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Module author: @GovnoCodules, @ftgmodulesbyfl1yd
+# Module author: @GovnoCodules, @ftgmodulesbyfl1yd, @D4n13l3k00
 
 # requires: Pillow
 
@@ -158,11 +158,11 @@ async def cmds(message, type_):
             or not reply.media
             or not any(
                 True
-                for _ in ("sticker", "photo", "video", "video_note")
+                for _ in ("sticker", "photo", "video", "video_note", "animation")
                 if getattr(reply, _, None) is not None
             )
         ):
-            return await message.edit("<b>Reply to photo/video/sticker</b>")
+            return await message.edit("<b>Reply to photo/video/sticker/gif</b>")
         if reply.file.size > 4194304:
             return await message.edit("<b>Video only up to 4mb</b>")
         args = utils.get_args_raw(message) or reply.message

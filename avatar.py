@@ -5,11 +5,10 @@
 import os
 
 from telethon import functions
-
-from .. import loader, utils
-
 from telethon.errors.rpcerrorlist import UsernameOccupiedError
 from telethon.tl.functions.account import UpdateProfileRequest, UpdateUsernameRequest
+
+from .. import loader, utils
 
 
 class GetPPMod(loader.Module):
@@ -71,9 +70,7 @@ class GetPPMod(loader.Module):
             try:
                 reply = await message.get_reply_message()
                 if not reply:
-                    return await message.edit(
-                        "No reply to a media."
-                    )
+                    return await message.edit("No reply to a media.")
                 await message.edit("Downloading...")
                 if reply.video:
                     await message.client.download_media(reply.media, "ava.mp4")

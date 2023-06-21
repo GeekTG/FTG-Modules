@@ -6,7 +6,7 @@ import requests
 from telethon.tl.functions.channels import EditBannedRequest as eb
 from telethon.tl.types import ChatBannedRights as cb
 
-from .. import utils, loader
+from .. import loader, utils
 
 
 @loader.tds
@@ -152,7 +152,7 @@ class BanWordsMod(loader.Module):
         if not message.is_private:
             chat = await message.get_chat()
             if chat.admin_rights or chat.creator:
-                if chat.admin_rights.delete_messages == False:
+                if chat.admin_rights.delete_messages is False:
                     return await message.edit("<b>У меня нет нужных прав.</b>")
 
             else:
@@ -209,7 +209,7 @@ class BanWordsMod(loader.Module):
                 words["stats"][chat_id].update({"action": "none"})
             else:
                 return await message.edit(
-                    f"<b>[BanWords]</b> Такого режима нет в списке. Есть: kick/ban/mute/none."
+                    "<b>[BanWords]</b> Такого режима нет в списке. Есть: kick/ban/mute/none."
                 )
             self.db.set("BanWords", "bws", words)
             return await message.edit(
@@ -229,7 +229,7 @@ class BanWordsMod(loader.Module):
             if chat_id not in str(words):
                 return
             action = words["stats"][chat_id]["action"]
-            if words["stats"][chat_id]["antimat"] == True:
+            if words["stats"][chat_id]["antimat"] is True:
                 r = requests.get("https://api.fl1yd.ml/badwords")
                 ls = r.text.split(", ")
             else:
